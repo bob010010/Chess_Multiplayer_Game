@@ -1,10 +1,18 @@
 extends CharacterBody2D
 
-const SPEED = 300.0
-var input_dir = Vector2.ZERO
-var knockback = Vector2.ZERO
-var damage: int = 0
-var shooting = false
+const SPEED: int = 300
+
+var input_dir: Vector2 = Vector2.ZERO
+var knockback: Vector2 = Vector2.ZERO
+var health: int = 500
+var body_damage: int = 0
+
+var shooting: bool = false
+var reload_speed: float = 0.2
+var shot_cooldown: float = reload_speed
+var bullet_speed: int = 500
+var bullet_damage: int = 0
+
 
 func _ready():
 	# Color ourselves green and enemies red
@@ -18,13 +26,17 @@ func _ready():
 
 func _process(_delta):
 	# Only update the text on our own screen
-	if name == str(multiplayer.get_unique_id()):
-		var pos_text = "Position: " + str(Vector2(int(position.x), int(position.y)))
-		var kb_text = "Knockback: " + str(Vector2(int(knockback.x), int(knockback.y)))
-		var dmg_text = "Damage: " + str(damage)
-		var shoot_text = "Shooting: " + str(shooting)
+	if name == str(multiplayer.get_unique_id()): 
+		var health_text = "Health: " + str(health) + "\n"
+		var pos_text = "Position: " + str(Vector2(int(position.x), int(position.y))) + "\n"
+		var kb_text = "Knockback: " + str(Vector2(int(knockback.x), int(knockback.y))) + "\n"
+		var body_dmg_text = "Body Damage: " + str(body_damage) + "\n"
+		var bullet_dmg_text = "Bullet Damage: " + str(bullet_damage) + "\n"
+		var bullet_speed_text = "Bullet Speed: " + str(bullet_speed) + "\n"
+		var shoot_text = "Shooting: " + str(shooting) + "\n"
+		var cooldown_text = "Cooldown: " + str(round(shot_cooldown)) + "\n"
 		
-		$HUD/StatsLabel.text = pos_text + "\n" + kb_text + "\n" + dmg_text + "\n" + shoot_text
+		$HUD/StatsLabel.text = health_text + pos_text + kb_text + body_dmg_text + bullet_dmg_text + bullet_speed_text + shoot_text + cooldown_text
 		
 			
 func _physics_process(delta):
@@ -58,34 +70,48 @@ func _physics_process(delta):
 				collider.apply_bounce(-normal * 500)
 				
 				if collider.is_in_group("food"):
-					collider.take_damage(2)
-					damage += 2 # Increment damage when we eat!
-
+					collider.take_damage(body_damage)
+					body_damage += 2
+					bullet_damage += 2
+					bullet_speed += 20
+		
+		if shot_cooldown > 0:
+			shot_cooldown -= delta
+			shooting = true
+		else:
+			shooting = false
 
 func apply_bounce(force: Vector2):
 	if multiplayer.is_server():
 		knockback = force
+
+func take_damage(amount: int):
+	if multiplayer.is_server():
+		health -= amount
+		print(str(health))
+		if health <= 0:
+			queue_free()
 
 # Add these new functions at the bottom of player.gd:
 func _input(event):
 	# Only the local client window detects their own mouse clicks
 	if name == str(multiplayer.get_unique_id()):
 		if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+			if shot_cooldown <= 0:
+				# Get the direction from our pawn to the mouse cursor
+				var click_pos = get_global_mouse_position()
+				var shoot_dir = (click_pos - global_position).normalized()
+				# Tell the server we want to shoot!
+				rpc_id(1, "request_shoot", shoot_dir)
+				shot_cooldown = reload_speed
 			
-			# Get the direction from our pawn to the mouse cursor
-			var click_pos = get_global_mouse_position()
-			var shoot_dir = (click_pos - global_position).normalized()
-			shooting = true
-			# Tell the server we want to shoot!
-			rpc_id(1, "request_shoot", shoot_dir)
 
 @rpc("any_peer", "call_local", "reliable")
 func request_shoot(dir: Vector2):
 	if multiplayer.is_server():
-		# Security check: verify the person sending the RPC is actually this player
 		if str(multiplayer.get_remote_sender_id()) == name:
-			# Call the spawn function on the Main scene
-			get_tree().current_scene.spawn_bullet(global_position, dir, name)
+			# Look at Main, then grab the SpawnedBullets node, THEN call spawn_bullet
+			get_tree().current_scene.get_node("SpawnedBullets").spawn_bullet(global_position, dir, name, bullet_speed, bullet_damage)
 
 # 3. THIS FUNCTION RUNS ON THE SERVER WHEN A CLIENT PRESSES A KEY
 @rpc("any_peer", "call_remote", "unreliable")

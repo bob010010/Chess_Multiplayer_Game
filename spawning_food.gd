@@ -21,7 +21,7 @@ func _process(delta):
 			# Using float() to ensure smooth division and prevent integer truncation
 			var current_food = max(get_child_count(), 1.0)
 			spawn_timer = 20.0 / (float(owner.max_food) / current_food)
-			print("Next food in: ", spawn_timer, " seconds")
+			#print("Next food in: ", spawn_timer, " seconds")
 
 func _spawn_random_food():
 	var food_instance = food_scene.instantiate()

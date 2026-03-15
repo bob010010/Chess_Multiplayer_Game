@@ -1,8 +1,10 @@
 extends Area2D
 
-const SPEED = 800.0
+var speed = 100.0
 var direction = Vector2.ZERO
+var damage = 1
 var shooter_id = "" # So we don't shoot ourselves!
+var time_to_live = 1
 
 func _ready():
 	if multiplayer.is_server():
@@ -11,7 +13,11 @@ func _ready():
 func _physics_process(delta):
 	# Only the server moves the bullet. The Synchronizer updates the clients.
 	if multiplayer.is_server():
-		position += direction * SPEED * delta
+		position += direction * speed * delta
+		time_to_live -= delta
+		if (time_to_live <= 0):
+			queue_free()
+
 
 func _on_body_entered(body):
 	if multiplayer.is_server():
@@ -24,8 +30,9 @@ func _on_body_entered(body):
 			body.apply_bounce(direction * 250)
 			
 			# Optional: Make the bullet do damage if they have a take_damage method
-			if body.is_in_group("food"):
-				body.take_damage(50)
+			if body.is_in_group("food") or body.is_in_group("player"):
+				body.take_damage(damage)
+				print("Damage done by bullet: " + str(damage))
 		
 		# Destroy the bullet after it hits anything (including walls)
 		queue_free()

@@ -4,6 +4,7 @@ const SPEED: int = 300
 
 var input_dir: Vector2 = Vector2.ZERO
 var knockback: Vector2 = Vector2.ZERO
+var max_health: int = 500
 var health: int = 500
 var body_damage: int = 0
 
@@ -34,7 +35,7 @@ func _process(_delta):
 		var bullet_dmg_text = "Bullet Damage: " + str(bullet_damage) + "\n"
 		var bullet_speed_text = "Bullet Speed: " + str(bullet_speed) + "\n"
 		var shoot_text = "Shooting: " + str(shooting) + "\n"
-		var cooldown_text = "Cooldown: " + str(round(shot_cooldown)) + "\n"
+		var cooldown_text = "Cooldown: " + str(snapped(shot_cooldown, 0.01)) + "\n"
 		
 		$HUD/StatsLabel.text = health_text + pos_text + kb_text + body_dmg_text + bullet_dmg_text + bullet_speed_text + shoot_text + cooldown_text
 		
@@ -92,25 +93,32 @@ func take_damage(amount: int):
 		if health <= 0:
 			queue_free()
 
-# Add these new functions at the bottom of player.gd:
 func _input(event):
 	# Only the local client window detects their own mouse clicks
 	if name == str(multiplayer.get_unique_id()):
 		if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-			if shot_cooldown <= 0:
-				# Get the direction from our pawn to the mouse cursor
-				var click_pos = get_global_mouse_position()
-				var shoot_dir = (click_pos - global_position).normalized()
-				# Tell the server we want to shoot!
-				rpc_id(1, "request_shoot", shoot_dir)
-				shot_cooldown = reload_speed
 			
+			var click_pos = get_global_mouse_position()
+			var shoot_dir = (click_pos - global_position).normalized()
+			shooting = true
+			
+			# NEW LOGIC: Separate the Host and the Client
+			if multiplayer.is_server():
+				# The Host is the server! Just spawn the bullet directly.
+				get_tree().current_scene.get_node("SpawnedBullets").spawn_bullet(global_position, shoot_dir, name, bullet_speed, bullet_damage)
+			else:
+				# The Client asks the Server to shoot.
+				rpc_id(1, "request_shoot", shoot_dir)
 
-@rpc("any_peer", "call_local", "reliable")
+# Notice we changed "call_local" back to "call_remote" since the Host doesn't use this anymore
+@rpc("any_peer", "call_remote", "reliable")
 func request_shoot(dir: Vector2):
 	if multiplayer.is_server():
+		# Optional: A print statement so you can literally see the server hear the client!
+		print("Server received shoot request from Client ID: ", multiplayer.get_remote_sender_id())
+		
+		# Security check: verify the person sending the RPC is actually this player
 		if str(multiplayer.get_remote_sender_id()) == name:
-			# Look at Main, then grab the SpawnedBullets node, THEN call spawn_bullet
 			get_tree().current_scene.get_node("SpawnedBullets").spawn_bullet(global_position, dir, name, bullet_speed, bullet_damage)
 
 # 3. THIS FUNCTION RUNS ON THE SERVER WHEN A CLIENT PRESSES A KEY

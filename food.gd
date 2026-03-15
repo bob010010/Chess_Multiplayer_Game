@@ -1,7 +1,8 @@
 extends CharacterBody2D
 
 @export var health: int = 100
-var knockback = Vector2.ZERO
+var max_health: int = 100
+var knockback: Vector2 = Vector2.ZERO
 
 @export var shape_type: int = 0:
 	set(value):

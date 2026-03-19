@@ -37,7 +37,7 @@ var shielding: bool = false
 
 var knockback: Vector2 = Vector2.ZERO
 var knockback_force: int = 500
-var body_damage: int = 5
+var body_damage: int = 20
 var ranks: Array[String] = ["Knight", "Rook", "Bishop"]
 
 # Initializes UI, colors, and connects component signals.
@@ -173,10 +173,10 @@ func _update_ui_points(new_points: int):
 
 # Populates the upgrade UI with valid random stat choices based on equipped weapons.
 func _show_upgrade_menu() -> void:
-	var valid_stats: Array[String] = ["max_health", "body_damage"]
+	var valid_stats: Array[String] = ["max_health", "regen_amount", "regen_speed", "body_damage", "player_speed"]
 	
 	if ranged_w_component:
-		valid_stats.append_array(["bullet_damage", "bullet_speed", "reload_speed"])
+		valid_stats.append_array(["bullet_damage", "bullet_speed", "reload_speed", "accuracy"])
 	if melee_w_component:
 		valid_stats.append_array(["melee_damage", "melee_knockback", "melee_cooldown"])
 	if area_w_component:
@@ -294,18 +294,22 @@ func _change_a_weapon(area_weapon_type: String):
 # Compiles and displays internal entity variables to the local HUD.
 func show_debug_info() -> void:
 	
-	#POSITION
-	var pos_text: String = "Position: " + str(Vector2(int(position.x), int(position.y))) + "\n\n"
-	
+	#POSITION AND SPEED
+	var pos_text: String = "Position: " + str(Vector2(int(position.x), int(position.y))) + "\n"
+	var speed_text: String = "Speed: " + str(movement_component.player_speed) + "\n\n"
+
 	#HEALTH
 	var max_health_text: String = "Max Health: " + str(health_component.max_health) + "\n"
-	var health_text: String = "Health: " + str(health_component.health) + "\n\n"
+	var health_text: String = "Health: " + str(health_component.health) + "\n"
+	var regen_amount_text: String = "Regen Amount: " + str(health_component.regen_amount) + "\n"
+	var regen_speed_text: String = "Regen Speed: " + str(health_component.regen_speed) + "\n"
+	var regen_cooldown_text: String = "Regen Cooldown: " + str(snapped(health_component.regen_cooldown, 0.1)) + "\n\n"
 	
 	#KNOCKBACK AND BODY DAMAGE
 	var kb_text: String = "Knockback: " + str(Vector2(int(knockback.x), int(knockback.y))) + "\n"
 	var body_dmg_text: String = "Body Damage: " + str(body_damage) + "\n\n"
 	
-	$HUD/StatsLabel.text = max_health_text + health_text + pos_text + kb_text + body_dmg_text
+	$HUD/StatsLabel.text = max_health_text + health_text + regen_amount_text + regen_speed_text + regen_cooldown_text + pos_text + speed_text + kb_text + body_dmg_text
 
 	#RANGED COMBAT
 	if ranged_w_component:
@@ -313,8 +317,9 @@ func show_debug_info() -> void:
 		var bullet_speed_text: String = "Bullet Speed: " + str(ranged_w_component.bullet_speed) + "\n\n"
 		var shoot_text: String = "Shooting: " + str(ranged_w_component.shooting) + "\n"
 		var reload_time_text: String = "Reload Time: " + str(ranged_w_component.reload_speed)+ "\n"
-		var cooldown_text: String = "Cooldown: " + str(snapped(ranged_w_component.shot_cooldown, 0.01)) + "\n\n"
-		$HUD/StatsLabel.text += bullet_dmg_text + bullet_speed_text + shoot_text + reload_time_text + cooldown_text
+		var cooldown_text: String = "Cooldown: " + str(snapped(ranged_w_component.shot_cooldown, 0.01)) + "\n"
+		var accuracy_text: String = "Accuracy: " + str(snapped(ranged_w_component.accuracy, 0.01)) + "\n\n"
+		$HUD/StatsLabel.text += bullet_dmg_text + bullet_speed_text + shoot_text + reload_time_text + cooldown_text + accuracy_text
 	else:
 		var no_ranged_text: String = "No Ranged Weapon" + "\n" + "\n"
 		$HUD/StatsLabel.text += no_ranged_text

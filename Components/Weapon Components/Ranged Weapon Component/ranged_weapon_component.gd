@@ -12,7 +12,7 @@ var shot_cooldown: float = reload_speed
 var bullet_speed: int = 500
 var bullet_damage: int = 150
 var recoil_strength: int = 30
-
+var accuracy: float = 80.0
 
 # Both the server and the local client need to run the reload timer
 func _physics_process(delta: float) -> void:
@@ -27,6 +27,12 @@ func shoot(click_pos: Vector2) -> void:
 		return
 		
 	var shoot_dir: Vector2 = (click_pos - player.global_position).normalized()
+	
+	#Adds bloom to create inaccuracy
+	var accuracy_r = 100 - accuracy # So increasing accuracy decreases bloom
+	var bloom_amount: float = randf_range(-accuracy_r/500, accuracy_r/500)
+	var dir_with_bloom: Vector2 = Vector2(shoot_dir.x + bloom_amount, shoot_dir.y + bloom_amount)
+	shoot_dir = dir_with_bloom
 	
 	shot_cooldown = reload_speed
 	shooting = true

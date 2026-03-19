@@ -14,7 +14,7 @@ func trigger_visual_attack(target_pos: Vector2) -> void:
 	
 	var forward_pos: Vector2 = position + (transform.x * lunge_distance)
 	active_tween = create_tween()
-	
+	active_tween.set_process_mode(Tween.TWEEN_PROCESS_PHYSICS) # Stops tunelling
 	active_tween.tween_property(self, "position", forward_pos, attack_duration * 0.3).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	active_tween.tween_property(self, "position", default_position, attack_duration * 0.7).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 

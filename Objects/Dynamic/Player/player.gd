@@ -3,10 +3,13 @@ extends CharacterBody2D
 @onready var movement_component: Node = $Components/MovementComponent
 @onready var health_component: Node = $Components/HealthComponent
 @onready var leveling_component: Node = $Components/LevelingComponent
+@onready var shield_component: Node2D = $Components/ShieldComponent
 @onready var sprite_component: Sprite2D = $PlayerSprite
 var ranged_w_component: Node
 var melee_w_component: Node
 var area_w_component: Node
+
+var shielding: bool = false
 
 @export var current_class: String = "Pawn":
 	set(value):
@@ -14,19 +17,19 @@ var area_w_component: Node
 		if is_node_ready():
 			sprite_component._on_promotion_applied(value)
 
-@export var current_melee_weapon: String = "Spear":
+@export var current_melee_weapon: String = "Sword":
 	set(value):
 		current_melee_weapon = value
 		if is_node_ready():
 			_change_m_weapon(value)
 
-@export var current_ranged_weapon: String = "None":
+@export var current_ranged_weapon: String = "Ranged_Spell":
 	set(value):
 		current_ranged_weapon = value
 		if is_node_ready():
 			_change_r_weapon(value)
 			
-@export var current_area_weapon: String = "None":
+@export var current_area_weapon: String = "Magic":
 	set(value):
 		current_area_weapon = value
 		if is_node_ready():
@@ -75,9 +78,11 @@ func _process(_delta: float) -> void:
 # Processes server-side physics and calls local client input gathering.
 func _physics_process(delta: float) -> void:
 	if name == str(multiplayer.get_unique_id()):
+		#if not shielding: # TODO Add this back in
 		check_ranged_input()
 		check_melee_input()
 		check_area_input()
+		check_shield_input()
 
 	if multiplayer.is_server():
 		decrease_knockback(delta)
@@ -99,6 +104,14 @@ func check_melee_input() -> void:
 func check_area_input() -> void:
 	if area_w_component and Input.is_action_just_pressed("area"):
 		area_w_component.request_area_attack.rpc_id(1)
+
+# Evaluates continuous input to request shield activation and deactivation from the server.
+func check_shield_input() -> void:
+	if shield_component:
+		if Input.is_action_just_pressed("shield"):
+			shield_component.request_shield_activation.rpc_id(1)
+		#elif Input.is_action_just_released("shield"): #Comment out this for testing
+			#shield_component.request_shield_deactivation.rpc_id(1)
 
 # Smoothly decays physical knockback momentum over time.
 func decrease_knockback(delta: float) -> void:
@@ -227,9 +240,9 @@ func _change_m_weapon(weapon_type: String) -> void:
 					
 			melee_w_component.show()
 			melee_w_component.process_mode = Node.PROCESS_MODE_INHERIT
+			print("Set melee weapon: " + weapon_type)
 		"None":
 			if melee_w_component:
-				print("Hiding melee")
 				melee_w_component.hide()
 				melee_w_component.process_mode = Node.PROCESS_MODE_DISABLED
 				melee_w_component = null
@@ -257,7 +270,7 @@ func _change_r_weapon(weapon_type: String) -> void:
 
 # Updates the active area weapon references, hides visuals, and disables processing for unused components.
 func _change_a_weapon(area_weapon_type: String):
-	print("Changing area weapon to: " + area_weapon_type)
+	#print("Changing area weapon to: " + area_weapon_type)
 	match area_weapon_type:
 		"Magic":
 			var magic = $"Components/Magic Area Weapon Component"
@@ -328,12 +341,21 @@ func show_debug_info() -> void:
 	else:
 		var no_area_text: String = "No Area Weapon" + "\n" + "\n"
 		$HUD/StatsLabel.text += no_area_text
-
+	
+	if shield_component:
+		var max_shield_health_text = "Max Shield Health: " + str(shield_component.max_shield_health) + "\n"
+		var shield_health_text = "Shield Health: " + str(shield_component.shield_health) + "\n"
+		var duration_text = "Total Shield Duration: " + str(shield_component.active_duration) + "\n\n"
+		$HUD/StatsLabel2.text = max_shield_health_text + shield_health_text + duration_text
+	else:
+		var no_shield_text: String = "No Shield" + "\n" + "\n"
+		$HUD/StatsLabel2.text = no_shield_text
+	
 	#PROMOTIONS AND UPGRADES
 	var pending_upgrades_text: String = "Pending upgrades: " + str(leveling_component.pending_upgrades) + "\n"
 	var pending_promotions_text: String = "Pending Promotions: " + str(leveling_component.pending_promotions) + "\n"
 	# Down the right side
-	$HUD/StatsLabel.text += pending_upgrades_text + pending_promotions_text
+	$HUD/StatsLabel2.text += pending_upgrades_text + pending_promotions_text
 
 	#POINTS AND LEVELLING
 	var player_level_text: String = "Level: " + str(leveling_component.player_level)

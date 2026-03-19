@@ -8,6 +8,7 @@ var time_to_live: float = 1.0
 
 # Connects the collision signal on the server
 func _ready() -> void:
+	add_to_group("shield_blockable")
 	if multiplayer.is_server():
 		body_entered.connect(_on_body_entered)
 
@@ -18,6 +19,12 @@ func _physics_process(delta: float) -> void:
 		time_to_live -= delta
 		if (time_to_live <= 0):
 			queue_free()
+
+# Accepts a bounce force to reflect the bullet away from the shield.
+func apply_bounce(bounce_force: Vector2) -> void:
+	if multiplayer.is_server():
+		direction = bounce_force.normalized()
+		shooter_id = ""
 
 # Handles logic when the bullet hits a physics body
 func _on_body_entered(body: Node2D) -> void:

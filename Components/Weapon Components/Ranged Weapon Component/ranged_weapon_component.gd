@@ -13,6 +13,7 @@ var bullet_speed: int = 500
 var bullet_damage: int = 150
 var recoil_strength: int = 30
 
+
 # Both the server and the local client need to run the reload timer
 func _physics_process(delta: float) -> void:
 	if multiplayer.is_server() or player.name == str(multiplayer.get_unique_id()):

@@ -32,9 +32,8 @@ func trigger_visual_attack(target_pos: Vector2) -> void:
 	
 	rotation = start_rot
 	active_tween = create_tween()
-	
+	#active_tween.set_process_mode(Tween.TWEEN_PROCESS_PHYSICS) # Stops tunelling
 	active_tween.tween_property(self, "rotation", target_rot, attack_duration).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-	#active_tween.tween_property(self, "rotation", base_aim_rotation, attack_duration * 0.3).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	
 	swing_direction *= -1
 

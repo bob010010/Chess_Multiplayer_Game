@@ -104,7 +104,7 @@ func apply_upgrade(stat_name: String) -> void:
 						"melee_damage":
 							player.melee_w_component.melee_damage = int(player.melee_w_component.melee_damage * multiplier)
 						"melee_knockback":
-							player.melee_w_component.knockback_force *= multiplier
+							player.melee_w_component.knockback_force = min(player.melee_w_component.knockback_force * multiplier, 4000)
 						"melee_cooldown":
 							player.melee_w_component.attack_cooldown *= multiplier
 			"area_damage", "area_knockback", "area_radius", "area_cooldown":
@@ -141,7 +141,6 @@ func request_promotion(choice: String) -> void:
 # Commands the local client to open the upgrade selection interface via signal.
 @rpc("authority", "call_local", "reliable")
 func trigger_upgrade_ui() -> void:
-	#print("Emitting upgrade")
 	show_upgrade_menu.emit()
 
 # Commands the local client to open the promotion selection interface via signal.
@@ -166,7 +165,7 @@ func change_weapon(class_choice: String) -> void:
 			new_a_weapon = "None"
 		"Bishop":
 			new_m_weapon = "None"
-			new_r_weapon = "BasicGun" # Assuming this is the actual name in your player.gd
+			new_r_weapon = "Ranged_Spell" # Assuming this is the actual name in your player.gd
 			new_a_weapon = "Magic"
 
 	# Directly update the synchronized variables rather than using signals
@@ -178,12 +177,13 @@ func change_weapon(class_choice: String) -> void:
 func apply_promotion_stats(class_choice: String) -> void:
 	var components: Node = player.get_node("Components")
 	var health_comp: Node = components.get_node("HealthComponent")
+	var move_comp: Node = components.get_node("MovementComponent")
 	var r_weapon_comp: Node = player.ranged_w_component
 	var m_weapon_comp: Node = player.melee_w_component
 	var a_weapon_comp: Node = player.area_w_component
-	var move_comp: Node = components.get_node("MovementComponent")
+	
 
-	print("Applying stats for: " + str(class_choice))
+	# print("Applying stats for: " + str(class_choice))
 	
 	match class_choice:
 		"Knight": #Knights are faster (Swords are naturally faster so no change to melee speed)
@@ -196,8 +196,9 @@ func apply_promotion_stats(class_choice: String) -> void:
 			health_comp.max_health = health_comp.max_health * 2
 			move_comp.player_speed = move_comp.player_speed * 0.5
 			m_weapon_comp.melee_damage = m_weapon_comp.melee_damage * 1.5
-			m_weapon_comp.knockback_force = m_weapon_comp.knockback_force * 2
-			
+			m_weapon_comp.knockback_force = min(m_weapon_comp.knockback_force * 2, 4000)
+			player.knockback_force = player.knockback_force * 2
+
 		"Bishop": #Bishops are ranged with magic and area attack
 			r_weapon_comp.bullet_speed = min(r_weapon_comp.bullet_speed * 2, 2500)
 			r_weapon_comp.reload_speed = max(r_weapon_comp.reload_speed * 0.5, 0.25)

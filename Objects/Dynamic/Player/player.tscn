@@ -17,6 +17,7 @@
 [ext_resource type="PackedScene" uid="uid://c0n8o6qg5guih" path="res://Components/Weapon Components/Meele Weapon Component/Sword Component/sword_component.tscn" id="15_cmuwl"]
 [ext_resource type="PackedScene" uid="uid://bcpvgo3r5i7b3" path="res://Components/Weapon Components/Meele Weapon Component/Spear Component/spear_component.tscn" id="16_xw66s"]
 [ext_resource type="PackedScene" uid="uid://dqv8bguh4vdbj" path="res://Components/Weapon Components/Area Weapon Component/Magic Area Weapon Component/magic_area_weapon_component.tscn" id="17_ws0sy"]
+[ext_resource type="PackedScene" uid="uid://i81b0a7uurhf" path="res://Components/Shield Components/Shield Component/shield_component.tscn" id="18_x7332"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_sweqy"]
 properties/0/path = NodePath(".:position")
@@ -70,30 +71,15 @@ properties/15/replication_mode = 2
 properties/16/path = NodePath(".:current_class")
 properties/16/spawn = true
 properties/16/replication_mode = 2
-properties/17/path = NodePath("Components/SwordComponent:melee_damage")
+properties/17/path = NodePath(".:current_melee_weapon")
 properties/17/spawn = true
 properties/17/replication_mode = 2
-properties/18/path = NodePath("Components/SwordComponent:knockback_force")
+properties/18/path = NodePath(".:current_ranged_weapon")
 properties/18/spawn = true
 properties/18/replication_mode = 2
-properties/19/path = NodePath("Components/SwordComponent:attack_cooldown")
+properties/19/path = NodePath(".:current_area_weapon")
 properties/19/spawn = true
 properties/19/replication_mode = 2
-properties/20/path = NodePath("Components/SwordComponent:attack_duration")
-properties/20/spawn = true
-properties/20/replication_mode = 2
-properties/21/path = NodePath("Components/SpearComponent:attack_duration")
-properties/21/spawn = true
-properties/21/replication_mode = 2
-properties/22/path = NodePath("Components/SpearComponent:attack_cooldown")
-properties/22/spawn = true
-properties/22/replication_mode = 2
-properties/23/path = NodePath("Components/SpearComponent:knockback_force")
-properties/23/spawn = true
-properties/23/replication_mode = 2
-properties/24/path = NodePath("Components/SpearComponent:melee_damage")
-properties/24/spawn = true
-properties/24/replication_mode = 2
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_onrkg"]
 size = Vector2(138.27162, 177.77779)
@@ -101,6 +87,9 @@ size = Vector2(138.27162, 177.77779)
 [node name="Player" type="CharacterBody2D" unique_id=328923263 groups=["player"]]
 scale = Vector2(0.25, 0.25)
 script = ExtResource("1_onrkg")
+current_melee_weapon = "Spear"
+current_ranged_weapon = "None"
+current_area_weapon = "None"
 
 [node name="PlayerSprite" type="Sprite2D" parent="." unique_id=1635438858]
 modulate = Color(0.75076467, 0.00045069636, 0.7539706, 1)
@@ -130,11 +119,14 @@ position_smoothing_enabled = true
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -46.0
-offset_top = 8.0
-offset_right = -6.0
-offset_bottom = 31.0
+offset_left = -45.0
+offset_top = 7.0
+offset_right = -25.0
+offset_bottom = 30.0
 grow_horizontal = 0
+theme_override_constants/line_spacing = 2
+theme_override_font_sizes/font_size = 13
+horizontal_alignment = 2
 
 [node name="LevelBar" parent="HUD" unique_id=1244872040 instance=ExtResource("3_hqtel")]
 anchors_preset = 5
@@ -200,6 +192,15 @@ text = "Promote"
 layout_mode = 2
 text = "Promote"
 
+[node name="StatsLabel2" type="Label" parent="HUD" unique_id=472733984]
+offset_left = 20.000002
+offset_top = 27.0
+offset_right = 21.000002
+offset_bottom = 44.0
+theme_override_constants/line_spacing = 2
+theme_override_font_sizes/font_size = 13
+horizontal_alignment = 2
+
 [node name="HealthBar" parent="." unique_id=1748738400 instance=ExtResource("3_i3pqv")]
 offset_left = -60.0
 offset_top = 130.0
@@ -226,3 +227,5 @@ script = ExtResource("9_b26j0")
 
 [node name="Magic Area Weapon Component" parent="Components" unique_id=1293441058 instance=ExtResource("17_ws0sy")]
 max_radius = 300.0
+
+[node name="ShieldComponent" parent="Components" unique_id=1213126401 instance=ExtResource("18_x7332")]

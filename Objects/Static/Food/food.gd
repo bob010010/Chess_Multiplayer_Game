@@ -18,7 +18,8 @@ var weight: int = 1
 		
 # Sets up groups, signals, and server-side generation
 func _ready() -> void:
-	add_to_group("food") 
+	add_to_group("food")
+	add_to_group("shield_blockable")
 	health_component.died.connect(_on_food_died)
 	
 	# Only the server should generate the random shape and health!

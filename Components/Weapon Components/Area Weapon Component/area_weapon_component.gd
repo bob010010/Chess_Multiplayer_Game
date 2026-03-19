@@ -33,6 +33,7 @@ func _ready() -> void:
 	hitbox.monitoring = false
 	hitbox_shape.disabled = true
 	hitbox.body_entered.connect(_on_body_entered)
+
 # Validates the attack request, activates the server-side hitbox, and starts timers.
 @rpc("any_peer", "call_local", "reliable")
 func request_area_attack() -> void:
@@ -85,4 +86,4 @@ func trigger_visual_finished() -> void:
 # Draws the area shape dynamically based on the synchronized radius variable.
 func _draw() -> void:
 	if active_tween:
-		draw_circle(Vector2.ZERO, radius, Color(1, 1, 1, 0.4))
+		draw_circle(Vector2.ZERO, radius, Color(0, 0, 1, 0.4))

@@ -14,7 +14,7 @@ var area_w_component: Node
 		if is_node_ready():
 			sprite_component._on_promotion_applied(value)
 
-@export var current_melee_weapon: String = "Sword":
+@export var current_melee_weapon: String = "Spear":
 	set(value):
 		current_melee_weapon = value
 		if is_node_ready():
@@ -26,13 +26,14 @@ var area_w_component: Node
 		if is_node_ready():
 			_change_r_weapon(value)
 			
-@export var current_area_weapon: String = "Magic":
+@export var current_area_weapon: String = "None":
 	set(value):
 		current_area_weapon = value
 		if is_node_ready():
 			_change_a_weapon(value)
 
 var knockback: Vector2 = Vector2.ZERO
+var knockback_force: int = 500
 var body_damage: int = 5
 var ranks: Array[String] = ["Knight", "Rook", "Bishop"]
 
@@ -59,8 +60,7 @@ func _ready() -> void:
 		leveling_component.update_ui_points.connect(_update_ui_points)
 		leveling_component.show_upgrade_menu.connect(_show_upgrade_menu)
 		leveling_component.show_promotion_menu.connect(_show_promotion_menu)
-		leveling_component.change_m_weapon.connect(_change_m_weapon)
-		leveling_component.change_r_weapon.connect(_change_r_weapon)
+
 	else:
 		$PlayerSprite.modulate = Color(1, 0, 0)
 		$HUD.hide()
@@ -98,10 +98,7 @@ func check_melee_input() -> void:
 
 func check_area_input() -> void:
 	if area_w_component and Input.is_action_just_pressed("area"):
-		print("Requesting")
 		area_w_component.request_area_attack.rpc_id(1)
-
-
 
 # Smoothly decays physical knockback momentum over time.
 func decrease_knockback(delta: float) -> void:
@@ -118,7 +115,7 @@ func handle_collisions() -> void:
 		knockback = normal * 500
 		
 		if collider and collider.has_method("apply_bounce"):
-			collider.apply_bounce(-normal * 500)
+			collider.apply_bounce(-normal * knockback_force)
 			if collider.is_in_group("food"):
 				do_contact_damage(collider)
 
@@ -160,13 +157,22 @@ func _update_ui_points(new_points: int):
 	#print("Queueing points: " + str(new_points))
 	$HUD/LevelBar.queue_points(new_points)
 
-# Populates the upgrade UI with random stat choices.
+# Populates the upgrade UI with valid random stat choices based on equipped weapons.
 func _show_upgrade_menu() -> void:
-	#print("Trying to show upgrade menu " + str(leveling_component.pending_upgrades))
+	var valid_stats: Array[String] = ["max_health", "body_damage"]
+	
+	if ranged_w_component:
+		valid_stats.append_array(["bullet_damage", "bullet_speed", "reload_speed"])
+	if melee_w_component:
+		valid_stats.append_array(["melee_damage", "melee_knockback", "melee_cooldown"])
+	if area_w_component:
+		valid_stats.append_array(["area_damage", "area_knockback", "area_radius", "area_cooldown"])
+		
 	for button: Node in $HUD/UpgradeUI.get_children():
-		var stat: String = leveling_component.upgradeable_stats.keys().pick_random()
+		var stat: String = valid_stats.pick_random()
 		button.stat_id = stat
 		button.refresh_text()
+		
 	$HUD/UpgradeUI.show()
 
 # Transmits the selected stat upgrade to the server.
@@ -251,6 +257,7 @@ func _change_r_weapon(weapon_type: String) -> void:
 
 # Updates the active area weapon references, hides visuals, and disables processing for unused components.
 func _change_a_weapon(area_weapon_type: String):
+	print("Changing area weapon to: " + area_weapon_type)
 	match area_weapon_type:
 		"Magic":
 			var magic = $"Components/Magic Area Weapon Component"
@@ -286,8 +293,8 @@ func show_debug_info() -> void:
 	
 	$HUD/StatsLabel.text = max_health_text + health_text + pos_text + kb_text + body_dmg_text
 
+	#RANGED COMBAT
 	if ranged_w_component:
-		#RANGED COMBAT
 		var bullet_dmg_text: String = "Bullet Damage: " + str(ranged_w_component.bullet_damage) + "\n"
 		var bullet_speed_text: String = "Bullet Speed: " + str(ranged_w_component.bullet_speed) + "\n\n"
 		var shoot_text: String = "Shooting: " + str(ranged_w_component.shooting) + "\n"
@@ -295,20 +302,32 @@ func show_debug_info() -> void:
 		var cooldown_text: String = "Cooldown: " + str(snapped(ranged_w_component.shot_cooldown, 0.01)) + "\n\n"
 		$HUD/StatsLabel.text += bullet_dmg_text + bullet_speed_text + shoot_text + reload_time_text + cooldown_text
 	else:
-		var no_ranged_text: String = "No Ranged Weapon"  + "\n" + "\n"
+		var no_ranged_text: String = "No Ranged Weapon" + "\n" + "\n"
 		$HUD/StatsLabel.text += no_ranged_text
 	
+	#MELEE COMBAT
 	if melee_w_component:
-		#MELEE COMBAT
 		var melee_dmg_text: String = "Melee Damage: " + str(melee_w_component.melee_damage) + "\n"
 		var melee_kb_text: String = "Melee Knockback: " + str(melee_w_component.knockback_force) + "\n"
 		var melee_cooldown_text: String = "Melee Cooldown: " + str(melee_w_component.attack_cooldown) + "\n"
-		var melee_duration_text: String = "Melee Duration: " + str(melee_w_component.attack_duration) + "\n"
+		var melee_duration_text: String = "Melee Attack Duration: " + str(melee_w_component.attack_duration) + "\n"
 		var melee_has_hit_text: String = "Melee Has Hit: " + str(melee_w_component.has_hit) + "\n\n"
 		$HUD/StatsLabel.text += melee_dmg_text + melee_kb_text + melee_cooldown_text + melee_duration_text + melee_has_hit_text
 	else:
 		var no_melee_text: String = "No Melee Weapon"  + "\n" + "\n"
 		$HUD/StatsLabel.text += no_melee_text
+
+	#AREA COMBAT
+	if area_w_component:
+		var area_damage_text: String = "Area Damage: " + str(area_w_component.area_damage) + "\n"
+		var area_kb_text: String = "Area Knockback: " + str(area_w_component.knockback_force) + "\n"
+		var area_radius_text: String = "Area Radius: " + str(area_w_component.max_radius) + "\n"
+		var area_cooldown_text: String = "Area Cooldown: " + str(area_w_component.attack_cooldown) + "\n"
+		var area_duration_text: String = "Area Attack Duration: " + str(area_w_component.attack_duration) + "\n\n"
+		$HUD/StatsLabel.text += area_damage_text + area_kb_text + area_radius_text + area_cooldown_text + area_duration_text
+	else:
+		var no_area_text: String = "No Area Weapon" + "\n" + "\n"
+		$HUD/StatsLabel.text += no_area_text
 
 	#PROMOTIONS AND UPGRADES
 	var pending_upgrades_text: String = "Pending upgrades: " + str(leveling_component.pending_upgrades) + "\n"
@@ -321,8 +340,6 @@ func show_debug_info() -> void:
 	var next_level_points_text: String = "    Points for next: " + str(leveling_component.next_level_points)
 	var points_text: String = "    Points: " + str(leveling_component.points) 
 	var score_text: String = "    Score: " + str(leveling_component.total_score)
-
-
 
 	# Below the level bar
 	$HUD/LevelLabel.text = player_level_text + next_level_points_text + points_text + score_text

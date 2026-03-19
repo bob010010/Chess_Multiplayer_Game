@@ -1,0 +1,5 @@
+[gd_scene format=3 uid="uid://i81b0a7uurhf"]
+
+[node name="ShieldComponent" type="Node2D" unique_id=1213126401]
+
+[node name="Area2D" type="Area2D" parent="." unique_id=1966239504]

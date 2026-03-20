@@ -9,8 +9,8 @@ func add_player(id: int) -> void:
 	var player_instance: Node = player_scene.instantiate()
 	player_instance.name = str(id) 
 	
-	var random_x: float = randf_range(-1000, 1000)
-	var random_y: float = randf_range(-1000, 1000)
+	var random_x: float = randf_range(-300, 300)
+	var random_y: float = randf_range(-300, 300)
 	player_instance.position = Vector2(random_x, random_y)
 	
 	add_child(player_instance, true)

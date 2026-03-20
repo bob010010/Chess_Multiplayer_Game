@@ -4,16 +4,16 @@ extends CharacterBody2D
 @onready var health_component: Node = $Components/HealthComponent
 @onready var leveling_component: Node = $Components/LevelingComponent
 @onready var promotion_component: Node = $Components/PromotionComponent
-@onready var shield_component: Node2D = $Components/ShieldComponent
 @onready var sprite_component: Sprite2D = $PlayerSprite
 var ranged_w_component: Node
 var melee_w_component: Node
 var area_w_component: Node
 var first_ability_component: Node
+var shield_component: Node
 
 var shielding: bool = false
 
-@export var current_class: String = "Pawn":
+@export var current_class: String = "Bishop":
 	set(value):
 		current_class = value
 		if is_node_ready():
@@ -38,6 +38,12 @@ var shielding: bool = false
 		if is_node_ready():
 			_change_first_ability(value)
 
+@export var current_shield: String = "Wooden":
+	set(value):
+		current_shield = value
+		if is_node_ready():
+			_change_shield(value)
+
 var knockback: Vector2 = Vector2.ZERO
 var knockback_force: int = 200
 var body_damage: int = 2
@@ -49,11 +55,16 @@ func _ready() -> void:
 	if is_node_ready():
 		print(current_class)
 		sprite_component._on_promotion_applied(current_class)
-
-	#Initialises the weapons on spawn
-	_change_m_weapon(current_melee_weapon)
-	_change_r_weapon(current_ranged_weapon)
-	_change_first_ability(current_first_ability)
+	
+	promotion_component.change_weapon(current_class)
+	promotion_component.apply_promotion_stats(current_class)
+	
+	#Initialises the weapons on spawn - For custom spawn stuff for testing
+	#_change_m_weapon(current_melee_weapon)
+	#_change_r_weapon(current_ranged_weapon)
+	#_change_first_ability(current_first_ability)
+	#_change_shield(current_shield)
+	health_component.died.connect(_on_player_died)
 	
 	if name == str(multiplayer.get_unique_id()):
 		$PlayerSprite.modulate = Color(0, 1, 0)
@@ -122,8 +133,8 @@ func check_shield_input() -> void:
 	if shield_component:
 		if Input.is_action_just_pressed("shield"):
 			shield_component.request_shield_activation.rpc_id(1)
-		#elif Input.is_action_just_released("shield"): #Comment out this for testing
-			#shield_component.request_shield_deactivation.rpc_id(1)
+		elif Input.is_action_just_released("shield"): #Comment out this for testing
+			shield_component.request_shield_deactivation.rpc_id(1)
 
 # Smoothly decays physical knockback momentum over time.
 func decrease_knockback(delta: float) -> void:
@@ -163,10 +174,23 @@ func _on_apply_recoil(force: Vector2) -> void:
 func take_damage(amount: int, attacker_id: String = "") -> void:
 	health_component.take_damage(amount, attacker_id)
 
-# Awards points to the attacker and removes the player entity.
+# Awards points to the attacker, disables the player, and triggers the death UI.
 func _on_player_died(attacker_id: String) -> void:
 	give_points_on_death(attacker_id)
-	queue_free()
+	print("Called")
+	# Disable collisions and processing so the dead body doesn't interact with the world
+	process_mode = Node.PROCESS_MODE_DISABLED
+	hide()
+	
+	# Tell the specific client who owns this player that they died, and pass the killer's ID
+	trigger_death_screen.rpc_id(name.to_int(), attacker_id)
+
+# Tells the local client to initiate the spectate sequence on the main scene.
+@rpc("authority", "call_local", "reliable")
+func trigger_death_screen(attacker_id: String) -> void:
+	var main_scene = get_tree().current_scene
+	if main_scene and main_scene.has_method("start_spectating"):
+		main_scene.start_spectating(attacker_id)
 
 # Locates the attacking entity and transfers the accumulated score.
 func give_points_on_death(attacker_id: String) -> void:
@@ -180,8 +204,12 @@ func get_points_from_kill(kill_value: int) -> void:
 	leveling_component.get_points_from_kill(kill_value)
 
 func _update_ui_points(new_points: int):
-	#print("Queueing points: " + str(new_points))
 	$HUD/LevelBar.queue_points(new_points)
+
+# Updates the local leaderboard UI with data broadcasted from the server.
+func update_leaderboard_ui(board_text: String) -> void:
+	if has_node("HUD/LeaderboardLabel"):
+		$HUD/LeaderboardLabel.text = board_text
 
 # Populates the upgrade UI with valid random stat choices based on equipped capabilities.
 func _show_upgrade_menu() -> void:
@@ -293,7 +321,7 @@ func _change_r_weapon(weapon_type: String) -> void:
 func _change_first_ability(ability_type: String) -> void:
 	match ability_type:
 		"Magic", "Teleport":
-			var magic: Node = $"Components/Magic Area Weapon Component"
+			var magic: Node = $"Components/MagicAreaWeaponComponent"
 			magic.hide() 
 			magic.process_mode = Node.PROCESS_MODE_DISABLED
 			
@@ -314,6 +342,31 @@ func _change_first_ability(ability_type: String) -> void:
 				first_ability_component.hide()
 				first_ability_component.process_mode = Node.PROCESS_MODE_DISABLED
 				first_ability_component = null
+
+# Updates the active shield references, hides visuals, and disables processing for unused components.
+func _change_shield(shield_type: String) -> void:
+	match shield_type:
+		"Wooden", "Magic":
+			var wooden_shield: Node = $Components/WoodenShieldComponent
+			wooden_shield.process_mode = Node.PROCESS_MODE_DISABLED
+			wooden_shield.hide()
+			
+			var magic_shield: Node = $Components/MagicShieldComponent
+			magic_shield.process_mode = Node.PROCESS_MODE_DISABLED
+			magic_shield.hide()
+			
+			match shield_type:
+				"Wooden":
+					shield_component = wooden_shield
+				"Magic":
+					shield_component = magic_shield
+					
+			shield_component.process_mode = Node.PROCESS_MODE_INHERIT
+		"None":
+			if shield_component:
+				shield_component.hide()
+				shield_component.process_mode = Node.PROCESS_MODE_DISABLED
+				shield_component = null
 			
 # Compiles and displays internal entity variables to the local HUD.
 func show_debug_info() -> void:

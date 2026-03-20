@@ -29,13 +29,14 @@
 [ext_resource type="PackedScene" uid="uid://dqv8bguh4vdbj" path="res://Components/Weapon Components/Area Weapon Component/Magic Area Weapon Component/magic_area_weapon_component.tscn" id="17_ws0sy"]
 [ext_resource type="Texture2D" uid="uid://bt2kynq1b814t" path="res://images/chess-pieces/white-queen.png" id="17_xyotm"]
 [ext_resource type="Texture2D" uid="uid://da1t6men8pybg" path="res://images/chess-pieces/white-commonr.png" id="18_ootfv"]
-[ext_resource type="PackedScene" uid="uid://i81b0a7uurhf" path="res://Components/Shield Components/Shield Component/shield_component.tscn" id="18_x7332"]
 [ext_resource type="Texture2D" uid="uid://5eubu4uhawbi" path="res://images/chess-pieces/white-grassh.png" id="19_46ev8"]
 [ext_resource type="Script" uid="uid://drtotaaepbr3t" path="res://Components/Promotion Component/promotion_component.gd" id="19_j1n4j"]
 [ext_resource type="Texture2D" uid="uid://bxbrjc37sox1c" path="res://images/chess-pieces/white-amazon.png" id="20_p8344"]
 [ext_resource type="Texture2D" uid="uid://dobde2a3751e6" path="res://images/chess-pieces/white-rqueen.png" id="21_p5e7e"]
 [ext_resource type="PackedScene" uid="uid://d4bosy3p363kl" path="res://UI/Bars/Ability Bar/ability_bar.tscn" id="26_xyotm"]
 [ext_resource type="Script" uid="uid://dd6mlpw8tkkbb" path="res://Components/Ability Components/teleport_component.gd" id="35_x2bxi"]
+[ext_resource type="PackedScene" uid="uid://3y2gt1rbgeo3" path="res://Components/Shield Components/Directional Shield Components/wooden_shield_component.tscn" id="36_xyotm"]
+[ext_resource type="PackedScene" uid="uid://dlp1hxy3ufer6" path="res://Components/Shield Components/Magic Shield/magic_shield_component.tscn" id="37_ootfv"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_sweqy"]
 properties/0/path = NodePath(".:position")
@@ -107,6 +108,30 @@ properties/21/replication_mode = 2
 properties/22/path = NodePath(".:current_first_ability")
 properties/22/spawn = true
 properties/22/replication_mode = 2
+properties/23/path = NodePath("Components/TeleportComponent:max_cooldown")
+properties/23/spawn = true
+properties/23/replication_mode = 2
+properties/24/path = NodePath("Components/TeleportComponent:current_cooldown")
+properties/24/spawn = true
+properties/24/replication_mode = 2
+properties/25/path = NodePath("Components/TeleportComponent:max_range")
+properties/25/spawn = true
+properties/25/replication_mode = 2
+properties/26/path = NodePath("Components/MagicAreaWeaponComponent:current_cooldown")
+properties/26/spawn = true
+properties/26/replication_mode = 2
+properties/27/path = NodePath("Components/MagicAreaWeaponComponent:max_cooldown")
+properties/27/spawn = true
+properties/27/replication_mode = 2
+properties/28/path = NodePath("Components/MagicAreaWeaponComponent:max_radius")
+properties/28/spawn = true
+properties/28/replication_mode = 2
+properties/29/path = NodePath("Components/MagicAreaWeaponComponent:knockback_force")
+properties/29/spawn = true
+properties/29/replication_mode = 2
+properties/30/path = NodePath("Components/MagicAreaWeaponComponent:area_damage")
+properties/30/spawn = true
+properties/30/replication_mode = 2
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_onrkg"]
 size = Vector2(138.27162, 177.77779)
@@ -120,8 +145,8 @@ bg_color = Color(0.9479591, 0.36396852, 0.55674356, 1)
 [node name="Player" type="CharacterBody2D" unique_id=328923263 groups=["player"]]
 scale = Vector2(0.25, 0.25)
 script = ExtResource("1_onrkg")
+current_class = "Pawn"
 current_melee_weapon = "Spear"
-current_ranged_weapon = "None"
 
 [node name="PlayerSprite" type="Sprite2D" parent="." unique_id=1635438858]
 modulate = Color(0.75076467, 0.00045069636, 0.7539706, 1)
@@ -158,7 +183,7 @@ scale = Vector2(0.81, 0.81)
 shape = SubResource("RectangleShape2D_onrkg")
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=436632609]
-zoom = Vector2(0.6, 0.6)
+zoom = Vector2(0.7, 0.7)
 position_smoothing_enabled = true
 
 [node name="HUD" type="CanvasLayer" parent="." unique_id=298534784]
@@ -249,6 +274,17 @@ theme_override_constants/line_spacing = 2
 theme_override_font_sizes/font_size = 13
 horizontal_alignment = 2
 
+[node name="LeaderboardLabel" type="Label" parent="HUD" unique_id=1060592598]
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 13.0
+offset_top = -52.0
+offset_right = 53.0
+offset_bottom = -29.0
+grow_vertical = 0
+theme_override_colors/font_color = Color(0, 0.46666667, 1, 1)
+
 [node name="HealthBar" parent="." unique_id=1748738400 instance=ExtResource("3_i3pqv")]
 offset_left = -60.0
 offset_top = 130.0
@@ -288,12 +324,14 @@ melee_damage = 30
 knockback_force = 400.0
 attack_cooldown = 2.0
 
-[node name="Magic Area Weapon Component" parent="Components" unique_id=1293441058 instance=ExtResource("17_ws0sy")]
-
-[node name="ShieldComponent" parent="Components" unique_id=1213126401 instance=ExtResource("18_x7332")]
+[node name="MagicAreaWeaponComponent" parent="Components" unique_id=1293441058 instance=ExtResource("17_ws0sy")]
 
 [node name="PromotionComponent" type="Node2D" parent="Components" unique_id=768163417]
 script = ExtResource("19_j1n4j")
 
 [node name="TeleportComponent" type="Node2D" parent="Components" unique_id=1275204178]
 script = ExtResource("35_x2bxi")
+
+[node name="WoodenShieldComponent" parent="Components" unique_id=975093531 instance=ExtResource("36_xyotm")]
+
+[node name="MagicShieldComponent" parent="Components" unique_id=669235489 instance=ExtResource("37_ootfv")]

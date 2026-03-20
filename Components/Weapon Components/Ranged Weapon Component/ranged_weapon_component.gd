@@ -7,12 +7,13 @@ signal apply_recoil(recoil_force: Vector2)
 
 # Weapon Stats
 var shooting: bool = false
-var reload_speed: float = 2
+var reload_speed: float = 0.4
 var shot_cooldown: float = reload_speed
 var bullet_speed: int = 200
 var bullet_damage: int = 10
+var bullet_force: float = 2.0
 var recoil_strength: int = 30
-var accuracy: float = 10.0
+var accuracy: float = 100.0
 
 # Both the server and the local client need to run the reload timer
 func _physics_process(delta: float) -> void:

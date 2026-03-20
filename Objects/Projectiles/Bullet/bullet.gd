@@ -4,7 +4,7 @@ var speed: float = 100.0
 var direction: Vector2 = Vector2.ZERO
 var damage: int = 1
 var shooter_id: String = "" 
-var time_to_live: float = 1.0
+var time_to_live: float = 3.0
 
 # Connects the collision signal on the server
 func _ready() -> void:
@@ -41,5 +41,6 @@ func _on_body_entered(body: Node2D) -> void:
 			if body.has_method("take_damage"):
 				body.take_damage(damage, shooter_id)
 		
-		# Destroys the bullet upon impact
-		queue_free()
+		# Decreases the time to live after piercing
+		time_to_live = time_to_live * 0.3
+		#queue_free()

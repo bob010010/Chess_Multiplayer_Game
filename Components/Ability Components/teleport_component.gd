@@ -2,9 +2,17 @@ extends Node2D
 
 var max_cooldown: float = 5.0
 var current_cooldown: float = 0.0
-var max_range: float = 100.0
+
+@export var max_range: float = 50.0:
+	set(value):
+		max_range = value
+		queue_redraw()
 
 @onready var player: CharacterBody2D = get_parent().get_parent() as CharacterBody2D
+
+# Ensures the debug radius is drawn immediately upon entering the scene tree.
+func _ready() -> void:
+	queue_redraw()
 
 # Reduces the active teleport cooldown timer exclusively on the server.
 func _process(delta: float) -> void:
@@ -40,3 +48,7 @@ func trigger_teleport_visuals() -> void:
 	var tween: Tween = create_tween()
 	tween.tween_property(sprite, "scale", Vector2(0.1, 0.1), 0.1)
 	tween.tween_property(sprite, "scale", Vector2(1.0, 1.0), 0.1).set_delay(0.1)
+
+# Draws a hollow translucent boundary representing the maximum valid teleport distance.
+func _draw() -> void:
+	draw_arc(Vector2.ZERO, max_range*4, 0.0, TAU, 300, Color(1.0, 0.0, 1.0, 0.8), 2.0)

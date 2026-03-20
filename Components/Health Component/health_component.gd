@@ -8,7 +8,7 @@ var health: int = 500
 @export var regen_speed: float = 10.0
 var regen_cooldown: float = regen_speed
 
-@onready var object: CharacterBody2D = get_parent().get_parent()
+@onready var object: Node = get_parent().get_parent()
 var health_bar: ProgressBar 
 
 # Sets initial health to max health.

@@ -17,6 +17,8 @@ func spawn_bullet(spawn_pos: Vector2, dir: Vector2, shooter_id: String, bullet_s
 		
 		bullet.speed = bullet_speed
 		bullet.damage = bullet_damage
+
+		bullet.time_to_live = bullet.time_to_live * 2.0
 		
 		# Adds the bullet to the SpawnedBullets node tree
 		add_child(bullet, true)

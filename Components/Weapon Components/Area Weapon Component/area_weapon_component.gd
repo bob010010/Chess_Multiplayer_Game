@@ -36,6 +36,7 @@ func _ready() -> void:
 
 # Tracks cooldown and attack duration natively on the server.
 func _process(delta: float) -> void:
+		
 	if multiplayer.is_server():
 		if current_cooldown > 0.0:
 			current_cooldown -= delta
@@ -80,7 +81,8 @@ func _on_attack_finished() -> void:
 # Unhides the component and serves as a virtual function for child class animations.
 @rpc("authority", "call_local", "reliable")
 func trigger_visual_attack() -> void:
-	show()
+	if player.name == str(multiplayer.get_unique_id()): #Hides for other players
+		show()
 
 # Hides the component across all clients when the attack window ends.
 @rpc("authority", "call_local", "reliable")
@@ -89,5 +91,5 @@ func trigger_visual_finished() -> void:
 
 # Draws the area shape dynamically based on the synchronized radius variable.
 func _draw() -> void:
-	if active_tween:
+	if active_tween and player.name == str(multiplayer.get_unique_id()): # NOT HIDING FOR OTHER PLAYERS
 		draw_circle(Vector2.ZERO, radius, Color(0, 0, 1, 0.4))

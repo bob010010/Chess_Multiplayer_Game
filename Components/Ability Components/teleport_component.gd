@@ -33,21 +33,29 @@ func _perform_teleport(target_pos: Vector2) -> void:
 	var distance: float = minf(start_pos.distance_to(target_pos), max_range)
 	var final_position: Vector2 = start_pos + (direction * distance)
 	
-	player.global_position = final_position
 	current_cooldown = max_cooldown
+	trigger_teleport_visuals.rpc(true) 
+	await get_tree().create_timer(0.7).timeout
 	
-	trigger_teleport_visuals.rpc()
+	player.global_position = final_position
+	trigger_teleport_visuals.rpc(false) 
 
 # Executes a localized scaling tween animation on all clients to visually emphasize the teleportation.
 @rpc("authority", "call_local", "reliable")
-func trigger_teleport_visuals() -> void:
+func trigger_teleport_visuals(going_out: bool) -> void:
 	var sprite: Sprite2D = player.get_node("PlayerSprite") as Sprite2D
-	if not sprite:
+	var components: Node2D = player.get_node("Components") as Node2D
+	if not sprite or not components:
 		return
 		
-	var tween: Tween = create_tween()
-	tween.tween_property(sprite, "scale", Vector2(0.1, 0.1), 0.1)
-	tween.tween_property(sprite, "scale", Vector2(1.0, 1.0), 0.1).set_delay(0.1)
+	var tween_sprite: Tween = create_tween()
+	var tween_components = create_tween() # Shrinks the components too so the weapons for example shrink with the sprite
+	if going_out:
+		tween_sprite.tween_property(sprite, "scale", Vector2(0.1, 0.1), 0.5).from(Vector2(1, 1))
+		tween_components.tween_property(components, "scale", Vector2(0.1, 0.1), 0.5).from(Vector2(1, 1))
+	else:
+		tween_sprite.tween_property(sprite, "scale", Vector2(1.5, 1.5), 0.5).from(Vector2(0.1, 0.1))
+		tween_components.tween_property(components, "scale", Vector2(1, 1), 0.5).from(Vector2(0.1, 0.1))
 
 # Draws a hollow translucent boundary representing the maximum valid teleport distance.
 func _draw() -> void:

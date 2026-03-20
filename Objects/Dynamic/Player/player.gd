@@ -13,7 +13,7 @@ var shield_component: Node
 
 var shielding: bool = false
 
-@export var current_class: String = "Bishop":
+@export var current_class: String = "Pawn":
 	set(value):
 		current_class = value
 		if is_node_ready():
@@ -59,18 +59,13 @@ func _ready() -> void:
 	promotion_component.change_weapon(current_class)
 	promotion_component.apply_promotion_stats(current_class)
 	
-	#Initialises the weapons on spawn - For custom spawn stuff for testing
-	#_change_m_weapon(current_melee_weapon)
-	#_change_r_weapon(current_ranged_weapon)
-	#_change_first_ability(current_first_ability)
-	#_change_shield(current_shield)
 	health_component.died.connect(_on_player_died)
 	
 	if name == str(multiplayer.get_unique_id()):
 		$PlayerSprite.modulate = Color(0, 1, 0)
 		$Camera2D.make_current()
 		$HUD.show()
-		
+		$AbilityBar.show()
 		$HUD/UpgradeUI.hide()
 		for button: Node in $HUD/UpgradeUI.get_children():
 			button.stat_chosen.connect(_on_stat_chosen)
@@ -85,6 +80,7 @@ func _ready() -> void:
 	else:
 		$PlayerSprite.modulate = Color(1, 0, 0)
 		$HUD.hide()
+		$AbilityBar.hide()
 	if ranged_w_component:
 		ranged_w_component.apply_recoil.connect(_on_apply_recoil)
 

@@ -367,10 +367,10 @@ func apply_promotion_stats(class_choice: String) -> void:
 			m_weapon_comp.attack_cooldown = float(base_stats["melee_cooldown"]) * float(upgrades["melee_cooldown"])
 			
 	if r_weapon_comp:
-		if base_stats.has("bullet_damage"):
-			r_weapon_comp.bullet_damage = int(float(base_stats["bullet_damage"]) * float(upgrades["bullet_damage"]))
-		if base_stats.has("bullet_speed"):
-			r_weapon_comp.bullet_speed = minf(float(base_stats["bullet_speed"]) * float(upgrades["bullet_speed"]), 2500.0)
+		if base_stats.has("projectile_damage"):
+			r_weapon_comp.projectile_damage = int(float(base_stats["projectile_damage"]) * float(upgrades["projectile_damage"]))
+		if base_stats.has("projectile_speed"):
+			r_weapon_comp.projectile_speed = minf(float(base_stats["projectile_speed"]) * float(upgrades["projectile_speed"]), 2500.0)
 		if base_stats.has("reload_speed"):
 			r_weapon_comp.reload_speed = maxf(float(base_stats["reload_speed"]) * float(upgrades["reload_speed"]), 0.2)
 		if base_stats.has("accuracy"):

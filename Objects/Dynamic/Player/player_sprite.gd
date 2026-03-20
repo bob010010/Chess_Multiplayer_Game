@@ -35,7 +35,7 @@ func _on_promotion_applied(new_class: String) -> void:
 			texture = knight_texture
 		"Shadow_Knight":
 			texture = shadow_knight_texture
-		"Flower_Knight":
+		"Flowers_Knight":
 			texture = flower_knight_texture
 		"Bishop":
 			texture = bishop_texture

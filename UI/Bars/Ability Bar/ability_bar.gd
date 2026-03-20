@@ -10,6 +10,10 @@ func _ready() -> void:
 
 # Detects a new cooldown cycle and initiates a continuous tween down to zero.
 func _process(_delta: float) -> void:
+	if player.name != str(multiplayer.get_unique_id()): #Hides for other players
+		hide()
+		return
+
 	var ability_comp: Node = player.first_ability_component
 	
 	if ability_comp == null or player.current_first_ability == "None":

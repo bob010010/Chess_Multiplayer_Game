@@ -118,7 +118,7 @@ func _create_boundaries() -> void:
 	add_child(boundary_body)
 	
 # Initiates the server and spawns the host player
-func _on_host_pressed() -> void:
+func _on_host_pressed() -> void:	
 	peer.create_server(PORT) 
 	multiplayer.multiplayer_peer = peer
 	
@@ -129,7 +129,7 @@ func _on_host_pressed() -> void:
 	$CanvasLayer/JoinButton.hide()
 	$CanvasLayer/RespawnButton.hide()
 	$CanvasLayer/LineEdit.hide()
-	is_hosting = true 
+	is_hosting = true
 
 # Attempts to connect to a server IP
 func _on_join_pressed() -> void:

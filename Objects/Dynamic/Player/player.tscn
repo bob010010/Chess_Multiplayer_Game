@@ -41,6 +41,7 @@
 [ext_resource type="PackedScene" uid="uid://2p2a116rfkeo" path="res://Components/Weapon Components/Ranged Weapon Components/Fireball Shooter Component/fireball_shooter_component.tscn" id="38_p8344"]
 [ext_resource type="PackedScene" uid="uid://dn8boj5kwnei2" path="res://Components/Ability Components/Stealth Components/Illusion Component/illusion_component.tscn" id="39_p8344"]
 [ext_resource type="PackedScene" uid="uid://bktkawpolxble" path="res://Components/Ability Components/Stealth Components/stealth_component.tscn" id="40_p5e7e"]
+[ext_resource type="PackedScene" uid="uid://c15lyias44lvs" path="res://Components/Weapon Components/Ranged Weapon Components/Pin Shooter Component/pin_shooter_component.tscn" id="42_pst4n"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_sweqy"]
 properties/0/path = NodePath(".:position")
@@ -196,6 +197,24 @@ properties/49/replication_mode = 2
 properties/50/path = NodePath("Components/MagicShieldComponent:active_duration")
 properties/50/spawn = true
 properties/50/replication_mode = 2
+properties/51/path = NodePath("Components/MovementComponent:movement_blocked")
+properties/51/spawn = true
+properties/51/replication_mode = 2
+properties/52/path = NodePath("Components/PinShooterComponent:accuracy")
+properties/52/spawn = true
+properties/52/replication_mode = 2
+properties/53/path = NodePath("Components/PinShooterComponent:projectile_damage")
+properties/53/spawn = true
+properties/53/replication_mode = 2
+properties/54/path = NodePath("Components/PinShooterComponent:projectile_speed")
+properties/54/spawn = true
+properties/54/replication_mode = 2
+properties/55/path = NodePath("Components/PinShooterComponent:shot_cooldown")
+properties/55/spawn = true
+properties/55/replication_mode = 2
+properties/56/path = NodePath("Components/PinShooterComponent:reload_speed")
+properties/56/spawn = true
+properties/56/replication_mode = 2
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_onrkg"]
 size = Vector2(138.27162, 177.77779)
@@ -425,3 +444,5 @@ script = ExtResource("35_x2bxi")
 [node name="IllusionComponent" parent="Components" unique_id=1196718733 instance=ExtResource("39_p8344")]
 
 [node name="StealthComponent" parent="Components" unique_id=577867912 instance=ExtResource("40_p5e7e")]
+
+[node name="PinShooterComponent" parent="Components" unique_id=1351820741 instance=ExtResource("42_pst4n")]

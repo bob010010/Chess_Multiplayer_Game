@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://c15lyias44lvs"]
+
+[ext_resource type="Script" uid="uid://h0a7ajb3red7" path="res://Components/Weapon Components/Ranged Weapon Components/Pin Shooter Component/pin_shooter_component.gd" id="1_j1yd8"]
+
+[node name="PinShooterComponent" type="Node2D" unique_id=1351820741]
+script = ExtResource("1_j1yd8")

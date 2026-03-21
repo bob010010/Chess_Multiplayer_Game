@@ -234,8 +234,8 @@ var class_base_stats: Dictionary = {
 		"melee_damage": 35.0,
 		"melee_knockback": 450.0,
 		"melee_cooldown": 0.7,
-		"projectile_damage": 30.0,
-		"projectile_speed": 1300.0,
+		"projectile_damage": 60.0,
+		"projectile_speed": 400.0,
 		"reload_speed": 0.8,
 		"accuracy": 95.0,
 		"illusion_cooldown": 12.0,
@@ -282,6 +282,7 @@ func request_promotion(choice: String) -> void:
 		change_weapon(choice)
 		apply_promotion_stats(choice)
 		
+		
 		player.current_class = choice 
 		
 		# Notify the specific client's UI about the promotion.
@@ -289,6 +290,8 @@ func request_promotion(choice: String) -> void:
 		if info_bar:
 			var formatted_class: String = choice.replace("_", " ")
 			info_bar.display_message.rpc_id(player.name.to_int(), "Promoted to " + formatted_class)
+		
+		player._show_upgrade_menu() # Re rolls as player may now have new components > new things to upgrade
 		
 		if pending_promotions > 0:
 			trigger_promotion_ui.rpc_id(multiplayer.get_remote_sender_id())
@@ -336,7 +339,7 @@ func change_weapon(class_choice: String) -> void:
 			new_shield = "Wooden"
 		"Jester":
 			new_m_weapon = "Spear"
-			new_r_weapon = "Bow"
+			new_r_weapon = "Pin_Shooter"
 			new_first_ability = "Illusion"
 			new_shield = "Magic"
 		"Super_Queen":

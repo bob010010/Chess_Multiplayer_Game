@@ -49,7 +49,7 @@ func request_scattered_illusions() -> void:
 		player.collision_mask = 0
 		trigger_stealth_visuals.rpc(true)
 		
-		await get_tree().create_timer(1.0).timeout # Remove in the future
+		await get_tree().create_timer(2.0).timeout # Remove in the future
 		
 		if not is_instance_valid(player):
 			return

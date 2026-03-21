@@ -135,7 +135,7 @@ spawn_path = NodePath("../SpawnedFood")
 script = ExtResource("4_lquwl")
 
 [node name="ProjectileSpawner" type="MultiplayerSpawner" parent="." unique_id=348082235]
-_spawnable_scenes = PackedStringArray("uid://d24rjpu5nvya5", "uid://2owofpdyy6p8")
+_spawnable_scenes = PackedStringArray("uid://d24rjpu5nvya5", "uid://2owofpdyy6p8", "uid://dmnhywv7oxjqf")
 spawn_path = NodePath("../SpawnedProjectiles")
 
 [node name="SpectatorCamera" type="Camera2D" parent="." unique_id=1223713430]

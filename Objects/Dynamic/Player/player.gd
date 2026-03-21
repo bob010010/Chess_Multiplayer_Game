@@ -13,7 +13,7 @@ var shield_component: Node
 
 var shielding: bool = false
 
-@export var current_class: String = "Pawn_II":
+@export var current_class: String = "Jester":
 	set(value):
 		current_class = value
 		if is_node_ready():
@@ -303,7 +303,7 @@ func _change_m_weapon(weapon_type: String) -> void:
 # Updates the active ranged weapon references, hides visuals, and disables processing for unused components.
 func _change_r_weapon(weapon_type: String) -> void:
 	match weapon_type:
-		"Fireball_Shooter", "Bow":
+		"Fireball_Shooter", "Bow", "Pin_Shooter":
 			var fireball_shooter: Node = $Components/FireballShooterComponent
 			fireball_shooter.hide() 
 			fireball_shooter.process_mode = Node.PROCESS_MODE_DISABLED
@@ -312,11 +312,17 @@ func _change_r_weapon(weapon_type: String) -> void:
 			bow.hide() 
 			bow.process_mode = Node.PROCESS_MODE_DISABLED
 			
+			var pin_shooter: Node = $Components/PinShooterComponent
+			pin_shooter.hide() 
+			pin_shooter.process_mode = Node.PROCESS_MODE_DISABLED
+			
 			match weapon_type:
 				"Fireball_Shooter":
 					ranged_w_component = fireball_shooter
 				"Bow":
 					ranged_w_component = bow
+				"Pin_Shooter":
+					ranged_w_component = pin_shooter
 			ranged_w_component.show()
 			ranged_w_component.process_mode = Node.PROCESS_MODE_INHERIT
 		"None":

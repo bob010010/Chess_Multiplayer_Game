@@ -4,6 +4,7 @@ extends Node2D
 @export var projectile_scenes: Dictionary = {
 	"Arrow": preload("res://Objects/Projectiles/Arrow/arrow.tscn"),
 	"Fireball": preload("res://Objects/Projectiles/Fireball/fireball.tscn"),
+	"Pin": preload("res://Objects/Projectiles/Pin/pin.tscn")
 }
 
 var projectile_counter: int = 0
@@ -15,7 +16,9 @@ func spawn_projectile(spawn_pos: Vector2, dir: Vector2, shooter_id: String, proj
 		if not projectile_scenes.has(projectile_type):
 			printerr("Projectile type not found: " + projectile_type + ". Defaulting.")
 			projectile_type = "Default"
-			
+		
+		print("Spawning" + projectile_type)
+		
 		var projectile: Node = projectile_scenes[projectile_type].instantiate()
 		
 		projectile_counter += 1

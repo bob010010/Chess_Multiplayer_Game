@@ -10,6 +10,7 @@ var teleport_time: float = 1.0
 		queue_redraw()
 
 @onready var player: CharacterBody2D = get_parent().get_parent() as CharacterBody2D
+@onready var move_comp: Node2D = player.get_node("Components/MovementComponent")
 var active_illusion: Node2D = null
 
 # Tracks the active tweens so they can be explicitly killed before setting manual scale values.
@@ -40,14 +41,17 @@ func _perform_teleport(target_pos: Vector2) -> void:
 	var distance: float = minf(start_pos.distance_to(target_pos), max_range)
 	var final_position: Vector2 = start_pos + (direction * distance)
 	
-	# Trigger the shrink animation and wait for it to complete.
+
+	# Block movement, trigger the shrink animation and wait for it to complete.
+	move_comp.movement_blocked = true
 	current_cooldown = max_cooldown
 	trigger_teleport_visuals.rpc(true, final_position) 
 	await get_tree().create_timer(teleport_time + 0.1).timeout # + 0.1 so it doesnt teleport before the visuals are done
 	
-	# Snap the player to the destination and restore their normal scale.
+	# Allow movement, snap the player to the destination and restore their normal scale.
 	player.global_position = final_position
 	trigger_teleport_visuals.rpc(false, final_position) 
+	move_comp.movement_blocked = false
 
 # Executes a localized scaling tween animation on all clients to visually emphasize the teleportation.
 @rpc("authority", "call_local", "reliable")

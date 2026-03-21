@@ -2,6 +2,7 @@ extends Node
 
 @export var player_speed: int = 100
 var input_dir: Vector2 = Vector2.ZERO
+var movement_blocked: bool = false
 
 @onready var player: Node = get_parent().get_parent()
 
@@ -13,6 +14,10 @@ func _physics_process(_delta: float) -> void:
 
 # Reads WASD keys and synchronizes it with the server
 func _gather_input() -> void:
+	
+	if movement_blocked:
+		return
+	
 	var x: float = Input.get_axis("move_left", "move_right")
 	var y: float = Input.get_axis("move_up", "move_down")
 	var new_dir: Vector2 = Vector2(x, y)

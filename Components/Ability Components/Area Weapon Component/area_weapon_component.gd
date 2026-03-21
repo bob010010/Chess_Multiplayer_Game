@@ -52,6 +52,10 @@ func request_area_attack() -> void:
 	if not multiplayer.is_server() or current_cooldown > 0.0:
 		return
 		
+	var info_label: Node = player.get_node_or_null("HUD/InfoLabel")
+	if info_label:
+		info_label.display_message.rpc_id(player.name.to_int(), "Ability Used: Area Attack")
+		
 	current_cooldown = max_cooldown
 	current_duration = attack_duration
 	

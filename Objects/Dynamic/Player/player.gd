@@ -13,7 +13,7 @@ var shield_component: Node
 
 var shielding: bool = false
 
-@export var current_class: String = "Jester":
+@export var current_class: String = "Pawn_II":
 	set(value):
 		current_class = value
 		if is_node_ready():

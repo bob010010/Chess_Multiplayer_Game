@@ -56,7 +56,11 @@ func trigger_teleport_visuals(going_out: bool, target_pos: Vector2 = Vector2.ZER
 	var components: Node2D = player.get_node("Components") as Node2D
 	if not sprite or not components:
 		return
-		
+	
+	var info_label: Node = player.get_node_or_null("HUD/InfoLabel")
+	if info_label:
+		info_label.display_message.rpc_id(player.name.to_int(), "Ability Used: Teleport")
+	
 	# Kill any ongoing scaling tweens to prevent them from overriding the new manual scale.
 	if active_tween_sprite and active_tween_sprite.is_valid():
 		active_tween_sprite.kill()

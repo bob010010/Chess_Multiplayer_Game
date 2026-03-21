@@ -38,8 +38,7 @@
 [ext_resource type="PackedScene" uid="uid://drldjkjxrdrg" path="res://Components/Weapon Components/Ranged Weapon Components/Bow Component/bow_component.tscn" id="37_46ev8"]
 [ext_resource type="PackedScene" uid="uid://dlp1hxy3ufer6" path="res://Components/Shield Components/Magic Shield/magic_shield_component.tscn" id="37_ootfv"]
 [ext_resource type="PackedScene" uid="uid://2p2a116rfkeo" path="res://Components/Weapon Components/Ranged Weapon Components/Fireball Shooter Component/fireball_shooter_component.tscn" id="38_p8344"]
-[ext_resource type="PackedScene" uid="uid://dn8boj5kwnei2" path="res://Components/Stealth Components/Illusion Component/illusion_component.tscn" id="39_p8344"]
-[ext_resource type="PackedScene" uid="uid://bktkawpolxble" path="res://Components/Stealth Components/stealth_component.tscn" id="40_p5e7e"]
+[ext_resource type="PackedScene" uid="uid://dn8boj5kwnei2" path="res://Components/Illusion Component/illusion_component.tscn" id="39_p8344"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_sweqy"]
 properties/0/path = NodePath(".:position")
@@ -247,6 +246,7 @@ scale = Vector2(0.81, 0.81)
 shape = SubResource("RectangleShape2D_onrkg")
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=436632609]
+zoom = Vector2(0.7, 0.7)
 position_smoothing_enabled = true
 
 [node name="HUD" type="CanvasLayer" parent="." unique_id=298534784]
@@ -414,5 +414,3 @@ script = ExtResource("35_x2bxi")
 [node name="FireballShooterComponent" parent="Components" unique_id=269407601 instance=ExtResource("38_p8344")]
 
 [node name="IllusionComponent" parent="Components" unique_id=1196718733 instance=ExtResource("39_p8344")]
-
-[node name="StealthComponent" parent="Components" unique_id=577867912 instance=ExtResource("40_p5e7e")]

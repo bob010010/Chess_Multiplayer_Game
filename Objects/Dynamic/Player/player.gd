@@ -13,7 +13,7 @@ var shield_component: Node
 
 var shielding: bool = false
 
-@export var current_class: String = "Pawn":
+@export var current_class: String = "Jester":
 	set(value):
 		current_class = value
 		if is_node_ready():
@@ -46,8 +46,7 @@ var shielding: bool = false
 
 var knockback: Vector2 = Vector2.ZERO
 var knockback_force: int = 200
-var body_damage: int = 2
-var ranks: Array[String] = ["Knight", "Rook", "Bishop"]
+var body_damage: int
 
 # Initializes UI, colors, and connects component signals.
 func _ready() -> void:
@@ -60,7 +59,10 @@ func _ready() -> void:
 	promotion_component.apply_promotion_stats(current_class)
 	
 	health_component.died.connect(_on_player_died)
-	
+
+	if ranged_w_component:
+		ranged_w_component.apply_recoil.connect(_on_apply_recoil)
+
 	if name == str(multiplayer.get_unique_id()):
 		$PlayerSprite.modulate = Color(0, 1, 0)
 		$Camera2D.make_current()
@@ -81,8 +83,7 @@ func _ready() -> void:
 		$PlayerSprite.modulate = Color(1, 0, 0)
 		$HUD.hide()
 		$AbilityBar.hide()
-	if ranged_w_component:
-		ranged_w_component.apply_recoil.connect(_on_apply_recoil)
+
 
 # Updates the debug info display.
 func _process(_delta: float) -> void:
@@ -123,6 +124,10 @@ func check_first_ability_input() -> void:
 				first_ability_component.request_area_attack.rpc_id(1)
 			"Teleport":
 				first_ability_component.request_teleport.rpc_id(1, get_global_mouse_position())
+			"Illusion":
+				first_ability_component.request_scattered_illusions.rpc_id(1)
+			"Stealth":
+				first_ability_component.request_stealth.rpc_id(1)
 
 # Evaluates continuous input to request shield activation and deactivation from the server.
 func check_shield_input() -> void:
@@ -222,6 +227,10 @@ func _show_upgrade_menu() -> void:
 				valid_stats.append_array(["area_damage", "area_knockback", "area_radius", "area_cooldown"])
 			"Teleport":
 				valid_stats.append_array(["teleport_cooldown", "teleport_range"])
+			"Illusion":
+				valid_stats.append_array(["illusion_cooldown", "illusion_duration"])
+			"Stealth":
+				valid_stats.append_array(["stealth_cooldown", "stealth_duration"])
 		
 	for button: Node in $HUD/UpgradeUI.get_children():
 		var stat: String = valid_stats.pick_random()
@@ -319,23 +328,40 @@ func _change_r_weapon(weapon_type: String) -> void:
 # Updates the active first ability references, hides visuals, and disables processing for unused components.
 func _change_first_ability(ability_type: String) -> void:
 	match ability_type:
-		"Magic", "Teleport":
-			var magic: Node = $"Components/MagicAreaWeaponComponent"
-			magic.hide() 
-			magic.process_mode = Node.PROCESS_MODE_DISABLED
+		"Magic", "Teleport", "Illusion", "Stealth":
+			var magic: Node = get_node_or_null("Components/MagicAreaWeaponComponent")
+			if magic:
+				magic.hide() 
+				magic.process_mode = Node.PROCESS_MODE_DISABLED
 			
-			var teleport: Node = $"Components/TeleportComponent"
-			teleport.hide() 
-			teleport.process_mode = Node.PROCESS_MODE_DISABLED
+			var teleport: Node = get_node_or_null("Components/TeleportComponent")
+			if teleport:
+				teleport.hide() 
+				teleport.process_mode = Node.PROCESS_MODE_DISABLED
+				
+			var illusion: Node = get_node_or_null("Components/IllusionComponent")
+			if illusion:
+				illusion.hide()
+				illusion.process_mode = Node.PROCESS_MODE_DISABLED
+				
+			var stealth: Node = get_node_or_null("Components/StealthComponent")
+			if stealth:
+				stealth.hide()
+				stealth.process_mode = Node.PROCESS_MODE_DISABLED
 			
 			match ability_type:
 				"Magic":
 					first_ability_component = magic
 				"Teleport":
 					first_ability_component = teleport
+				"Illusion":
+					first_ability_component = illusion
+				"Stealth":
+					first_ability_component = stealth
 			
-			first_ability_component.show()
-			first_ability_component.process_mode = Node.PROCESS_MODE_INHERIT
+			if first_ability_component:
+				first_ability_component.show()
+				first_ability_component.process_mode = Node.PROCESS_MODE_INHERIT
 		"None":
 			if first_ability_component:
 				first_ability_component.hide()
@@ -412,7 +438,7 @@ func show_debug_info() -> void:
 		var no_melee_text: String = "No Melee Weapon"  + "\n" + "\n"
 		$HUD/StatsLabel.text += no_melee_text
 
-# FIRST ABILITY COMBAT
+	# FIRST ABILITY
 	if first_ability_component:
 		match current_first_ability:
 			"Magic":
@@ -427,10 +453,22 @@ func show_debug_info() -> void:
 				var tele_duration_text: String = "Til next: " + str(snapped(first_ability_component.current_cooldown, 0.1)) + "\n"
 				var tele_range_text: String = "Teleport Range: " + str(first_ability_component.max_range) + "\n\n"
 				$HUD/StatsLabel.text += tele_cooldown_text + tele_duration_text + tele_range_text
+			"Illusion":
+				var illu_cooldown_text: String = "Illusion Cooldown: " + str(first_ability_component.max_cooldown) + "\n"
+				var illu_duration_text: String = "Illusion Duration: " + str(first_ability_component.illusion_duration) + "\n"
+				var illu_time_text: String = "Til next: " + str(snapped(first_ability_component.current_cooldown, 0.1)) + "\n"
+				var illu_amount_text: String = "Illusion Amount: " + str(first_ability_component.illusions_count) + "\n\n"
+				$HUD/StatsLabel.text += illu_cooldown_text + illu_time_text + illu_duration_text + illu_amount_text
+			"Stealth":
+				var stealth_cd_text: String = "Stealth Cooldown: " + str(first_ability_component.max_cooldown) + "\n"
+				var stealth_dur_text: String = "Stealth Duration: " + str(first_ability_component.stealth_duration) + "\n"
+				var stealth_time_text: String = "Til next: " + str(snapped(first_ability_component.current_cooldown, 0.1)) + "\n\n"
+				$HUD/StatsLabel.text += stealth_cd_text + stealth_dur_text + stealth_time_text
 	else:
 		var no_ability_text: String = "No First Ability" + "\n" + "\n"
 		$HUD/StatsLabel.text += no_ability_text
 	
+	# SHIELD
 	if shield_component:
 		var max_shield_health_text = "Max Shield Health: " + str(shield_component.max_shield_health) + "\n"
 		var shield_health_text = "Shield Health: " + str(shield_component.shield_health) + "\n"

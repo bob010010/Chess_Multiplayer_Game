@@ -45,6 +45,8 @@ var max_tier_template: Dictionary = {
 	"area_cooldown": 2.0,
 	"teleport_range": 1000.0,
 	"teleport_cooldown": 2.0,
+	"stealth_cooldown": 12.0,
+	"stealth_duration": 3.0,
 	"shield_health": 200.0
 }
 
@@ -222,7 +224,25 @@ var class_base_stats: Dictionary = {
 	"King": max_tier_template.duplicate(),
 	"Queen": max_tier_template.duplicate(),
 	"Sultan": max_tier_template.duplicate(),
-	"Jester": max_tier_template.duplicate(),
+
+	"Jester": {
+		"player_speed": 520.0,
+		"max_health": 110.0,
+		"regen_speed": 2.0,
+		"regen_amount": 5.0,
+		"body_damage": 12.0,
+		"melee_damage": 35.0,
+		"melee_knockback": 450.0,
+		"melee_cooldown": 0.7,
+		"projectile_damage": 30.0,
+		"projectile_speed": 1300.0,
+		"reload_speed": 0.8,
+		"accuracy": 95.0,
+		"illusion_cooldown": 12.0,
+		"illusion_duration": 5.0,
+		"illusions_count": 6.0,
+		"shield_health": 70.0
+	},
 
 	# Rank 9
 	"Super_Queen": max_tier_template.duplicate(),
@@ -277,16 +297,22 @@ func change_weapon(class_choice: String) -> void:
 	match class_choice:
 		"Pawn", "Pawn_I", "Pawn_II":
 			new_m_weapon = "Spear"
-		"Knight", "Shadow_Knight", "Flowers_Knight", "Ottoman_Knight", "King_Knight":
+
+		"Knight", "Flowers_Knight", "Ottoman_Knight", "King_Knight":
 			new_m_weapon = "Sword"
 			new_first_ability = "Teleport"
+			
 		"Mini_Rook", "Rook", "Rook_Knight":
 			new_r_weapon = "Bow"
+
 		"Bishop", "Bishop_Knight":
 			new_r_weapon = "Fireball_Shooter"
 			new_first_ability = "Magic"
 			new_shield = "Magic"
-			
+
+		"Shadow_Knight":
+			new_m_weapon = "Sword"
+			new_first_ability = "Stealth"
 		"King":
 			new_m_weapon = "Sword"
 			new_r_weapon = "Bow"
@@ -305,8 +331,8 @@ func change_weapon(class_choice: String) -> void:
 		"Jester":
 			new_m_weapon = "Spear"
 			new_r_weapon = "Bow"
-			new_first_ability = "Teleport"
-			new_shield = "None"
+			new_first_ability = "Illusion"
+			new_shield = "Magic"
 		"Super_Queen":
 			new_m_weapon = "Sword"
 			new_r_weapon = "Fireball_Shooter"
@@ -315,7 +341,7 @@ func change_weapon(class_choice: String) -> void:
 		"Holy_Queen":
 			new_m_weapon = "Spear"
 			new_r_weapon = "Fireball_Shooter"
-			new_first_ability = "Magic"
+			new_first_ability = "Illusion"
 			new_shield = "Magic"
 			
 	player.current_melee_weapon = new_m_weapon
@@ -392,3 +418,15 @@ func apply_promotion_stats(class_choice: String) -> void:
 					first_ability_comp.max_range = float(base_stats["teleport_range"]) * float(upgrades["teleport_range"])
 				if base_stats.has("teleport_cooldown"):
 					first_ability_comp.max_cooldown = float(base_stats["teleport_cooldown"]) * float(upgrades["teleport_cooldown"])
+			"Illusion":
+				if base_stats.has("illusion_cooldown"):
+					first_ability_comp.max_cooldown = float(base_stats["illusion_cooldown"]) * float(upgrades["illusion_cooldown"])
+				if base_stats.has("illusion_duration"):
+					first_ability_comp.illusion_duration = float(base_stats["illusion_duration"]) * float(upgrades["illusion_duration"])
+				if base_stats.has("illusions_count"):
+					first_ability_comp.illusions_count = int(float(base_stats["illusions_count"]) * float(upgrades["illusions_count"]))
+			"Stealth":
+				if base_stats.has("stealth_cooldown"):
+					first_ability_comp.max_cooldown = float(base_stats["stealth_cooldown"]) * float(upgrades["stealth_cooldown"])
+				if base_stats.has("stealth_duration"):
+					first_ability_comp.stealth_duration = float(base_stats["stealth_duration"]) * float(upgrades["stealth_duration"])

@@ -42,5 +42,7 @@ func get_colour_based_on_type() -> Color:
 			return Color(0.816, 0.212, 0.604, 0.6)
 		"max_cooldown", "max_range":
 			return Color(0.792, 0.102, 0.949, 0.6)
+		"max_cooldown", "illusion_duration", "illusions_count":
+			return Color(0.0, 0.337, 0.0, 0.6)
 		_:
-			return Color("6c6563ff")
+			return Color(0.424, 0.396, 0.388, 0.6)

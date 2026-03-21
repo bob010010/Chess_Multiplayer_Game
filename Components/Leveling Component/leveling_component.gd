@@ -44,11 +44,19 @@ var upgrade_increments: Dictionary = {
 	#Teleport
 	"teleport_cooldown": 0.9,
 	"teleport_range": 1.1,
+
+	#Illusion
+	"illusion_cooldown": 0.9,
+	"illusion_duration": 1.2,
+	"illusion_amount": 1.2,
+
+	#Stealth
+	"stealth_cooldown": 0.9,
+	"stealth_duration": 1.2,
 	
 	#Shield
 	"shield_health": 1.2
 }
-
 
 # The cumulative multipliers tracked continuously throughout the player's life.
 var stat_multipliers: Dictionary = {
@@ -80,6 +88,15 @@ var stat_multipliers: Dictionary = {
 	#Teleport
 	"teleport_cooldown": 1.0,
 	"teleport_range": 1.0,
+	
+	#Illusion
+	"illusion_cooldown": 1.0,
+	"illusion_duration": 1.0,
+	"illusions_count": 1.0,
+
+	#Stealth
+	"stealth_cooldown": 1.0,
+	"stealth_duration": 1.0,
 	
 	#Shield
 	"shield_health": 1.0

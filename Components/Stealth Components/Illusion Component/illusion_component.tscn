@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://dn8boj5kwnei2"]
+
+[ext_resource type="Script" uid="uid://da5ctw2lgkvai" path="res://Components/Stealth Components/Illusion Component/illusion_component.gd" id="1_dvx3g"]
+
+[node name="IllusionComponent" type="Node2D" unique_id=1196718733]
+script = ExtResource("1_dvx3g")

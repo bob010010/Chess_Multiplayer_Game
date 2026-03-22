@@ -47,6 +47,8 @@ var max_tier_template: Dictionary = {
 	"teleport_cooldown": 2.0,
 	"stealth_cooldown": 12.0,
 	"stealth_duration": 3.0,
+	"spawner_cooldown": 12.0,
+	"spawner_limit": 2.0,
 	"shield_health": 200.0
 }
 
@@ -154,6 +156,8 @@ var class_base_stats: Dictionary = {
 		"melee_damage": 40.0,
 		"melee_knockback": 800.0,
 		"melee_cooldown": 1.5,
+		"spawner_cooldown": 12.0,
+		"spawner_limit": 2.0,
 		"shield_health": 120.0
 	},
 	"Bishop": {
@@ -198,6 +202,8 @@ var class_base_stats: Dictionary = {
 		"melee_cooldown": 1.0,
 		"teleport_range": 350.0,
 		"teleport_cooldown": 6.0,
+		"spawner_cooldown": 12.0,
+		"spawner_limit": 2.0,
 		"shield_health": 100.0
 	},
 	"Bishop_Knight": {
@@ -277,6 +283,7 @@ func request_promotion(choice: String) -> void:
 		return
 		
 	if pending_promotions > 0:
+		print("Trying to promote")
 		pending_promotions -= 1
 		
 		change_weapon(choice)
@@ -311,9 +318,13 @@ func change_weapon(class_choice: String) -> void:
 			new_m_weapon = "Sword"
 			new_first_ability = "Teleport"
 			
-		"Mini_Rook", "Rook", "Rook_Knight":
+		"Mini_Rook":
 			new_r_weapon = "Bow"
-
+		
+		"Rook", "Rook_Knight":
+			new_r_weapon = "Bow"
+			new_first_ability = "Spawner"
+		
 		"Bishop", "Bishop_Knight":
 			new_r_weapon = "Fireball_Shooter"
 			new_first_ability = "Magic"
@@ -352,7 +363,7 @@ func change_weapon(class_choice: String) -> void:
 			new_r_weapon = "Fireball_Shooter"
 			new_first_ability = "Illusion"
 			new_shield = "Magic"
-			
+	print("New ability: " + new_first_ability)
 	player.current_melee_weapon = new_m_weapon
 	player.current_ranged_weapon = new_r_weapon
 	player.current_first_ability = new_first_ability
@@ -439,3 +450,8 @@ func apply_promotion_stats(class_choice: String) -> void:
 					first_ability_comp.max_cooldown = float(base_stats["stealth_cooldown"]) * float(upgrades["stealth_cooldown"])
 				if base_stats.has("stealth_duration"):
 					first_ability_comp.stealth_duration = float(base_stats["stealth_duration"]) * float(upgrades["stealth_duration"])
+			"Spawner":
+					if base_stats.has("spawner_cooldown"):
+						first_ability_comp.max_cooldown = float(base_stats["spawner_cooldown"]) * float(upgrades["spawner_cooldown"])
+					if base_stats.has("max_spawns"):
+						first_ability_comp.max_spawns = int(float(base_stats["max_spawns"]) * float(upgrades["max_spawns"]))

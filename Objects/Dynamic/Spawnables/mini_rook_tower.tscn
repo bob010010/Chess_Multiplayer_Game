@@ -1,0 +1,57 @@
+[gd_scene format=3 uid="uid://b2rtodncqul3h"]
+
+[ext_resource type="Script" uid="uid://dm3wlrl0ecmr1" path="res://Objects/Dynamic/Spawnables/mini_rook_tower.gd" id="1_2373d"]
+[ext_resource type="Texture2D" uid="uid://b6grref5skx1o" path="res://images/chess-pieces/white-rook4.png" id="1_j1h6l"]
+[ext_resource type="PackedScene" uid="uid://bah68f313cuc3" path="res://Components/Health Component/health_component.tscn" id="1_jxjvf"]
+[ext_resource type="PackedScene" uid="uid://b0tv68ilswjsh" path="res://UI/Bars/Health Bar/health_bar.tscn" id="3_41amo"]
+[ext_resource type="PackedScene" uid="uid://drldjkjxrdrg" path="res://Components/Weapon Components/Ranged Weapon Components/Bow Component/bow_component.tscn" id="3_2373d"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_j1h6l"]
+size = Vector2(82, 75)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_41amo"]
+size = Vector2(1228, 1053)
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_2373d"]
+properties/0/path = NodePath(".:position")
+properties/0/spawn = true
+properties/0/replication_mode = 2
+properties/1/path = NodePath(".:rotation")
+properties/1/spawn = true
+properties/1/replication_mode = 2
+properties/2/path = NodePath("Components/HealthComponent:health")
+properties/2/spawn = true
+properties/2/replication_mode = 2
+
+[node name="Mini_Rook_Tower" type="StaticBody2D" unique_id=228438802]
+scale = Vector2(0.4, 0.4)
+script = ExtResource("1_2373d")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=509983907]
+texture = ExtResource("1_j1h6l")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=2122222128]
+position = Vector2(0, 12.5)
+shape = SubResource("RectangleShape2D_j1h6l")
+
+[node name="Area2D" type="Area2D" parent="." unique_id=707570078]
+
+[node name="DetectionArea" type="CollisionShape2D" parent="Area2D" unique_id=737770204]
+scale = Vector2(1.5, 1.5)
+shape = SubResource("RectangleShape2D_41amo")
+
+[node name="Components" type="Node2D" parent="." unique_id=489340707]
+
+[node name="HealthComponent" parent="Components" unique_id=421527654 instance=ExtResource("1_jxjvf")]
+
+[node name="BowComponent" parent="Components" unique_id=73394275 instance=ExtResource("3_2373d")]
+position = Vector2(0, 4.9999995)
+
+[node name="HealthBar" parent="." unique_id=1748738400 instance=ExtResource("3_41amo")]
+offset_left = -30.0
+offset_top = 60.0
+offset_right = 30.0
+offset_bottom = 70.0
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=168763180]
+replication_config = SubResource("SceneReplicationConfig_2373d")

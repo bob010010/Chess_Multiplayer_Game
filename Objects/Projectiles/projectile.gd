@@ -38,9 +38,9 @@ func _on_body_entered(body: Node2D) -> void:
 		if body.has_method("apply_bounce"):
 			body.apply_bounce(direction * 250)
 			
-			# Applies damage to the hit entity
-			if body.has_method("take_damage"):
-				body.take_damage(damage, shooter_id)
+		# Applies damage to the hit entity
+		if body.has_method("take_damage"):
+			body.take_damage(damage, shooter_id)
 				
 		# Trigger the custom subclass hit behavior
 		_on_hit(body)

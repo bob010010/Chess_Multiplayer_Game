@@ -11,9 +11,11 @@ var area_w_component: Node
 var first_ability_component: Node
 var shield_component: Node
 
+@export var team_id: int = 0
+
 var shielding: bool = false
 
-@export var current_class: String = "Jester":
+@export var current_class: String = "Rook_Knight":
 	set(value):
 		current_class = value
 		if is_node_ready():
@@ -36,6 +38,7 @@ var shielding: bool = false
 	set(value):
 		current_first_ability = value
 		if is_node_ready():
+			print(value)
 			_change_first_ability(value)
 
 @export var current_shield: String = "Wooden":
@@ -83,7 +86,21 @@ func _ready() -> void:
 		$PlayerSprite.modulate = Color(1, 0, 0)
 		$HUD.hide()
 		$AbilityBar.hide()
+	print(team_id)
 
+func apply_team_color() -> void:
+	var sprite: Sprite2D = get_node_or_null("PlayerSprite")
+	if not sprite:
+		return
+		
+	var local_id: String = str(multiplayer.get_unique_id())
+	var local_player: Node = get_tree().current_scene.get_node_or_null(local_id)
+	print("P")
+	if local_player:
+		if self.team_id == local_player.team_id:
+			sprite.modulate = Color(0, 1.0, 0)
+		else:
+			sprite.modulate = Color(1, 0, 0)
 
 # Updates the debug info display.
 func _process(_delta: float) -> void:
@@ -128,6 +145,8 @@ func check_first_ability_input() -> void:
 				first_ability_component.request_scattered_illusions.rpc_id(1)
 			"Stealth":
 				first_ability_component.request_stealth.rpc_id(1)
+			"Spawner":
+				first_ability_component.request_spawn.rpc_id(1, position)
 
 # Evaluates continuous input to request shield activation and deactivation from the server.
 func check_shield_input() -> void:
@@ -231,6 +250,8 @@ func _show_upgrade_menu() -> void:
 				valid_stats.append_array(["illusion_cooldown", "illusion_duration"])
 			"Stealth":
 				valid_stats.append_array(["stealth_cooldown", "stealth_duration"])
+			"Spawner":
+				valid_stats.append_array(["spawner_cooldown", "max_spawns"])
 		
 	for button: Node in $HUD/UpgradeUI.get_children():
 		var stat: String = valid_stats.pick_random()
@@ -334,7 +355,7 @@ func _change_r_weapon(weapon_type: String) -> void:
 # Updates the active first ability references, hides visuals, and disables processing for unused components.
 func _change_first_ability(ability_type: String) -> void:
 	match ability_type:
-		"Magic", "Teleport", "Illusion", "Stealth":
+		"Magic", "Teleport", "Illusion", "Stealth", "Spawner":
 			var magic: Node = get_node_or_null("Components/MagicAreaWeaponComponent")
 			if magic:
 				magic.hide() 
@@ -354,7 +375,12 @@ func _change_first_ability(ability_type: String) -> void:
 			if stealth:
 				stealth.hide()
 				stealth.process_mode = Node.PROCESS_MODE_DISABLED
-			
+				
+			var spawner: Node = get_node_or_null("Components/SpawnerComponent")
+			if spawner:
+				spawner.hide()
+				spawner.process_mode = Node.PROCESS_MODE_DISABLED
+			print("Setting to: " + ability_type)
 			match ability_type:
 				"Magic":
 					first_ability_component = magic
@@ -364,6 +390,8 @@ func _change_first_ability(ability_type: String) -> void:
 					first_ability_component = illusion
 				"Stealth":
 					first_ability_component = stealth
+				"Spawner":
+					first_ability_component = spawner
 			
 			if first_ability_component:
 				first_ability_component.show()

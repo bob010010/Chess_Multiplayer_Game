@@ -13,7 +13,6 @@
 [ext_resource type="Texture2D" uid="uid://fb7p2l5bl7vo" path="res://images/chess-pieces/white-rook.png" id="5_op7ga"]
 [ext_resource type="Script" uid="uid://grm2y86px8ee" path="res://Components/Movement Component/movement_component.gd" id="6_2hs0m"]
 [ext_resource type="Texture2D" uid="uid://cniblbm6wnaui" path="res://images/chess-pieces/white-bishop.png" id="6_q13i1"]
-[ext_resource type="Script" uid="uid://bjthdas6w0rl7" path="res://Components/Health Component/health_component.gd" id="7_1jxqw"]
 [ext_resource type="Script" uid="uid://bcp4tn61yaump" path="res://Components/Leveling Component/leveling_component.gd" id="8_dw050"]
 [ext_resource type="Texture2D" uid="uid://b6grref5skx1o" path="res://images/chess-pieces/white-rook4.png" id="9_4ge2x"]
 [ext_resource type="Texture2D" uid="uid://bti2nc5m3le0j" path="res://images/chess-pieces/white-nightrd.png" id="10_ktvaa"]
@@ -42,6 +41,8 @@
 [ext_resource type="PackedScene" uid="uid://dn8boj5kwnei2" path="res://Components/Ability Components/Stealth Components/Illusion Component/illusion_component.tscn" id="39_p8344"]
 [ext_resource type="PackedScene" uid="uid://bktkawpolxble" path="res://Components/Ability Components/Stealth Components/stealth_component.tscn" id="40_p5e7e"]
 [ext_resource type="PackedScene" uid="uid://c15lyias44lvs" path="res://Components/Weapon Components/Ranged Weapon Components/Pin Shooter Component/pin_shooter_component.tscn" id="42_pst4n"]
+[ext_resource type="PackedScene" uid="uid://bah68f313cuc3" path="res://Components/Health Component/health_component.tscn" id="42_psthg"]
+[ext_resource type="PackedScene" uid="uid://qsi0va4ssotc" path="res://Components/Ability Components/Spawner Component/spawner_component.tscn" id="43_psthg"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_sweqy"]
 properties/0/path = NodePath(".:position")
@@ -408,9 +409,6 @@ show_percentage = false
 [node name="MovementComponent" type="Node2D" parent="Components" unique_id=795235486]
 script = ExtResource("6_2hs0m")
 
-[node name="HealthComponent" type="Node2D" parent="Components" unique_id=643590896]
-script = ExtResource("7_1jxqw")
-
 [node name="LevelingComponent" type="Node2D" parent="Components" unique_id=1888361447]
 position = Vector2(0, 12)
 script = ExtResource("8_dw050")
@@ -446,3 +444,7 @@ script = ExtResource("35_x2bxi")
 [node name="StealthComponent" parent="Components" unique_id=577867912 instance=ExtResource("40_p5e7e")]
 
 [node name="PinShooterComponent" parent="Components" unique_id=1351820741 instance=ExtResource("42_pst4n")]
+
+[node name="HealthComponent" parent="Components" unique_id=421527654 instance=ExtResource("42_psthg")]
+
+[node name="SpawnerComponent" parent="Components" unique_id=1294504567 instance=ExtResource("43_psthg")]

@@ -6,7 +6,7 @@ var knockback: Vector2 = Vector2.ZERO
 var weight: int = 1
 var distance_factor: float = 0.0
 @export var points_value: int
-
+var team_id: int = 999
 @export var shape_type: String = "":
 	set(value):
 		shape_type = value

@@ -13,7 +13,8 @@ func _ready() -> void:
 	var sprite_comp = get_node_or_null("Sprite2D")
 	if sprite_comp: 
 		sprite_comp.texture = [red_texture, green_texture, blue_texture].pick_random()
-		print(str(sprite_comp.texture))
+	else:
+		printerr("No sprite node for pin")
 	if multiplayer.is_server():
 		body_entered.connect(_on_body_entered)
 

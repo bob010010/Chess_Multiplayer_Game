@@ -54,6 +54,10 @@ var upgrade_increments: Dictionary = {
 	"stealth_cooldown": 0.9,
 	"stealth_duration": 1.2,
 	
+	#Spawning
+	"spawner_cooldown": 0.9,
+	"spawner_limit": 1.2,
+	
 	#Shield
 	"shield_health": 1.2
 }
@@ -97,6 +101,10 @@ var stat_multipliers: Dictionary = {
 	#Stealth
 	"stealth_cooldown": 1.0,
 	"stealth_duration": 1.0,
+	
+	#Spawning
+	"spawner_cooldown": 1.0,
+	"spawner_limit": 1.0,
 	
 	#Shield
 	"shield_health": 1.0

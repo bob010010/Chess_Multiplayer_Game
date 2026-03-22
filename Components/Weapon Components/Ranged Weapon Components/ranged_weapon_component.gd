@@ -30,7 +30,7 @@ func _physics_process(delta: float) -> void:
 func shoot(click_pos: Vector2) -> void:
 	if shot_cooldown > 0:
 		return
-		
+	print("Tryna shoot" + str(click_pos))
 	var shoot_dir: Vector2 = (click_pos - player.global_position).normalized()
 	
 	#Adds bloom to create inaccuracy

@@ -17,8 +17,6 @@ func spawn_projectile(spawn_pos: Vector2, dir: Vector2, shooter_id: String, proj
 			printerr("Projectile type not found: " + projectile_type + ". Defaulting.")
 			projectile_type = "Default"
 		
-		print("Spawning" + projectile_type)
-		
 		var projectile: Node = projectile_scenes[projectile_type].instantiate()
 		
 		projectile_counter += 1

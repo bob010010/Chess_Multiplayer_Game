@@ -216,6 +216,18 @@ properties/55/replication_mode = 2
 properties/56/path = NodePath("Components/PinShooterComponent:reload_speed")
 properties/56/spawn = true
 properties/56/replication_mode = 2
+properties/57/path = NodePath(".:team_id")
+properties/57/spawn = true
+properties/57/replication_mode = 2
+properties/58/path = NodePath("Components/SpawnerComponent:current_cooldown")
+properties/58/spawn = true
+properties/58/replication_mode = 2
+properties/59/path = NodePath("Components/SpawnerComponent:max_cooldown")
+properties/59/spawn = true
+properties/59/replication_mode = 2
+properties/60/path = NodePath("Components/SpawnerComponent:max_spawns")
+properties/60/spawn = true
+properties/60/replication_mode = 2
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_onrkg"]
 size = Vector2(138.27162, 177.77779)

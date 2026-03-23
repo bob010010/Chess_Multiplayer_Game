@@ -55,7 +55,6 @@ var body_damage: int
 func _ready() -> void:
 	#Initialises the class on spawn
 	if is_node_ready():
-		print(current_class)
 		sprite_component._on_promotion_applied(current_class)
 	
 	promotion_component.change_weapon(current_class)
@@ -89,18 +88,18 @@ func _ready() -> void:
 	print(team_id)
 
 func apply_team_color() -> void:
-	var sprite: Sprite2D = get_node_or_null("PlayerSprite")
+	var sprite: Sprite2D = get_node_or_null("PlayerSprite") as Sprite2D
 	if not sprite:
 		return
 		
 	var local_id: String = str(multiplayer.get_unique_id())
-	var local_player: Node = get_tree().current_scene.get_node_or_null(local_id)
-	print("P")
-	if local_player:
-		if self.team_id == local_player.team_id:
-			sprite.modulate = Color(0, 1.0, 0)
+	var local_player: Node2D = get_tree().current_scene.find_child(local_id, true, false) as Node2D
+	
+	if local_player and "team_id" in local_player:
+		if self.team_id == local_player.get("team_id"):
+			sprite.modulate = Color(0.0, 1.0, 0.0)
 		else:
-			sprite.modulate = Color(1, 0, 0)
+			sprite.modulate = Color(1.0, 0.0, 0.0)
 
 # Updates the debug info display.
 func _process(_delta: float) -> void:
@@ -251,7 +250,7 @@ func _show_upgrade_menu() -> void:
 			"Stealth":
 				valid_stats.append_array(["stealth_cooldown", "stealth_duration"])
 			"Spawner":
-				valid_stats.append_array(["spawner_cooldown", "max_spawns"])
+				valid_stats.append_array(["spawner_cooldown", "spawner_limit"])
 		
 	for button: Node in $HUD/UpgradeUI.get_children():
 		var stat: String = valid_stats.pick_random()
@@ -380,7 +379,6 @@ func _change_first_ability(ability_type: String) -> void:
 			if spawner:
 				spawner.hide()
 				spawner.process_mode = Node.PROCESS_MODE_DISABLED
-			print("Setting to: " + ability_type)
 			match ability_type:
 				"Magic":
 					first_ability_component = magic
@@ -498,6 +496,11 @@ func show_debug_info() -> void:
 				var stealth_dur_text: String = "Stealth Duration: " + str(first_ability_component.stealth_duration) + "\n"
 				var stealth_time_text: String = "Til next: " + str(snapped(first_ability_component.current_cooldown, 0.1)) + "\n\n"
 				$HUD/StatsLabel.text += stealth_cd_text + stealth_dur_text + stealth_time_text
+			"Spawner":
+				var spawner_cd_text: String = "Spawner Cooldown: " + str(first_ability_component.max_cooldown) + "\n"
+				var stealth_time_text: String = "Til next: " + str(snapped(first_ability_component.current_cooldown, 0.1)) + "\n"
+				var stealth_dur_text: String = "Max spawns: " + str(first_ability_component.max_spawns) + "\n\n"
+				$HUD/StatsLabel.text += spawner_cd_text + stealth_time_text + stealth_dur_text
 	else:
 		var no_ability_text: String = "No First Ability" + "\n" + "\n"
 		$HUD/StatsLabel.text += no_ability_text

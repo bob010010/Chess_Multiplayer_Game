@@ -53,7 +53,7 @@ func broadcast_leaderboard() -> void:
 	for player: Node in $SpawnedPlayers.get_children():
 		var leveling_comp: Node = player.get_node_or_null("Components/LevelingComponent")
 		if leveling_comp:
-			scores.append({"id": player.name, "score": leveling_comp.total_score})
+			scores.append({"id": player.name, "score": leveling_comp.total_score, "team_id": player.team_id})
 			
 	# Sort the array from highest score to lowest
 	scores.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return a["score"] > b["score"])
@@ -63,7 +63,7 @@ func broadcast_leaderboard() -> void:
 	for i: int in range(scores.size()):
 		var p_data: Dictionary = scores[i]
 		var prefix: String = "Player " if p_data["id"] != "1" else "Host "
-		lb_text += str(i + 1) + ". " + prefix + p_data["id"].left(4) + " - Score: " + str(p_data["score"]) + "\n"
+		lb_text += str(i + 1) + ". " + prefix + p_data["id"].left(4) + " - Score: " + str(p_data["score"]) + " - Team: " + str(p_data["team_id"]) + "\n"
 		
 	# Beam the compiled text to all clients
 	update_leaderboard_rpc.rpc(lb_text)

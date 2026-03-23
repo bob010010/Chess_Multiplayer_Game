@@ -4,12 +4,19 @@ signal died(attacker_id: String)
 
 @export var max_health: int = 500
 var health: int = 500
+
+var healing: bool = true
 @export var regen_amount: int = 2
 @export var regen_speed: float = 10.0
 var regen_cooldown: float = regen_speed
 
+var decaying: bool = false
+var decay_amount: int = 1
+var decay_speed: float = 10.0
+var decay_cooldown: float = decay_speed
+
 @onready var object: Node = get_parent().get_parent()
-var health_bar: ProgressBar 
+var health_bar: ProgressBar
 
 var active_dmg_label: Label = null
 var active_heal_label: Label = null
@@ -24,13 +31,25 @@ func _ready() -> void:
 	if not health_bar:
 		printerr("No health bar")
 
-# Deducts health, emits death signal if empty, and triggers floating damage text.
-func take_damage(amount: int, attacker_id: String = "") -> void:
-	if multiplayer.is_server():
-		health -= amount
-		spawn_floating_text.rpc(amount, false)
-		if health <= 0:
-			died.emit(attacker_id)
+# Handles passive health regeneration/decay exclusively on the server.
+func _process(delta: float) -> void:
+	if not multiplayer.is_server():
+		return
+
+	# Handles regeneration only when the object is damaged.
+	if healing and health < max_health:
+		regen_cooldown -= delta
+		if regen_cooldown <= 0.0:
+			regen_cooldown = regen_speed
+			heal(regen_amount)
+
+	# Handles decay regardless of current health status.
+	if decaying and health > 0:
+		decay_cooldown -= delta
+		if decay_cooldown <= 0.0:
+			decay_cooldown = decay_speed
+			take_damage(decay_amount, "")
+
 
 # Restores health up to the maximum limit and triggers floating heal text.
 func heal(amount: int) -> void:
@@ -43,13 +62,14 @@ func heal(amount: int) -> void:
 			health += actual_heal
 			spawn_floating_text.rpc(actual_heal, true)
 
-# Handles passive health regeneration exclusively on the server.
-func _process(delta: float) -> void:
-	if multiplayer.is_server() and health < max_health:
-		regen_cooldown -= delta
-		if regen_cooldown <= 0.0:
-			regen_cooldown = regen_speed
-			heal(regen_amount)
+# Deducts health, emits death signal if empty, and triggers floating damage text.
+func take_damage(amount: int, attacker_id: String = "") -> void:
+	if multiplayer.is_server():
+		health -= amount
+		spawn_floating_text.rpc(amount, false)
+
+		if health <= 0:
+			died.emit(attacker_id)
 
 # Spawns or updates a floating, vanishing label on all clients to stack health changes dynamically from the base position.
 @rpc("authority", "call_local", "unreliable")

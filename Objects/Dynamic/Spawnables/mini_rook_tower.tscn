@@ -22,6 +22,12 @@ properties/1/replication_mode = 2
 properties/2/path = NodePath("Components/HealthComponent:health")
 properties/2/spawn = true
 properties/2/replication_mode = 2
+properties/3/path = NodePath(".:team_id")
+properties/3/spawn = true
+properties/3/replication_mode = 2
+properties/4/path = NodePath("Components/HealthComponent:max_health")
+properties/4/spawn = true
+properties/4/replication_mode = 1
 
 [node name="Mini_Rook_Tower" type="StaticBody2D" unique_id=228438802]
 scale = Vector2(0.4, 0.4)
@@ -39,6 +45,7 @@ shape = SubResource("RectangleShape2D_j1h6l")
 [node name="DetectionArea" type="CollisionShape2D" parent="Area2D" unique_id=737770204]
 scale = Vector2(1.5, 1.5)
 shape = SubResource("RectangleShape2D_41amo")
+debug_color = Color(0.5513601, 0.4082944, 0.9865976, 0.1764706)
 
 [node name="Components" type="Node2D" parent="." unique_id=489340707]
 

@@ -30,7 +30,6 @@ func _physics_process(delta: float) -> void:
 func shoot(click_pos: Vector2) -> void:
 	if shot_cooldown > 0:
 		return
-	print("Tryna shoot" + str(click_pos))
 	var shoot_dir: Vector2 = (click_pos - player.global_position).normalized()
 	
 	#Adds bloom to create inaccuracy
@@ -49,8 +48,13 @@ func shoot(click_pos: Vector2) -> void:
 
 # Spawns the projectile and triggers the recoil signal
 func _spawn_projectile_and_recoil(dir: Vector2) -> void:
-	# Make sure to rename your spawner node and function in your main scene!
-	get_tree().current_scene.get_node("SpawnedProjectiles").spawn_projectile(player.global_position, dir, player.name, projectile_speed, projectile_damage, projectile_type)
+	var shooter_identity: String = player.name
+	
+	# If the component is attached to a tower, use the tower's stored owner ID for kill credit.
+	if "owner_peer_id" in player and player.get("owner_peer_id") != "":
+		shooter_identity = player.get("owner_peer_id")
+		
+	get_tree().current_scene.get_node("SpawnedProjectiles").spawn_projectile(player.global_position, dir, shooter_identity, projectile_speed, projectile_damage, projectile_type)
 	apply_recoil.emit(-dir * recoil_strength)
 
 # Used by clients to ask the server to spawn a projectile

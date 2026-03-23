@@ -56,7 +56,7 @@ var upgrade_increments: Dictionary = {
 	
 	#Spawning
 	"spawner_cooldown": 0.9,
-	"spawner_limit": 1.2,
+	"max_spawns": 1.2,
 	
 	#Shield
 	"shield_health": 1.2
@@ -73,10 +73,10 @@ var stat_multipliers: Dictionary = {
 	"regen_amount": 1.0,
 	
 	#Ranged
-	"projectile_damage": 1.1,
-	"projectile_speed": 1.1,
+	"projectile_damage": 1.0,
+	"projectile_speed": 1.0,
 	"reload_speed": 0.9,
-	"accuracy": 1.1,
+	"accuracy": 1.0,
 	
 	#Melee
 	"melee_damage": 1.0,
@@ -104,7 +104,7 @@ var stat_multipliers: Dictionary = {
 	
 	#Spawning
 	"spawner_cooldown": 1.0,
-	"spawner_limit": 1.0,
+	"max_spawns": 1.0,
 	
 	#Shield
 	"shield_health": 1.0

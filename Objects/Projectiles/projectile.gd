@@ -33,7 +33,11 @@ func _on_body_entered(body: Node2D) -> void:
 		# Ignores collision with the shooter
 		if body.name == shooter_id:
 			return 
-			
+		
+		# Checks if the target shares the same team ID as the projectile
+		if body.has_method("get") and body.get("team_id") == get_meta("team_id", -1):
+			return
+		
 		# Applies knockback to the hit entity
 		if body.has_method("apply_bounce"):
 			body.apply_bounce(direction * 250)

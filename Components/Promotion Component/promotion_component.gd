@@ -48,7 +48,7 @@ var max_tier_template: Dictionary = {
 	"stealth_cooldown": 12.0,
 	"stealth_duration": 3.0,
 	"spawner_cooldown": 12.0,
-	"spawner_limit": 2.0,
+	"max_spawns": 7.0,
 	"shield_health": 200.0
 }
 
@@ -157,7 +157,7 @@ var class_base_stats: Dictionary = {
 		"melee_knockback": 800.0,
 		"melee_cooldown": 1.5,
 		"spawner_cooldown": 12.0,
-		"spawner_limit": 2.0,
+		"max_spawns": 3.0,
 		"shield_health": 120.0
 	},
 	"Bishop": {
@@ -203,7 +203,7 @@ var class_base_stats: Dictionary = {
 		"teleport_range": 350.0,
 		"teleport_cooldown": 6.0,
 		"spawner_cooldown": 12.0,
-		"spawner_limit": 2.0,
+		"max_spawns": 5.0,
 		"shield_health": 100.0
 	},
 	"Bishop_Knight": {
@@ -320,16 +320,13 @@ func change_weapon(class_choice: String) -> void:
 			
 		"Mini_Rook":
 			new_r_weapon = "Bow"
-		
 		"Rook", "Rook_Knight":
 			new_r_weapon = "Bow"
 			new_first_ability = "Spawner"
-		
 		"Bishop", "Bishop_Knight":
 			new_r_weapon = "Fireball_Shooter"
 			new_first_ability = "Magic"
 			new_shield = "Magic"
-
 		"Shadow_Knight":
 			new_m_weapon = "Sword"
 			new_first_ability = "Stealth"
@@ -346,7 +343,7 @@ func change_weapon(class_choice: String) -> void:
 		"Sultan":
 			new_m_weapon = "Spear"
 			new_r_weapon = "Fireball_Shooter"
-			new_first_ability = "Teleport"
+			new_first_ability = "Spawner"
 			new_shield = "Wooden"
 		"Jester":
 			new_m_weapon = "Spear"

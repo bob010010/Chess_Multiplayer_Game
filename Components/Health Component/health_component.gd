@@ -3,10 +3,10 @@ extends Node
 signal died(attacker_id: String)
 
 @export var max_health: int = 500
-var health: int = 500
+var health: float = 500
 
 var healing: bool = true
-@export var regen_amount: int = 2
+@export var regen_amount: float = 2.0
 @export var regen_speed: float = 10.0
 var regen_cooldown: float = regen_speed
 
@@ -52,9 +52,9 @@ func _process(delta: float) -> void:
 
 
 # Restores health up to the maximum limit and triggers floating heal text.
-func heal(amount: int) -> void:
+func heal(amount: float) -> void:
 	if multiplayer.is_server():
-		var actual_heal: int = amount
+		var actual_heal: float = amount
 		if health + amount > max_health:
 			actual_heal = max_health - health
 			

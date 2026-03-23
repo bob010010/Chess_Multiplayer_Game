@@ -1,18 +1,20 @@
-# Components/Ability Components/spawner_component.gd
 extends Node2D
 class_name SpawnerComponent
 
 @export var max_cooldown: float = 15.0
 var current_cooldown: float = 0.0
 @export var max_spawns: int = 2
+var current_spawns: int = 0
 
 @onready var player: CharacterBody2D = get_parent().get_parent() as CharacterBody2D
 
 var active_towers: Array[Node2D] = []
 
+
 func _process(delta: float) -> void:
 	if multiplayer.is_server() and current_cooldown > 0.0:
 		current_cooldown -= delta
+		current_spawns = active_towers.size()
 
 @rpc("any_peer", "call_local", "reliable")
 func request_spawn(spawn_pos: Vector2) -> void:

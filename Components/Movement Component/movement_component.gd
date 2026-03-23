@@ -8,7 +8,6 @@ var movement_blocked: bool = false
 
 # Triggers local input gathering for the client
 func _physics_process(_delta: float) -> void:
-	# Client gets input
 	if player.name == str(multiplayer.get_unique_id()):
 		_gather_input()
 
@@ -16,6 +15,7 @@ func _physics_process(_delta: float) -> void:
 func _gather_input() -> void:
 	
 	if movement_blocked:
+		input_dir = Vector2.ZERO
 		return
 	
 	var x: float = Input.get_axis("move_left", "move_right")
@@ -24,7 +24,7 @@ func _gather_input() -> void:
 		
 	if new_dir.length() > 0:
 		new_dir = new_dir.normalized()
-		
+
 	# Only send an RPC if the input actually changed
 	if new_dir != input_dir:
 		input_dir = new_dir

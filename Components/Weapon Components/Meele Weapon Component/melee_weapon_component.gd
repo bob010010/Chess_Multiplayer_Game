@@ -49,13 +49,9 @@ func _on_target_entered(target: Node2D) -> void:
 	# Instantly ignore overlaps if we aren't swinging, or if we hit ourselves
 	if not is_attacking or target == player or has_hit:
 		return
-	
-	if target.has_method("take_damage"):
-		target.take_damage(melee_damage, player.name)
-		
-	if target.has_method("apply_bounce"):
-		var direction: Vector2 = global_position.direction_to(target.global_position)
-		target.apply_bounce(direction * knockback_force)
+
+	var dir: Vector2 = global_position.direction_to(target.global_position)
+	CandDUtils.knockback_and_damage(target, melee_damage, player.name, dir, knockback_force)
 
 	has_hit = true
 	is_attacking = false # Prevent double-hitting

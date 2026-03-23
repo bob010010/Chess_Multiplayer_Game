@@ -137,14 +137,5 @@ func take_damage(amount: int, attacker_id: String = "") -> void:
 
 # Triggered when health hits 0 to clean up the entity.
 func _on_food_died(attacker_id: String) -> void:
-	give_points_on_death(attacker_id)
+	PointsUtil.give_points_on_death(get_tree().current_scene, attacker_id, points_value)
 	queue_free()
-
-# Gives points to the attacker upon death.
-func give_points_on_death(attacker_id: String) -> void:
-	if attacker_id != "":
-		var attacker: Node = get_tree().current_scene.get_node_or_null("SpawnedPlayers/" + attacker_id)
-		if attacker and attacker.has_method("get_points_from_kill"):
-			attacker.get_points_from_kill(points_value)
-		else:
-			printerr("No attacker id")

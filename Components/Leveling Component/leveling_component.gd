@@ -6,7 +6,9 @@ signal show_upgrade_menu()
 @export var points: int = 0:
 	set(value):
 		points = value
-		update_ui_points.emit(points)
+		if multiplayer.is_server():
+			sync_points_to_client.rpc_id(player.name.to_int(), value)
+
 
 @export var player_level: int = 1
 @export var next_level_points: int = 10
@@ -21,7 +23,7 @@ var upgrade_increments: Dictionary = {
 	
 	#Health & Regen
 	"max_health": 1.1,
-	"regen_speed": 1.1,
+	"regen_speed": 0.9,
 	"regen_amount": 1.1,
 	
 	#Ranged
@@ -109,57 +111,13 @@ var stat_multipliers: Dictionary = {
 	#Shield
 	"shield_health": 1.0
 }
-var max_stats: Dictionary = {
-	"player_speed": 1200.0,
-	"body_damage": 40.0,
-	
-	#Health & Regen
-	"max_health": 400.0,
-	"regen_speed": 0.5,
-	"regen_amount": 20.0,
 
-	#Ranged
-	"projectile_damage": 80.0,
-	"projectile_speed": 3000.0,
-	"reload_speed": 0.15,
-	"accuracy": 100.0,
 
-	#Melee
-	"melee_damage": 120.0,
-	"melee_knockback": 1600.0,
-	"melee_cooldown": 0.1,
-
-	#Area
-	"area_damage": 150.0,
-	"area_knockback": 2000.0,
-	"area_radius": 1000.0,
-	"area_cooldown": 1.0,
-
-	#Teleport
-	"teleport_cooldown": 1.0,
-	"teleport_range": 2000.0,
-
-	#Illusion
-	"illusion_cooldown": 4.0,
-	"illusion_duration": 10.0,
-	"illusions_count": 12.0,
-
-	#Stealth
-	"stealth_cooldown": 6.0,
-	"stealth_duration": 6.0,
-
-	#Spawning
-	"spawner_cooldown": 6.0,
-	"max_spawns": 10.0,
-
-	#Shield
-	"shield_health": 400.0
-}
 
 @onready var player: CharacterBody2D = get_parent().get_parent()
 
 # Grants score and initiates level up verification.
-func get_points_from_kill(amount: int) -> void:
+func get_points(amount: int) -> void:
 	if not multiplayer.is_server():
 		return
 		
@@ -168,7 +126,6 @@ func get_points_from_kill(amount: int) -> void:
 	request_level_up_math()
 
 # Evaluates if current points meet the threshold for the next level.
-@rpc("any_peer", "call_local", "reliable")
 func request_level_up_math() -> void:
 	if not multiplayer.is_server():
 		return
@@ -182,15 +139,20 @@ func request_level_up_math() -> void:
 		
 		var leftover: int = points - next_level_points
 		
+		# Flash the bar to full before resetting, so the client sees it fill up
+		sync_points_to_client.rpc_id(peer_id, next_level_points)
+		
 		next_level_points = int(pow(float(player_level), 1.5) * 10.0) #Points per level calculation
 		pending_upgrades += 1
-		
 		points = leftover
 		
 		# Promote if at the right level
 		if player_level % 2 == 0:
 			player.get_node("Components/PromotionComponent").add_pending_promotion(peer_id)
-			
+		
+		# Send the leftover to the client so the bar resets to the correct position
+		sync_points_to_client.rpc_id(peer_id, leftover)
+		
 	# If we leveled up at least once, trigger the upgrade menu for the client
 	if leveled_up and pending_upgrades > 0:
 		trigger_upgrade_ui.rpc_id(peer_id)
@@ -224,3 +186,8 @@ func apply_upgrade(stat_name: String) -> void:
 @rpc("authority", "call_local", "reliable")
 func trigger_upgrade_ui() -> void:
 	show_upgrade_menu.emit()
+
+# Commands the client to update the level bar
+@rpc("authority", "call_local", "reliable")
+func sync_points_to_client(val: int) -> void:
+	update_ui_points.emit(val)

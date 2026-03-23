@@ -6,6 +6,7 @@ var direction: Vector2 = Vector2.ZERO
 var damage: int = 1
 var shooter_id: String = "" 
 var time_to_live: float = 3.0
+var bullet_knockback: float = 250.0
 
 # Connects the collision signal on the server
 func _ready() -> void:
@@ -38,13 +39,7 @@ func _on_body_entered(body: Node2D) -> void:
 		if body.has_method("get") and body.get("team_id") == get_meta("team_id", -1):
 			return
 		
-		# Applies knockback to the hit entity
-		if body.has_method("apply_bounce"):
-			body.apply_bounce(direction * 250)
-			
-		# Applies damage to the hit entity
-		if body.has_method("take_damage"):
-			body.take_damage(damage, shooter_id)
+		CandDUtils.knockback_and_damage(body, damage, shooter_id, direction, bullet_knockback)
 				
 		# Trigger the custom subclass hit behavior
 		_on_hit(body)

@@ -69,12 +69,8 @@ func _on_body_entered(body: Node2D) -> void:
 	if body == player:
 		return
 		
-	if body.has_method("take_damage"):
-		body.take_damage(area_damage, player.name)
-		
-	if body.has_method("apply_bounce"):
-		var direction: Vector2 = global_position.direction_to(body.global_position)
-		body.apply_bounce(direction * knockback_force)
+	var dir: Vector2 = global_position.direction_to(body.global_position)
+	CandDUtils.knockback_and_damage(body, area_damage, player.name, dir, knockback_force)
 
 # Disables the physical hitbox and commands clients to hide the visual effect.
 func _on_attack_finished() -> void:

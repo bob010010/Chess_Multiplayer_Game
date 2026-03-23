@@ -73,9 +73,10 @@ func broadcast_leaderboard() -> void:
 func update_leaderboard_rpc(leaderboard_text: String) -> void:
 	var local_id: String = str(multiplayer.get_unique_id())
 	var local_player: Node = $SpawnedPlayers.get_node_or_null(local_id)
-	
-	if local_player and local_player.has_method("update_leaderboard_ui"):
-		local_player.update_leaderboard_ui(leaderboard_text)
+	if local_player:
+		var player_UI: Node = local_player.get_node_or_null("PlayerUI")
+		if player_UI and player_UI.has_method("update_leaderboard_ui"):
+			player_UI.update_leaderboard_ui(leaderboard_text)
 
 # Sets up the local client's UI and camera for the spectate phase.
 func start_spectating(killer_id: String) -> void:

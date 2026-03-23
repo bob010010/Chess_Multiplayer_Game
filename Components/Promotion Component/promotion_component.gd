@@ -2,7 +2,7 @@ extends Node
 
 signal show_promotion_menu(available_classes: Array[String])
 
-var pending_promotions: int = 0
+var pending_promotions: int = 1 # For the start when you promote to your starting class
 
 var promotion_tree: Dictionary = {
 	"Pawn": ["Pawn_I", "Knight", "Bishop", "Mini_Rook"], #Rank 1
@@ -36,7 +36,7 @@ var max_tier_template: Dictionary = {
 	"melee_knockback": 800.0,
 	"melee_cooldown": 0.2, 
 	"projectile_damage": 40.0,
-	"projectile_speed": 1500.0,
+	"projectile_speed": 1000.0,
 	"reload_speed": 0.3,
 	"accuracy": 100.0, 
 	"area_damage": 75.0,
@@ -169,7 +169,7 @@ var class_base_stats: Dictionary = {
 		"regen_amount": 3.0,
 		"body_damage": 4.0,
 		"projectile_damage": 15.0,
-		"projectile_speed": 800.0,
+		"projectile_speed": 600.0,
 		"reload_speed": 1.2,
 		"accuracy": 70.0,
 		"area_damage": 30.0,
@@ -216,7 +216,7 @@ var class_base_stats: Dictionary = {
 		"regen_amount": 4.0,
 		"body_damage": 6.0,
 		"projectile_damage": 25.0,
-		"projectile_speed": 1000.0,
+		"projectile_speed": 800.0,
 		"reload_speed": 0.9,
 		"accuracy": 85.0,
 		"area_damage": 45.0,
@@ -240,9 +240,6 @@ var class_base_stats: Dictionary = {
 		"regen_speed": 2.0,
 		"regen_amount": 5.0,
 		"body_damage": 12.0,
-		"melee_damage": 35.0,
-		"melee_knockback": 450.0,
-		"melee_cooldown": 0.7,
 		"projectile_damage": 60.0,
 		"projectile_speed": 400.0,
 		"reload_speed": 0.8,
@@ -258,8 +255,55 @@ var class_base_stats: Dictionary = {
 	"Holy_Queen": max_tier_template.duplicate()
 }
 
-@onready var player: CharacterBody2D = get_parent().get_parent() as CharacterBody2D
+var max_stats: Dictionary = {
+	"player_speed": 1200.0,
+	"body_damage": 40.0,
+	
+	#Health & Regen
+	"max_health": 400.0,
+	"regen_speed": 0.5,
+	"regen_amount": 20.0,
 
+	#Ranged
+	"projectile_damage": 80.0,
+	"projectile_speed": 1100.0,
+	"reload_speed": 0.15,
+	"accuracy": 100.0,
+
+	#Melee
+	"melee_damage": 120.0,
+	"melee_knockback": 1600.0,
+	"melee_cooldown": 0.1,
+
+	#Area
+	"area_damage": 150.0,
+	"area_knockback": 2000.0,
+	"area_radius": 1000.0,
+	"area_cooldown": 1.0,
+
+	#Teleport
+	"teleport_cooldown": 1.0,
+	"teleport_range": 2000.0,
+
+	#Illusion
+	"illusion_cooldown": 4.0,
+	"illusion_duration": 10.0,
+	"illusions_count": 12.0,
+
+	#Stealth
+	"stealth_cooldown": 6.0,
+	"stealth_duration": 6.0,
+
+	#Spawning
+	"spawner_cooldown": 6.0,
+	"max_spawns": 10.0,
+
+	#Shield
+	"shield_health": 400.0
+}
+
+@onready var player: CharacterBody2D = get_parent().get_parent() as CharacterBody2D
+@onready var player_UI: Node2D = player.get_node("PlayerUI")
 
 # Grants a pending promotion and notifies the client to open the UI.
 func add_pending_promotion(peer_id: int) -> void:
@@ -292,18 +336,20 @@ func request_promotion(choice: String) -> void:
 		change_weapon(choice)
 		apply_promotion_stats(choice)
 		
-		
-		player.current_class = choice 
+		player.current_class = choice # TODO Add a check the class is in the dict !!1
 		
 		# Notify the specific client's UI about the promotion.
 		var info_bar: Node = player.get_node_or_null("HUD/InfoLabel")
 		if info_bar:
 			var formatted_class: String = choice.replace("_", " ")
 			info_bar.display_message.rpc_id(player.name.to_int(), "Promoted to " + formatted_class)
+
+		# Re rolls as player may now have new components > new things to upgrade
+		var level_comp: Node2D = player.get_node_or_null("Components/LevelingComponent")
+		if level_comp:
+			level_comp.trigger_upgrade_ui.rpc_id(player.name.to_int())
 		
-		player._show_upgrade_menu() # Re rolls as player may now have new components > new things to upgrade
-		
-		if pending_promotions > 0:
+		if pending_promotions > 0: # ERROR? Is this causing the duplicate promotion visuals
 			trigger_promotion_ui.rpc_id(multiplayer.get_remote_sender_id())
 
 # Updates the active components based on the chosen class.
@@ -400,13 +446,12 @@ func apply_promotion_stats(class_choice: String) -> void:
 	if not class_base_stats.has(class_choice):
 		printerr("Trying to upgrade a non existent class")
 		return
-	print("\n")
 	print("Promoting: " + class_choice)
 	
 	var base_stats: Dictionary = class_base_stats[class_choice]
 	var leveling: Node = player.get_node("Components/LevelingComponent")
 	var upgrades: Dictionary = leveling.stat_multipliers
-	var caps: Dictionary = leveling.max_stats
+	var caps: Dictionary = max_stats
 
 	var components: Node = player.get_node("Components")
 	var health_comp: Node = components.get_node("HealthComponent")
@@ -426,7 +471,7 @@ func apply_promotion_stats(class_choice: String) -> void:
 		if base_stats.has("regen_speed"):
 			health_comp.regen_speed = _get_capped_value("regen_speed", float(base_stats["regen_speed"]) * float(upgrades["regen_speed"]), caps["regen_speed"], health_comp.regen_speed, true)
 		if base_stats.has("regen_amount"):
-			health_comp.regen_amount = int(_get_capped_value("regen_amount", float(base_stats["regen_amount"]) * float(upgrades["regen_amount"]), caps["regen_amount"], health_comp.regen_amount))
+			health_comp.regen_amount = _get_capped_value("regen_amount", float(base_stats["regen_amount"]) * float(upgrades["regen_amount"]), caps["regen_amount"], health_comp.regen_amount)
 			
 	if base_stats.has("body_damage"):
 		player.body_damage = int(_get_capped_value("body_damage", float(base_stats["body_damage"]) * float(upgrades["body_damage"]), caps["body_damage"], player.body_damage))

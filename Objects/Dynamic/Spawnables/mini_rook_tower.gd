@@ -39,11 +39,6 @@ func _process(_delta: float) -> void:
 		var direction: Vector2 = global_position.direction_to(target.global_position)
 		ranged_weapon.shoot(global_position + direction)
 
-# Routes damage down to the health component.
-func take_damage(amount: int, attacker_id: String = "") -> void:
-	if multiplayer.is_server():
-		health_component.take_damage(amount, attacker_id)
-
 # Triggered when health hits 0 to clean up the entity.
 func on_tower_died(_attacker_id: String) -> void:
 	queue_free()

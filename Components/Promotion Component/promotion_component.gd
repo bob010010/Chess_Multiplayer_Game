@@ -360,7 +360,7 @@ func change_weapon(class_choice: String) -> void:
 			new_r_weapon = "Fireball_Shooter"
 			new_first_ability = "Illusion"
 			new_shield = "Magic"
-	print("New ability: " + new_first_ability)
+	print("New shield: " + new_shield)
 	player.current_melee_weapon = new_m_weapon
 	player.current_ranged_weapon = new_r_weapon
 	player.current_first_ability = new_first_ability

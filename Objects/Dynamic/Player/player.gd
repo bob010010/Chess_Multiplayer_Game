@@ -15,7 +15,7 @@ var shield_component: Node
 
 var shielding: bool = false
 
-@export var current_class: String = "Rook_Knight":
+@export var current_class: String = "Pawn_II":
 	set(value):
 		current_class = value
 		if is_node_ready():
@@ -150,10 +150,17 @@ func check_first_ability_input() -> void:
 # Evaluates continuous input to request shield activation and deactivation from the server.
 func check_shield_input() -> void:
 	if shield_component:
-		if Input.is_action_just_pressed("shield"):
-			shield_component.request_shield_activation.rpc_id(1)
-		elif Input.is_action_just_released("shield"): #Comment out this for testing
-			shield_component.request_shield_deactivation.rpc_id(1)
+		var shield_testing = true
+		if not shield_testing:
+			if Input.is_action_just_pressed("shield"):
+				print("Trying to activate shield")
+				shield_component.request_shield_activation.rpc_id(1)
+			elif Input.is_action_just_released("shield"):
+				shield_component.request_shield_deactivation.rpc_id(1)
+		else:
+			if Input.is_action_just_pressed("shield"):
+				print("Trying to activate shield")
+				shield_component.request_shield_activation.rpc_id(1)
 
 # Smoothly decays physical knockback momentum over time.
 func decrease_knockback(delta: float) -> void:

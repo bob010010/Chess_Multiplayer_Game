@@ -8,6 +8,7 @@ class_name ShieldComponent
 @export var max_shield_health: int = 100
 var shield_health: int = 100
 @export var active_duration: float = 200.0
+var shield_knockback: float = 1000.0
 
 var is_active: bool = false
 
@@ -66,7 +67,7 @@ func _on_body_entered(body: Node2D) -> void:
 		
 		if body.has_method("apply_bounce"):
 			var direction: Vector2 = global_position.direction_to(body.global_position)
-			body.apply_bounce(direction * 500.0)
+			body.apply_bounce(direction * shield_knockback)
 			
 		var parent_node: Node = body.get_parent()
 		if parent_node and parent_node.has_method("trigger_visual_retract"):

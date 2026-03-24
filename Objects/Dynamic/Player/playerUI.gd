@@ -20,6 +20,8 @@ var shield_component: Node
 
 var current_first_ability: String
 
+@onready var health_bar: ProgressBar = $"../HealthBar"
+
 @onready var name_label: Label = $"../Name"
 @onready var stats_label_one: Label = $"../HUD/StatsLabel"
 @onready var stats_label_two: Label = $"../HUD/StatsLabel2"
@@ -37,6 +39,12 @@ func _ready() -> void:
 		promotion_component.show_promotion_menu.connect(_show_promotion_menu)
 		if not health_component:
 			printerr("No health component")
+
+# Toggles the visibility of identifying UI elements specifically for other players
+func toggle_external_ui(is_hidden: bool) -> void:
+	if player.name != str(multiplayer.get_unique_id()):
+		name_label.visible = not is_hidden
+		health_bar.visible = not is_hidden
 
 # Populates the upgrade UI with valid random stat choices based on equipped capabilities.
 func _show_upgrade_menu() -> void:

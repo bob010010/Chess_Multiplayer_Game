@@ -47,7 +47,6 @@ func _on_attack_finished() -> void:
 
 # Handles collisions
 func _on_target_entered(target: Node2D) -> void:
-	print("F")
 	# Instantly ignore overlaps if we aren't swinging, or if we hit ourselves
 	if not is_attacking or target == player or has_hit:
 		return

@@ -6,19 +6,41 @@ class_name IllusionComponent
 var illusion_min_range: float = 150.0
 var illusion_max_range: float = 400.0
 
-var active_illusions: Array[Node2D] = []
+var active_illusions: Array[Dictionary] = []
+var last_player_position: Vector2 = Vector2.ZERO
 
-# Receives the requested single illusion execution from the client and triggers it after a stealth delay.
+# Tracks player movement and updates all active illusion positions based on their assigned directions.
+func _physics_process(_delta: float) -> void:
+	if last_player_position == Vector2.ZERO:
+		last_player_position = player.global_position
+		return
+
+	var movement_delta: float = player.global_position.distance_to(last_player_position)
+	
+	if movement_delta > 0.0:
+		for i: int in range(active_illusions.size() - 1, -1, -1):
+			var data: Dictionary = active_illusions[i]
+			var illusion_node: Variant = data.get("node")
+			if is_instance_valid(illusion_node):
+				var move_vec: Vector2 = data["dir"] * movement_delta
+				illusion_node.global_position += move_vec
+			else:
+				active_illusions.remove_at(i)
+
+	last_player_position = player.global_position
+
+# Receives the requested single illusion execution and hides identifying UI until the end of the duration.
 @rpc("any_peer", "call_local", "reliable")
 func request_illusion(spawn_pos: Vector2) -> void:
 	if multiplayer.is_server() and current_cooldown <= 0.0:
 		current_cooldown = max_cooldown
 		
-		# Store original physical states, disable hitboxes, and hide the player across the network.
 		var original_layer: int = player.collision_layer
 		var original_mask: int = player.collision_mask
 		player.collision_layer = 0
-		player.collision_mask = 0
+		player.collision_mask = player.LAYER_WORLD_BOUNDARIES
+		
+		trigger_ui_visibility.rpc(true)
 		trigger_stealth_visuals.rpc(true)
 		
 		await get_tree().create_timer(1.0).timeout
@@ -26,13 +48,18 @@ func request_illusion(spawn_pos: Vector2) -> void:
 		if not is_instance_valid(player):
 			return
 			
-		# Restore physical presence and simultaneously spawn the illusion while revealing the player.
 		player.collision_layer = original_layer
 		player.collision_mask = original_mask
 		trigger_stealth_visuals.rpc(false)
-		trigger_illusion_visuals.rpc(spawn_pos)
+		
+		var random_dir: Vector2 = Vector2.RIGHT.rotated(randf() * TAU)
+		trigger_illusion_visuals.rpc(spawn_pos, random_dir)
+		
+		await get_tree().create_timer(illusion_duration - 1.0).timeout
+		if is_instance_valid(player):
+			trigger_ui_visibility.rpc(false)
 
-# Temporarily hides the player, waits, and then spawns multiple illusions around their new position.
+# Manages the scattered illusion sequence by keeping identifying UI hidden for the entire movement duration.
 @rpc("any_peer", "call_local", "reliable")
 func request_scattered_illusions() -> void:
 	if multiplayer.is_server() and current_cooldown <= 0.0:
@@ -42,34 +69,41 @@ func request_scattered_illusions() -> void:
 		if info_label:
 			info_label.display_message.rpc_id(player.name.to_int(), "Ability Used: Illusion")
 		
-		# Store original physical states, disable hitboxes, and hide the player across the network.
 		var original_layer: int = player.collision_layer
 		var original_mask: int = player.collision_mask
 
-		# Disable player interaction but maintain world collision.
 		player.collision_layer = 0
 		player.collision_mask = player.LAYER_WORLD_BOUNDARIES
 		
+		# Hide both alpha and identifying UI.
+		trigger_ui_visibility.rpc(true)
 		trigger_stealth_visuals.rpc(true)
 		
-		await get_tree().create_timer(2.0).timeout # Remove in the future
+		await get_tree().create_timer(1.0).timeout
 		
 		if not is_instance_valid(player):
 			return
 			
-		# Restore physical presence and prepare the ring of illusion coordinates.
+		var positions: Array[Vector2] = []
+		var directions: Array[Vector2] = []
+		
+		for i: int in range(int(illusions_count)):
+			positions.append(get_position_for_illusion())
+			directions.append(Vector2.RIGHT.rotated(randf() * TAU))
+			
+		# Restore alpha so player is visible, but identifying UI stays hidden.
 		player.collision_layer = original_layer
 		player.collision_mask = original_mask
+		trigger_stealth_visuals.rpc(false)
+		trigger_scattered_illusions.rpc(positions, directions)
 		
-		var positions: Array[Vector2] = []
+		# Wait for the moving stage to conclude before showing the username and health bar.
+		await get_tree().create_timer(illusion_duration).timeout
 		
-		for i: int in range(illusions_count):
-			positions.append(get_position_for_illusion())
-			
-		trigger_stealth_visuals.rpc(false) # Need to move to happen halfway through (After the illusions appear and the player has had the chance to move). 
-		trigger_scattered_illusions.rpc(positions)
+		if is_instance_valid(player):
+			trigger_ui_visibility.rpc(false)
 
-#Tries to get a position for the illusion, handling outside the map by recursion
+# Calculates a valid random position for an illusion while ensuring it remains within map boundaries.
 func get_position_for_illusion() -> Vector2:
 	var random_angle: float = randf() * TAU
 	var random_radius: float = randf_range(illusion_min_range, illusion_max_range)
@@ -77,18 +111,11 @@ func get_position_for_illusion() -> Vector2:
 	if AbilityUtils.is_position_within_map(get_tree().current_scene, player.global_position + offset):
 		return player.global_position + offset
 	else:
-		print("Outside, trying again")
 		return get_position_for_illusion()
-
-# Requests the server to prematurely stop all active illusions.
-@rpc("any_peer", "call_local", "reliable")
-func request_stop_illusion() -> void:
-	if multiplayer.is_server():
-		stop_illusion_visuals.rpc()
 
 # Spawns a complete temporary visual duplicate of the player and their active equipment across all clients.
 @rpc("authority", "call_local", "reliable")
-func trigger_illusion_visuals(spawn_pos: Vector2) -> void:
+func trigger_illusion_visuals(spawn_pos: Vector2, move_dir: Vector2) -> void:
 	var main_scene: Node = get_tree().current_scene
 	if not main_scene:
 		return
@@ -96,7 +123,7 @@ func trigger_illusion_visuals(spawn_pos: Vector2) -> void:
 	_cleanup_illusions()
 	
 	var illusion: Node2D = _build_illusion_node(spawn_pos, main_scene)
-	active_illusions.append(illusion)
+	active_illusions.append({"node": illusion, "dir": move_dir})
 	
 	var tween: Tween = create_tween()
 	tween.tween_property(illusion, "modulate:a", 0.0, illusion_duration).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
@@ -104,21 +131,21 @@ func trigger_illusion_visuals(spawn_pos: Vector2) -> void:
 
 # Iterates through the provided positions to spawn multiple synchronous player duplicates.
 @rpc("authority", "call_local", "reliable")
-func trigger_scattered_illusions(positions: Array[Vector2]) -> void:
+func trigger_scattered_illusions(positions: Array[Vector2], directions: Array[Vector2]) -> void:
 	var main_scene: Node = get_tree().current_scene
 	if not main_scene:
 		return
 		
 	_cleanup_illusions()
 	
-	# Instantiate an independent visual prop for every coordinate calculated by the server.
-	for pos: Vector2 in positions:
+	for i: int in range(positions.size()):
+		var pos: Vector2 = positions[i]
+		var dir: Vector2 = directions[i]
 		var illusion: Node2D = _build_illusion_node(pos, main_scene)
-		active_illusions.append(illusion)
 		
-		# Starts invisible to sync with the stealth component's fade-in time (0.75s)
+		active_illusions.append({"node": illusion, "dir": dir})
+		
 		illusion.modulate.a = 0.0
-		
 		var tween: Tween = create_tween()
 		tween.tween_property(illusion, "modulate:a", 1.0, 0.75).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 		tween.tween_property(illusion, "modulate:a", 0.0, illusion_duration).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
@@ -127,18 +154,20 @@ func trigger_scattered_illusions(positions: Array[Vector2]) -> void:
 # Commands all clients to rapidly fade out and destroy all tracked active illusions.
 @rpc("authority", "call_local", "reliable")
 func stop_illusion_visuals() -> void:
-	for illusion: Node2D in active_illusions:
-		if is_instance_valid(illusion):
+	for data: Dictionary in active_illusions:
+		var illusion_node: Variant = data.get("node")
+		if is_instance_valid(illusion_node):
 			var tween: Tween = create_tween()
-			tween.tween_property(illusion, "modulate:a", 0.0, 0.2).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-			tween.tween_callback(illusion.queue_free)
+			tween.tween_property(illusion_node, "modulate:a", 0.0, 0.2).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+			tween.tween_callback(illusion_node.queue_free)
 	active_illusions.clear()
 
 # Instantly removes all currently active illusions to prevent orphaned visual nodes.
 func _cleanup_illusions() -> void:
-	for illusion: Node2D in active_illusions:
-		if is_instance_valid(illusion):
-			illusion.queue_free()
+	for data: Dictionary in active_illusions:
+		var illusion_node: Variant = data.get("node")
+		if is_instance_valid(illusion_node):
+			illusion_node.queue_free()
 	active_illusions.clear()
 
 # Constructs the illusion node with duplicated sprites and equipment stripped of their physics.
@@ -147,7 +176,6 @@ func _build_illusion_node(spawn_pos: Vector2, parent_scene: Node) -> Node2D:
 	illusion_node.global_position = spawn_pos
 	parent_scene.add_child(illusion_node)
 	
-	# Duplicate the primary visual representation of the player entity. (They are invisible at the time)
 	var player_sprite: Sprite2D = player.get_node_or_null("PlayerSprite") as Sprite2D
 	if player_sprite:
 		var sprite_dup: Sprite2D = player_sprite.duplicate(0) as Sprite2D
@@ -156,7 +184,6 @@ func _build_illusion_node(spawn_pos: Vector2, parent_scene: Node) -> Node2D:
 		illusion_node.add_child(sprite_dup)
 		illusion_node.scale *= 0.25
 		
-	# Create a proxy container to hold all duplicated active equipment.
 	var comp_container: Node2D = Node2D.new()
 	comp_container.name = "Components"
 	illusion_node.add_child(comp_container)
@@ -168,7 +195,6 @@ func _build_illusion_node(spawn_pos: Vector2, parent_scene: Node) -> Node2D:
 		player.shield_component
 	]
 	
-	# Iterate through equipped items, duplicate them, strip their logic, and attach them to the illusion.
 	for comp: Node in active_comps:
 		if comp and comp.visible:
 			var comp_dup: Node = comp.duplicate(0)

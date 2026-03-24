@@ -254,6 +254,18 @@ properties/66/replication_mode = 2
 properties/67/path = NodePath("Components/TeleportCrushComponent:attack_duration")
 properties/67/spawn = true
 properties/67/replication_mode = 2
+properties/68/path = NodePath("Components/StealthComponent:max_cooldown")
+properties/68/spawn = true
+properties/68/replication_mode = 1
+properties/69/path = NodePath("Components/StealthComponent:current_cooldown")
+properties/69/spawn = true
+properties/69/replication_mode = 1
+properties/70/path = NodePath("Components/IllusionComponent:current_cooldown")
+properties/70/spawn = true
+properties/70/replication_mode = 1
+properties/71/path = NodePath("Components/IllusionComponent:max_cooldown")
+properties/71/spawn = true
+properties/71/replication_mode = 1
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_onrkg"]
 size = Vector2(138.27162, 177.77779)

@@ -4,6 +4,7 @@ class_name TestingComponent
 @export var commands_enabled: bool = true
 
 @onready var player: CharacterBody2D = get_parent() as CharacterBody2D
+var c_s: String = "1"
 
 # Monitors input to toggle the visibility of the global command console UI.
 func _input(event: InputEvent) -> void:
@@ -23,7 +24,7 @@ func send_command(command_text: String) -> void:
 	execute_server_command.rpc_id(1, command_text)
 
 # Validates the command system state and parses the incoming string on the server.
-@rpc("any_peer", "call_local", "reliable")
+@rpc("any_peer", "call_remote", "reliable")
 func execute_server_command(command_text: String) -> void:
 	if not multiplayer.is_server() or not commands_enabled:
 		return
@@ -34,7 +35,7 @@ func execute_server_command(command_text: String) -> void:
 		
 	var cmd: String = args[0].to_lower()
 	
-	print(cmd)
+	print(args)
 	
 	match cmd:
 		"1/spawn":
@@ -51,9 +52,10 @@ func execute_server_command(command_text: String) -> void:
 			_handle_levels(args)
 
 # 1/spawn food 0,0 Circle
-# Instantiates a food entity at specific coordinates with a defined shape type.
+# 1/spawn ai 0,0 Knight
+# Instantiates either a food entity or an AI pawn at specific coordinates with a defined sub-type or class.
 func _handle_spawn(args: PackedStringArray) -> void:
-	if args.size() < 4 or args[1] != "food":
+	if args.size() < 4:
 		return
 		
 	var pos_data: PackedStringArray = args[2].split(",")
@@ -61,16 +63,27 @@ func _handle_spawn(args: PackedStringArray) -> void:
 		return
 		
 	var spawn_pos: Vector2 = Vector2(float(pos_data[0]), float(pos_data[1]))
-	var shape: String = args[3].replace('"', "")
+	var sub_type: String = args[3].replace('"', "")
 	
-	var food_container: Node = get_tree().current_scene.get_node_or_null("SpawnedFood")
-	if is_instance_valid(food_container):
-		var food_scene: PackedScene = load("res://Objects/Static/Food/food.tscn")
-		var food_instance: CharacterBody2D = food_scene.instantiate() as CharacterBody2D
-		food_instance.position = spawn_pos
-		print(str(food_instance.position))
-		food_instance.shape_type = shape
-		food_container.add_child(food_instance, true)
+	match args[1].to_lower():
+		"food":
+			var food_container: Node = get_tree().current_scene.get_node_or_null("SpawnedFood")
+			if is_instance_valid(food_container):
+				var food_scene: PackedScene = load("res://Objects/Static/Food/food.tscn")
+				var food_instance: CharacterBody2D = food_scene.instantiate() as CharacterBody2D
+				food_instance.position = spawn_pos
+				food_instance.shape_type = sub_type
+				food_container.add_child(food_instance, true)
+		"ai":
+			print("Trying to spawn AI")
+			var npc_container: Node = get_tree().current_scene.get_node_or_null("SpawnedNPCs")
+			if is_instance_valid(npc_container):
+				var npc_scene: PackedScene = load("res://Objects/Dynamic/AI/npc.tscn")
+				var npc_instance: CharacterBody2D = npc_scene.instantiate() as CharacterBody2D
+				npc_instance.position = spawn_pos
+				npc_instance.current_class = sub_type
+				print(npc_instance.current_class)
+				npc_container.add_child(npc_instance, true)
 
 # 1/promote Knight
 # Forces a class promotion on the parent player through the promotion component.
@@ -80,6 +93,7 @@ func _handle_promote(args: PackedStringArray) -> void:
 		
 	var promo_comp: Node = player.get_node_or_null("Components/PromotionComponent")
 	if is_instance_valid(promo_comp):
+		print("Requesting " + args[1])
 		promo_comp.request_promotion(args[1])
 
 # 1/points 100
@@ -103,11 +117,11 @@ func _handle_levels(args: PackedStringArray) -> void:
 		return
 	
 	var target_level: int = int(args[1])
-	if target_level <= level_comp.player_level:
+	if target_level <= level_comp.entity_level:
 		return
 	
 	var points_needed: int = 0
-	for lvl in range(level_comp.player_level, target_level):
+	for lvl in range(level_comp.entity_level, target_level):
 		points_needed += int(pow(float(lvl), 1.5) * 10.0)
 	
 	# Subtract points already accumulated towards the next level

@@ -6,7 +6,7 @@ extends Node2D
 @onready var health_component: Node = $"../Components/HealthComponent"
 @onready var leveling_component: Node = $"../Components/LevelingComponent"
 @onready var promotion_component: Node = $"../Components/PromotionComponent"
-@onready var sprite_component: Sprite2D = $"../PlayerSprite"
+@onready var sprite_component: Sprite2D = $"../SpriteComponent"
 
 @onready var melee_info_label: Label = $"../HUD/PromotionInfoLabel/MeleeWeapon"
 @onready var ranged_info_label: Label = $"../HUD/PromotionInfoLabel/RangedWeapon"
@@ -45,7 +45,7 @@ func toggle_external_ui(is_hidden: bool) -> void:
 	if player.name != str(multiplayer.get_unique_id()):
 		name_label.visible = not is_hidden
 		health_bar.visible = not is_hidden
-		print("This needs checking: " + health_bar.visible)
+		print("This needs checking: " + str(health_bar.visible))
 
 # Populates the upgrade UI with valid random stat choices based on equipped capabilities.
 func _show_upgrade_menu() -> void:
@@ -53,7 +53,7 @@ func _show_upgrade_menu() -> void:
 		printerr("Called to show upgrade menu without an upgrade")
 		return
 
-	var valid_stats: Array[String] = ["max_health", "regen_amount", "regen_speed", "body_damage", "player_speed"]
+	var valid_stats: Array[String] = ["max_health", "regen_amount", "regen_speed", "body_damage", "move_speed"]
 	
 	if ranged_w_component:
 		valid_stats.append_array(["projectile_damage", "projectile_speed", "reload_speed", "accuracy"])
@@ -115,7 +115,7 @@ func show_debug_info() -> void:
 	
 	#POSITION AND SPEED
 	var pos_text: String = "Position: " + str(Vector2(int(player.position.x), int(player.position.y))) + "\n"
-	var speed_text: String = "Speed: " + str(movement_component.player_speed) + "\n\n"
+	var speed_text: String = "Speed: " + str(movement_component.move_speed) + "\n\n"
 
 	#HEALTH
 	var max_health_text: String = "Max Health: " + str(health_component.max_health) + "\n"
@@ -217,10 +217,10 @@ func show_debug_info() -> void:
 	stats_label_two.text += pending_upgrades_text + pending_promotions_text
 
 	#POINTS AND LEVELLING
-	var player_level_text: String = "Level: " + str(leveling_component.player_level)
+	var entity_level_text: String = "Level: " + str(leveling_component.entity_level)
 	var next_level_points_text: String = "    Points for next: " + str(leveling_component.next_level_points)
 	var points_text: String = "    Points: " + str(leveling_component.points) 
 	var score_text: String = "    Score: " + str(leveling_component.total_score)
 
 	# Below the level bar
-	level_label.text = player_level_text + next_level_points_text + points_text + score_text
+	level_label.text = entity_level_text + next_level_points_text + points_text + score_text

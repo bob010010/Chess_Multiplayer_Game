@@ -11,8 +11,6 @@ func _ready() -> void:
 # Receives a string and animates the label. Callable locally or across the network.
 @rpc("any_peer", "call_local", "reliable")
 func display_message(message: String) -> void:
-	
-	
 	if message.contains("Upgraded"):
 		
 		var stat_button: Node = get_parent().get_node_or_null("UpgradeUI/StatButton")

@@ -32,7 +32,7 @@ func update_button_color() -> void:
 # Gets a themed colour based on the category of the stat
 func get_colour_based_on_type(stat: String) -> Color:
 	match stat:
-		"player_speed", "body_damage":
+		"move_speed", "body_damage":
 			return Color(0.553, 0.902, 0.196, 0.6)
 		"max_health", "regen_speed", "regen_amount":
 			return Color(0.184, 0.498, 0.165, 0.6)

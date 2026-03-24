@@ -1,7 +1,7 @@
 extends Button
 
 @onready var player: Node = owner
-@onready var player_sprite: Node = player.get_node("PlayerSprite")
+@onready var player_sprite: Node = player.get_node("SpriteComponent")
 
 @onready var icon_rect: TextureRect = $VBoxContainer/TextureRect
 @onready var text_label: Label = $VBoxContainer/Label

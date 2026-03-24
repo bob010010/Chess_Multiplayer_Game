@@ -12,6 +12,7 @@ var team_id: int = -1
 func initialize(creator_id: String, creator_team: int) -> void:
 	owner_peer_id = creator_id
 	team_id = creator_team
+	add_to_group("tower")
 	
 	if not health_component.died.is_connected(on_tower_died):
 		health_component.died.connect(on_tower_died)
@@ -34,7 +35,7 @@ func _process(_delta: float) -> void:
 			apply_team_color()
 		return
 		
-	var target: Node2D = _get_closest_target()
+	var target: Node2D = TargetingUtils.get_closest_enemy(position, detection_area, team_id, -1, true) # Currently towers go for anything
 	if target and ranged_weapon and ranged_weapon.shot_cooldown <= 0.0:
 		var direction: Vector2 = global_position.direction_to(target.global_position)
 		ranged_weapon.shoot(global_position + direction)
@@ -53,18 +54,3 @@ func apply_team_color() -> void:
 			$Sprite2D.modulate = Color(0.0, 1.0, 0.0)
 		else:
 			$Sprite2D.modulate = Color(1.0, 0.0, 0.0)
-
-# Identifies the nearest valid enemy target within the detection radius.
-func _get_closest_target() -> Node2D:
-	var closest: Node2D = null
-	var min_dist: float = INF
-	
-	for body: Node2D in detection_area.get_overlapping_bodies():
-		if body is CharacterBody2D and "team_id" in body:
-			if body.get("team_id") != team_id: 
-				var dist: float = global_position.distance_to(body.global_position)
-				if dist < min_dist:
-					min_dist = dist
-					closest = body
-					
-	return closest

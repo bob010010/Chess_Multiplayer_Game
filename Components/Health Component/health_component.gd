@@ -15,7 +15,7 @@ var decay_amount: int = 1
 var decay_speed: float = 10.0
 var decay_cooldown: float = decay_speed
 
-@onready var object: Node = get_parent().get_parent()
+@onready var entity: Node = get_parent().get_parent()
 var health_bar: ProgressBar
 
 var active_dmg_label: Label = null
@@ -27,7 +27,7 @@ var heal_tween: Tween = null
 
 # Sets initial health to max health.
 func _ready() -> void:
-	health_bar = object.get_node("HealthBar") as ProgressBar
+	health_bar = entity.get_node("HealthBar") as ProgressBar
 	if not health_bar:
 		printerr("No health bar")
 
@@ -74,13 +74,13 @@ func take_damage(amount: int, attacker_id: String = "") -> void:
 # Spawns or updates a floating, vanishing label on all clients to stack health changes dynamically from the base position.
 @rpc("authority", "call_local", "unreliable")
 func spawn_floating_text(amount: int, is_heal: bool) -> void:
-	if not object:
+	if not entity:
 		return
 		
 	var active_label: Label = active_heal_label if is_heal else active_dmg_label
 	var active_tween: Tween = heal_tween if is_heal else dmg_tween
 	
-	var vertical_offset: float = -20.0 * object.scale.y
+	var vertical_offset: float = -20.0 * entity.scale.y
 	var random_offset_x: float = randf_range(-15.0, 15.0) - 18.0 
 	
 	if is_instance_valid(active_label):
@@ -94,8 +94,8 @@ func spawn_floating_text(amount: int, is_heal: bool) -> void:
 		active_label.scale = Vector2(1.5, 1.5)
 		active_label.modulate.a = 1.0
 		
-		active_label.global_position.y = object.global_position.y + vertical_offset
-		active_label.global_position.x = object.global_position.x + random_offset_x
+		active_label.global_position.y = entity.global_position.y + vertical_offset
+		active_label.global_position.x = entity.global_position.x + random_offset_x
 		
 		if active_tween and active_tween.is_valid():
 			active_tween.kill()
@@ -129,9 +129,9 @@ func spawn_floating_text(amount: int, is_heal: bool) -> void:
 		label.text = "-" + str(amount)
 		label.modulate = Color(1.0, 0.0, 0.0)
 	
-	label.global_position = object.global_position + Vector2(random_offset_x, vertical_offset)
+	label.global_position = entity.global_position + Vector2(random_offset_x, vertical_offset)
 	
-	object.add_child(label)
+	entity.add_child(label)
 	
 	var tween: Tween = create_tween()
 	tween.set_parallel(true)

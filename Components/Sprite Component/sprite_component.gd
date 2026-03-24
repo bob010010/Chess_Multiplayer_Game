@@ -1,7 +1,5 @@
 extends Sprite2D
 
-@onready var player: Node = get_parent()
-
 @export var pawn_texture: Texture2D
 @export var pawn_i_texture: Texture2D
 @export var pawn_ii_texture: Texture2D

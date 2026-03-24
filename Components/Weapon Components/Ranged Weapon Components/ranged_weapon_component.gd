@@ -4,7 +4,7 @@ class_name RangedWeaponComponent
 # Tells the parent to apply knockback
 signal apply_recoil(recoil_force: Vector2)
 
-@onready var player: Node = get_parent().get_parent()
+@onready var entity: Node = get_parent().get_parent()
 
 # An identifier passed to the projectile so it knows what sprite to load
 @export var projectile_type: String = "Default"
@@ -21,22 +21,26 @@ var accuracy: float = 100.0
 
 # Both the server and the local client need to run the reload timer
 func _physics_process(delta: float) -> void:
-	if multiplayer.is_server() or player.name == str(multiplayer.get_unique_id()):
+	if multiplayer.is_server() or entity.name == str(multiplayer.get_unique_id()):
 		if shot_cooldown > 0:
 			shot_cooldown -= delta
+			#print(entity.name + " " + str(shot_cooldown))
 		shooting = shot_cooldown > (reload_speed - 0.1)
 
-# The player script calls this and passes the mouse position
+# Processes the shooting logic and resets the cooldown timer exclusively on the server for AI or locally for players.
 func shoot(click_pos: Vector2) -> void:
-	if shot_cooldown > 0:
+	if shot_cooldown > 0.0:
 		return
-	var shoot_dir: Vector2 = (click_pos - player.global_position).normalized()
+		
+	var shoot_dir: Vector2 = (click_pos - entity.global_position).normalized()
 	
-	#Adds bloom to create inaccuracy
-	var accuracy_r = 100 - accuracy # So increasing accuracy decreases bloom
-	var bloom_amount: float = randf_range(-accuracy_r/500, accuracy_r/500)
-	var dir_with_bloom: Vector2 = Vector2(shoot_dir.x + bloom_amount, shoot_dir.y + bloom_amount)
-	shoot_dir = dir_with_bloom
+	# Handle edge case where target is exactly at entity position to prevent zero-vector normalization.
+	if shoot_dir == Vector2.ZERO:
+		shoot_dir = Vector2.RIGHT.rotated(entity.global_rotation)
+	
+	var accuracy_r: float = 100.0 - accuracy
+	var bloom_amount: float = randf_range(-accuracy_r / 500.0, accuracy_r / 500.0)
+	shoot_dir = (shoot_dir + Vector2(bloom_amount, bloom_amount)).normalized()
 	
 	shot_cooldown = reload_speed
 	shooting = true
@@ -44,17 +48,17 @@ func shoot(click_pos: Vector2) -> void:
 	if multiplayer.is_server():
 		_spawn_projectile_and_recoil(shoot_dir)
 	else:
-		rpc_id(1, "request_shoot", shoot_dir)
+		request_shoot.rpc_id(1, shoot_dir)
 
 # Spawns the projectile and triggers the recoil signal
 func _spawn_projectile_and_recoil(dir: Vector2) -> void:
-	var shooter_identity: String = player.name
+	var shooter_identity: String = entity.name
 	
 	# If the component is attached to a tower, use the tower's stored owner ID for kill credit.
-	if "owner_peer_id" in player and player.get("owner_peer_id") != "":
-		shooter_identity = player.get("owner_peer_id")
+	if "owner_peer_id" in entity and entity.get("owner_peer_id") != "":
+		shooter_identity = entity.get("owner_peer_id")
 		
-	get_tree().current_scene.get_node("SpawnedProjectiles").spawn_projectile(player.global_position, dir, shooter_identity, projectile_speed, projectile_damage, projectile_type)
+	get_tree().current_scene.get_node("SpawnedProjectiles").spawn_projectile(entity.global_position, dir, shooter_identity, projectile_speed, projectile_damage, projectile_type)
 	apply_recoil.emit(-dir * recoil_strength)
 
 # Used by clients to ask the server to spawn a projectile
@@ -62,7 +66,7 @@ func _spawn_projectile_and_recoil(dir: Vector2) -> void:
 func request_shoot(dir: Vector2) -> void:
 	if multiplayer.is_server():
 		# Security check
-		if str(multiplayer.get_remote_sender_id()) == player.name:
+		if str(multiplayer.get_remote_sender_id()) == entity.name:
 			if shot_cooldown <= 0:
 				shot_cooldown = reload_speed
 				_spawn_projectile_and_recoil(dir)

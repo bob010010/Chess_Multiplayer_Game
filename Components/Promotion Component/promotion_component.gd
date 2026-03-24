@@ -1,4 +1,5 @@
 extends Node
+class_name PromotionComponent
 
 signal show_promotion_menu(available_classes: Array[String])
 
@@ -29,7 +30,7 @@ var promotion_tree: Dictionary = {
 }
 
 var max_tier_template: Dictionary = {
-	"player_speed": 600.0,
+	"move_speed": 500.0,
 	"max_health": 200.0,
 	"regen_speed": 3.0,
 	"regen_amount": 10.0,
@@ -58,7 +59,7 @@ var class_base_stats: Dictionary = {
 	
 	# Rank 1
 	"Pawn": {
-		"player_speed": 300.0,
+		"move_speed": 300.0,
 		"max_health": 50.0,
 		"regen_speed": 1.0,
 		"regen_amount": 1.0,
@@ -71,7 +72,7 @@ var class_base_stats: Dictionary = {
 	
 	# Rank 2
 	"Pawn_I": {
-		"player_speed": 320.0,
+		"move_speed": 320.0,
 		"max_health": 65.0,
 		"regen_speed": 1.2,
 		"regen_amount": 2.0,
@@ -84,7 +85,7 @@ var class_base_stats: Dictionary = {
 	
 	# Rank 3
 	"Pawn_II": {
-		"player_speed": 340.0,
+		"move_speed": 340.0,
 		"max_health": 80.0,
 		"regen_speed": 1.5,
 		"regen_amount": 2.0,
@@ -97,7 +98,7 @@ var class_base_stats: Dictionary = {
 
 	# Rank 4
 	"Knight": {
-		"player_speed": 450.0,
+		"move_speed": 450.0,
 		"max_health": 60.0,
 		"regen_speed": 1.5,
 		"regen_amount": 2.0,
@@ -110,7 +111,7 @@ var class_base_stats: Dictionary = {
 		"shield_health": 40.0
 	},
 	"Mini_Rook": {
-		"player_speed": 200.0,
+		"move_speed": 200.0,
 		"max_health": 150.0,
 		"regen_speed": 1.0,
 		"regen_amount": 2.0,
@@ -125,7 +126,7 @@ var class_base_stats: Dictionary = {
 
 	# Rank 5
 	"Shadow_Knight": { 
-		"player_speed": 550.0,
+		"move_speed": 550.0,
 		"max_health": 45.0,
 		"regen_speed": 1.0,
 		"regen_amount": 1.0,
@@ -138,7 +139,7 @@ var class_base_stats: Dictionary = {
 		"shield_health": 25.0
 	},
 	"Flowers_Knight": {
-		"player_speed": 400.0,
+		"move_speed": 400.0,
 		"max_health": 80.0,
 		"regen_speed": 2.5,
 		"regen_amount": 5.0,
@@ -151,7 +152,7 @@ var class_base_stats: Dictionary = {
 		"shield_health": 80.0
 	},
 	"Rook": {
-		"player_speed": 150.0,
+		"move_speed": 150.0,
 		"max_health": 220.0,
 		"regen_speed": 1.5,
 		"regen_amount": 4.0,
@@ -165,7 +166,7 @@ var class_base_stats: Dictionary = {
 		"shield_health": 120.0
 	},
 	"Bishop": {
-		"player_speed": 350.0,
+		"move_speed": 350.0,
 		"max_health": 45.0,
 		"regen_speed": 1.0,
 		"regen_amount": 3.0,
@@ -183,7 +184,7 @@ var class_base_stats: Dictionary = {
 
 	# Rank 6
 	"Sultans_Knight": {
-		"player_speed": 500.0,
+		"move_speed": 500.0,
 		"max_health": 70.0,
 		"regen_speed": 1.5,
 		"regen_amount": 3.0,
@@ -196,7 +197,7 @@ var class_base_stats: Dictionary = {
 		"shield_health": 50.0
 	},
 	"Rook_Knight": {
-		"player_speed": 300.0,
+		"move_speed": 300.0,
 		"max_health": 170.0,
 		"regen_speed": 1.5,
 		"regen_amount": 3.0,
@@ -212,7 +213,7 @@ var class_base_stats: Dictionary = {
 		"shield_health": 100.0
 	},
 	"Bishop_Knight": {
-		"player_speed": 420.0,
+		"move_speed": 420.0,
 		"max_health": 60.0,
 		"regen_speed": 1.5,
 		"regen_amount": 4.0,
@@ -239,7 +240,7 @@ var class_base_stats: Dictionary = {
 	"Sultan": max_tier_template.duplicate(),
 
 	"Jester": {
-		"player_speed": 520.0,
+		"move_speed": 520.0,
 		"max_health": 110.0,
 		"regen_speed": 2.0,
 		"regen_amount": 5.0,
@@ -260,7 +261,7 @@ var class_base_stats: Dictionary = {
 }
 
 var max_stats: Dictionary = {
-	"player_speed": 1200.0,
+	"move_speed": 800.0,
 	"body_damage": 40.0,
 	
 	#Health & Regen
@@ -306,29 +307,46 @@ var max_stats: Dictionary = {
 	"shield_health": 400.0
 }
 
-@onready var player: CharacterBody2D = get_parent().get_parent() as CharacterBody2D
-@onready var player_UI: Node2D = player.get_node("PlayerUI")
+@onready var entity: CharacterBody2D = get_parent().get_parent() as CharacterBody2D
 
-# Grants a pending promotion and notifies the client to open the UI.
+# Increments the promotion counter and triggers appropriate selection logic for players or NPCs.
 func add_pending_promotion(peer_id: int) -> void:
 	if multiplayer.is_server():
 		pending_promotions += 1
-		trigger_promotion_ui.rpc_id(peer_id)
+		if entity.is_in_group("player"):
+			trigger_promotion_ui.rpc_id(peer_id)
+		else:
+			_npc_auto_promote()
 
-# Commands the local client to open the promotion selection interface with branch options.
+# Selects a random available class from the promotion tree for NPC entities.
+func _npc_auto_promote() -> void:
+	var options: Array[String] = []
+	var current: String = entity.get("current_class")
+	#print("Ai promting from: " + current)
+	if current == "Super_Queen" or current == "Holy_Queen":
+		print("Ai maxed")
+		return
+
+	if promotion_tree.has(current):
+		for opt: Variant in promotion_tree[current]:
+			options.append(opt as String)
+			
+	if not options.is_empty():
+		request_promotion(options.pick_random())
+
+# Commands the local player client to display the class promotion interface.
 @rpc("authority", "call_local", "reliable")
 func trigger_promotion_ui() -> void:
-	var current: String = player.current_class
+	var current: String = entity.get("current_class")
 	var options: Array[String] = []
 	
 	if promotion_tree.has(current):
-		var raw_options: Array = promotion_tree[current]
-		for opt: Variant in raw_options:
+		for opt: Variant in promotion_tree[current]:
 			options.append(opt as String)
 			
 	show_promotion_menu.emit(options)
 
-# Processes the class choice and applies stats on the server.
+# Handles the transition to a new class and updates components on the server.
 @rpc("any_peer", "call_local", "reliable")
 func request_promotion(choice: String) -> void:
 	if not multiplayer.is_server():
@@ -336,240 +354,150 @@ func request_promotion(choice: String) -> void:
 		
 	if pending_promotions > 0:
 		pending_promotions -= 1
-		
 		change_weapon(choice)
 		apply_promotion_stats(choice)
-		
-		player.current_class = choice # TODO Add a check the class is in the dict !!
-		
-		# Ensure we are not RPCing a client that hasn't finished loading sub-nodes
-		var peer_id: int = player.name.to_int()
+		entity.set("current_class", choice)
 
-		# Notify the specific client's UI about the promotion.
-		var info_bar: Node = player.get_node_or_null("HUD/InfoLabel")
-		# Verify the node exists and is inside the tree before calling an RPC
-		if info_bar and info_bar.is_inside_tree():
-			var formatted_class: String = choice.replace("_", " ")
-			info_bar.display_message.rpc_id(peer_id, "Promoted to " + formatted_class)
-		else:
-			printerr("No info bar when promoting")
-			
-		# Re rolls as player may now have new components > new things to upgrade
-		var level_comp: Node2D = player.get_node_or_null("Components/LevelingComponent")
-		if level_comp and level_comp.is_inside_tree():
-			level_comp.trigger_upgrade_ui.rpc_id(peer_id)
+		if entity.is_in_group("player"):
+			player_promotion_UI_and_reroll(choice)
 		
-		if pending_promotions > 0: # ERROR? Is this causing the duplicate promotion visuals
-			trigger_promotion_ui.rpc_id(multiplayer.get_remote_sender_id())
+		if pending_promotions > 0:
+			if entity.is_in_group("player"):
+				trigger_promotion_ui.rpc_id(multiplayer.get_remote_sender_id())
+			else:
+				_npc_auto_promote()
 
-# Updates the active components based on the chosen class.
+# Updates the players UI and re rolls their upgrades
+func player_promotion_UI_and_reroll(choice: String) -> void:
+	#Displays the promotion info to the player
+	var info: Node = entity.get_node_or_null("HUD/InfoLabel")
+	if info and info.is_inside_tree():
+		info.display_message.rpc_id(entity.name.to_int(), "Promoted to " + choice.replace("_", " "))
+
+	# Re rolls as player may now have new components > new things to upgrade
+	var level_comp: LevelingComponent = entity.get_node_or_null("Components/LevelingComponent") as LevelingComponent
+	if level_comp and level_comp.is_inside_tree() and level_comp.pending_upgrades > 0:
+		level_comp.trigger_upgrade_ui.rpc_id(entity.name.to_int())
+
+# Updates weapon and ability strings based on the selected class template.
 func change_weapon(class_choice: String) -> void:
-	var new_m_weapon: String = "None"
-	var new_r_weapon: String = "None"
-	var new_first_ability: String = "None"
-	var new_shield: String = "None"
+	var new_m: String = "None"
+	var new_r: String = "None"
+	var new_a: String = "None"
+	var new_s: String = "None"
 	
 	match class_choice:
 		"Pawn", "Pawn_I", "Pawn_II":
-			new_m_weapon = "Spear"
-			new_shield = "Wooden"
-
+			new_m = "Spear"; new_s = "Wooden"
 		"Knight", "Flowers_Knight":
-			new_m_weapon = "Sword"
-			new_first_ability = "Teleport"
-			new_shield = "Wooden"
-			
+			new_m = "Sword"; new_a = "Teleport"; new_s = "Wooden"
 		"Shadow_Knight":
-			new_m_weapon = "Sword"
-			new_first_ability = "Stealth"
-			new_shield = "Wooden"
-			
+			new_m = "Sword"; new_a = "Stealth"; new_s = "Wooden"
 		"Sultans_Knight", "King_Knight":
-			new_m_weapon = "Sword"
-			new_first_ability = "Teleport_Crush"
-			new_shield = "Wooden"
+			new_m = "Sword"; new_a = "Teleport_Crush"; new_s = "Wooden"
+		"Mini_Rook": 
+			new_r = "Bow"
+		"Rook", "Rook_Knight", "King_Rook": 
+			new_r = "Bow"; new_a = "Spawner"
+		"Bishop", "Bishop_Knight", "King_Bishop": 
+			new_r = "Fireball_Shooter"; new_a = "Magic"; new_s = "Magic"
+		"King": 
+			new_m = "Sword"; new_a = "Magic"; new_s = "Wooden"
+		"Sultan": 
+			new_m = "Spear"; new_a = "Spawner"; new_s = "Wooden"
+		"Queen": 
+			new_r = "Fireball_Shooter"; new_a = "Teleport_Crush"; new_s = "Magic"
+		"Jester": 
+			new_r = "Pin_Shooter"; new_a = "Illusion"; new_s = "Magic"
+		"Super_Queen": 
+			new_m = "Sword"; new_r = "Bow"; new_a = "Teleport_Crush"; new_s = "Wooden"
+		"Holy_Queen": 
+			new_m = "Spear"; new_r = "Fireball_Shooter"; new_a = "Illusion"; new_s = "Magic"
 			
-		"Mini_Rook":
-			new_r_weapon = "Bow"
-			
-		"Rook", "Rook_Knight", "King_Rook":
-			new_r_weapon = "Bow"
-			new_first_ability = "Spawner"
-			
-		"Bishop", "Bishop_Knight", "King_Bishop":
-			new_r_weapon = "Fireball_Shooter"
-			new_first_ability = "Magic"
-			new_shield = "Magic"
-			
-		"King":
-			new_m_weapon = "Sword"
-			new_first_ability = "Magic"
-			new_shield = "Wooden"
-			
-		"Sultan":
-			new_m_weapon = "Spear"
-			new_first_ability = "Spawner"
-			new_shield = "Wooden"
-			
-		"Queen":
-			new_r_weapon = "Fireball_Shooter"
-			new_first_ability = "Teleport_Crush"
-			new_shield = "Magic"
-			
-		"Jester":
-			new_r_weapon = "Pin_Shooter"
-			new_first_ability = "Illusion"
-			new_shield = "Magic"
-			
-		"Super_Queen":
-			new_m_weapon = "Sword"
-			new_r_weapon = "Bow"
-			new_first_ability = "Teleport_Crush"
-			new_shield = "Wooden"
-			
-		"Holy_Queen":
-			new_m_weapon = "Spear"
-			new_r_weapon = "Fireball_Shooter"
-			new_first_ability = "Illusion"
-			new_shield = "Magic"
-			
-	player.current_melee_weapon = new_m_weapon
-	player.current_ranged_weapon = new_r_weapon
-	player.current_first_ability = new_first_ability
-	player.current_shield = new_shield
+	entity.set("current_melee_weapon", new_m)
+	entity.set("current_ranged_weapon", new_r)
+	entity.set("current_first_ability", new_a)
+	entity.set("current_shield", new_s)
 
-#For testing
-func _get_capped_value(stat_name: String, new_val: float, cap_val: float, old_val: float, is_cooldown: bool = false) -> float:
-	var reached_cap: bool = new_val <= cap_val if is_cooldown else new_val >= cap_val
-	var final_val: float = cap_val if reached_cap else new_val
-	# Only proceed with logging if the rounded values differ.
-	if snapped(final_val, 0.01) != snapped(old_val, 0.01):
-		if reached_cap:
-			print("Stat Log: " + stat_name + " reached MAX CAP: " + str(cap_val))
-		else:
-			print("Stat Log: " + stat_name + " changed from " + str(snapped(old_val, 0.01)) + " to " + str(snapped(final_val, 0.01)))
-			
-	return final_val
 
-# Recalculates stats using the new class's baseline multiplied by the player's lifetime stat upgrades.
+# Calculates and applies capped stat values to the entity's active components.
 func apply_promotion_stats(class_choice: String) -> void:
 	if not class_base_stats.has(class_choice):
-		printerr("Trying to upgrade a non existent class")
 		return
-	print("Promoting: " + class_choice)
 	
-	var base_stats: Dictionary = class_base_stats[class_choice]
-	var leveling: Node = player.get_node("Components/LevelingComponent")
-	var upgrades: Dictionary = leveling.stat_multipliers
-	var caps: Dictionary = max_stats
+	var base: Dictionary = class_base_stats[class_choice]
+	var level: LevelingComponent = entity.get_node("Components/LevelingComponent") as LevelingComponent
+	var mults: Dictionary = level.stat_multipliers
+	
+	var comps: Node = entity.get_node("Components")
+	var h_comp: Node = comps.get_node("HealthComponent")
+	var m_comp: Node = comps.get_node("MovementComponent")
+	var r_w_comp: Node = entity.get("ranged_w_component")
+	var m_w_comp: Node = entity.get("melee_w_component")
+	var a_comp: Node = entity.get("first_ability_component")
+	var s_comp: Node = entity.get("shield_component")
 
-	var components: Node = player.get_node("Components")
-	var health_comp: Node = components.get_node("HealthComponent")
-	var move_comp: Node = components.get_node("MovementComponent")
-	var r_weapon_comp: Node = player.ranged_w_component
-	var m_weapon_comp: Node = player.melee_w_component
-	var first_ability_comp: Node = player.first_ability_component
-	var shield_comp: Node = player.shield_component
+	if m_comp and base.has("move_speed"):
+		m_comp.move_speed = _get_capped_value("move_speed", base["move_speed"] * mults["move_speed"], max_stats["move_speed"], m_comp.move_speed)
+	if h_comp:
+		if base.has("max_health"):
+			h_comp.max_health = int(_get_capped_value("max_health", base["max_health"] * mults["max_health"], max_stats["max_health"], h_comp.max_health))
+			h_comp.health = h_comp.max_health
+		if base.has("regen_speed"):
+			h_comp.regen_speed = _get_capped_value("regen_speed", base["regen_speed"] * mults["regen_speed"], max_stats["regen_speed"], h_comp.regen_speed, true)
+		if base.has("regen_amount"):
+			h_comp.regen_amount = _get_capped_value("regen_amount", base["regen_amount"] * mults["regen_amount"], max_stats["regen_amount"], h_comp.regen_amount)
+	if base.has("body_damage"):
+		entity.set("body_damage", int(_get_capped_value("body_damage", base["body_damage"] * mults["body_damage"], max_stats["body_damage"], entity.get("body_damage"))))
+	if s_comp and base.has("shield_health"):
+		s_comp.max_shield_health = int(_get_capped_value("shield_health", base["shield_health"] * mults["shield_health"], max_stats["shield_health"], s_comp.max_shield_health))
+	if m_w_comp:
+		if base.has("melee_damage"): m_w_comp.melee_damage = int(_get_capped_value("melee_damage", base["melee_damage"] * mults["melee_damage"], max_stats["melee_damage"], m_w_comp.melee_damage))
+		if base.has("melee_knockback"): m_w_comp.knockback_force = _get_capped_value("melee_knockback", base["melee_knockback"] * mults["melee_knockback"], max_stats["melee_knockback"], m_w_comp.knockback_force)
+		if base.has("melee_cooldown"): m_w_comp.attack_cooldown = _get_capped_value("melee_cooldown", base["melee_cooldown"] * mults["melee_cooldown"], max_stats["melee_cooldown"], m_w_comp.attack_cooldown, true)
+	if r_w_comp:
+		if base.has("projectile_damage"): r_w_comp.projectile_damage = int(_get_capped_value("projectile_damage", base["projectile_damage"] * mults["projectile_damage"], max_stats["projectile_damage"], r_w_comp.projectile_damage))
+		if base.has("projectile_speed"): r_w_comp.projectile_speed = _get_capped_value("projectile_speed", base["projectile_speed"] * mults["projectile_speed"], max_stats["projectile_speed"], r_w_comp.projectile_speed)
+		if base.has("reload_speed"): r_w_comp.reload_speed = _get_capped_value("reload_speed", base["reload_speed"] * mults["reload_speed"], max_stats["reload_speed"], r_w_comp.reload_speed, true)
+		if base.has("accuracy"): r_w_comp.accuracy = _get_capped_value("accuracy", base["accuracy"] * mults["accuracy"], max_stats["accuracy"], r_w_comp.accuracy)
+	if a_comp:
+		_apply_ability_stats(a_comp, base, mults)
 
-	if move_comp and base_stats.has("player_speed"):
-		move_comp.player_speed = _get_capped_value("player_speed", float(base_stats["player_speed"]) * float(upgrades["player_speed"]), caps["player_speed"], move_comp.player_speed)
-		
-	if health_comp:
-		if base_stats.has("max_health"):
-			health_comp.max_health = int(_get_capped_value("max_health", float(base_stats["max_health"]) * float(upgrades["max_health"]), caps["max_health"], health_comp.max_health))
-			health_comp.health = health_comp.max_health
-		if base_stats.has("regen_speed"):
-			health_comp.regen_speed = _get_capped_value("regen_speed", float(base_stats["regen_speed"]) * float(upgrades["regen_speed"]), caps["regen_speed"], health_comp.regen_speed, true)
-		if base_stats.has("regen_amount"):
-			health_comp.regen_amount = _get_capped_value("regen_amount", float(base_stats["regen_amount"]) * float(upgrades["regen_amount"]), caps["regen_amount"], health_comp.regen_amount)
-			
-	if base_stats.has("body_damage"):
-		player.body_damage = int(_get_capped_value("body_damage", float(base_stats["body_damage"]) * float(upgrades["body_damage"]), caps["body_damage"], player.body_damage))
-		
-	if shield_comp and base_stats.has("shield_health"):
-		shield_comp.max_shield_health = int(_get_capped_value("shield_health", float(base_stats["shield_health"]) * float(upgrades["shield_health"]), caps["shield_health"], shield_comp.max_shield_health))
-		
-	if m_weapon_comp:
-		if base_stats.has("melee_damage"):
-			m_weapon_comp.melee_damage = int(_get_capped_value("melee_damage", float(base_stats["melee_damage"]) * float(upgrades["melee_damage"]), caps["melee_damage"], m_weapon_comp.melee_damage))
-		if base_stats.has("melee_knockback"):
-			m_weapon_comp.knockback_force = _get_capped_value("melee_knockback", float(base_stats["melee_knockback"]) * float(upgrades["melee_knockback"]), caps["melee_knockback"], m_weapon_comp.knockback_force)
-		if base_stats.has("melee_cooldown"):
-			m_weapon_comp.attack_cooldown = _get_capped_value("melee_cooldown", float(base_stats["melee_cooldown"]) * float(upgrades["melee_cooldown"]), caps["melee_cooldown"], m_weapon_comp.attack_cooldown, true)
-			
-	if r_weapon_comp:
-		if base_stats.has("projectile_damage"):
-			r_weapon_comp.projectile_damage = int(_get_capped_value("projectile_damage", float(base_stats["projectile_damage"]) * float(upgrades["projectile_damage"]), caps["projectile_damage"], r_weapon_comp.projectile_damage))
-		if base_stats.has("projectile_speed"):
-			r_weapon_comp.projectile_speed = _get_capped_value("projectile_speed", float(base_stats["projectile_speed"]) * float(upgrades["projectile_speed"]), caps["projectile_speed"], r_weapon_comp.projectile_speed)
-		if base_stats.has("reload_speed"):
-			r_weapon_comp.reload_speed = _get_capped_value("reload_speed", float(base_stats["reload_speed"]) * float(upgrades["reload_speed"]), caps["reload_speed"], r_weapon_comp.reload_speed, true)
-		if base_stats.has("accuracy"):
-			r_weapon_comp.accuracy = _get_capped_value("accuracy", float(base_stats["accuracy"]) * float(upgrades["accuracy"]), caps["accuracy"], r_weapon_comp.accuracy)
-			
-	if first_ability_comp:
-		match player.current_first_ability:
-			"Magic":
-				if base_stats.has("area_damage"):
-					first_ability_comp.area_damage = int(_get_capped_value("area_damage", float(base_stats["area_damage"]) * float(upgrades["area_damage"]), caps["area_damage"], first_ability_comp.area_damage))
-				if base_stats.has("area_knockback"):
-					first_ability_comp.knockback_force = _get_capped_value("area_knockback", float(base_stats["area_knockback"]) * float(upgrades["area_knockback"]), caps["area_knockback"], first_ability_comp.knockback_force)
-				if base_stats.has("area_radius"):
-					first_ability_comp.max_radius = _get_capped_value("area_radius", float(base_stats["area_radius"]) * float(upgrades["area_radius"]), caps["area_radius"], first_ability_comp.max_radius)
-				if base_stats.has("area_cooldown"):
-					first_ability_comp.max_cooldown = _get_capped_value("area_cooldown", float(base_stats["area_cooldown"]) * float(upgrades["area_cooldown"]), caps["area_cooldown"], first_ability_comp.max_cooldown, true)
-			
-			"Teleport":
-				if base_stats.has("teleport_range"):
-					first_ability_comp.max_range = _get_capped_value("teleport_range", float(base_stats["teleport_range"]) * float(upgrades["teleport_range"]), caps["teleport_range"], first_ability_comp.max_range)
-				if base_stats.has("teleport_cooldown"):
-					first_ability_comp.max_cooldown = _get_capped_value("teleport_cooldown", float(base_stats["teleport_cooldown"]) * float(upgrades["teleport_cooldown"]), caps["teleport_cooldown"], first_ability_comp.max_cooldown, true)
-			
-			"Teleport_Crush":
-				if base_stats.has("area_damage"):
-					first_ability_comp.area_damage = int(_get_capped_value("area_damage", float(base_stats["area_damage"]) * float(upgrades["area_damage"]), caps["area_damage"], first_ability_comp.area_damage))
-				if base_stats.has("area_knockback"):
-					first_ability_comp.knockback_force = _get_capped_value("area_knockback", float(base_stats["area_knockback"]) * float(upgrades["area_knockback"]), caps["area_knockback"], first_ability_comp.knockback_force)
-				if base_stats.has("area_radius"):
-					first_ability_comp.max_radius = _get_capped_value("area_radius", float(base_stats["area_radius"]) * float(upgrades["area_radius"]), caps["area_radius"], first_ability_comp.max_radius)
-				if base_stats.has("teleport_range"):
-					first_ability_comp.max_range = _get_capped_value("teleport_range", float(base_stats["teleport_range"]) * float(upgrades["teleport_range"]), caps["teleport_range"], first_ability_comp.max_range)
-				if base_stats.has("teleport_cooldown"):
-					first_ability_comp.max_cooldown = _get_capped_value("teleport_cooldown", float(base_stats["teleport_cooldown"]) * float(upgrades["teleport_cooldown"]), caps["teleport_cooldown"], first_ability_comp.max_cooldown, true)
-			
-			"Illusion":
-				if base_stats.has("illusion_cooldown"):
-					first_ability_comp.max_cooldown = _get_capped_value("illusion_cooldown", float(base_stats["illusion_cooldown"]) * float(upgrades["illusion_cooldown"]), caps["illusion_cooldown"], first_ability_comp.max_cooldown, true)
-				if base_stats.has("illusion_duration"):
-					first_ability_comp.illusion_duration = _get_capped_value("illusion_duration", float(base_stats["illusion_duration"]) * float(upgrades["illusion_duration"]), caps["illusion_duration"], first_ability_comp.illusion_duration)
-				if base_stats.has("illusions_count"):
-					first_ability_comp.illusions_count = int(_get_capped_value("illusions_count", float(base_stats["illusions_count"]) * float(upgrades["illusions_count"]), caps["illusions_count"], first_ability_comp.illusions_count))
-			
-			"Stealth":
-				if base_stats.has("stealth_cooldown"):
-					first_ability_comp.max_cooldown = _get_capped_value("stealth_cooldown", float(base_stats["stealth_cooldown"]) * float(upgrades["stealth_cooldown"]), caps["stealth_cooldown"], first_ability_comp.max_cooldown, true)
-				if base_stats.has("stealth_duration"):
-					first_ability_comp.stealth_duration = _get_capped_value("stealth_duration", float(base_stats["stealth_duration"]) * float(upgrades["stealth_duration"]), caps["stealth_duration"], first_ability_comp.stealth_duration)
-			
-			"Spawner":
-				if base_stats.has("spawner_cooldown"):
-					first_ability_comp.max_cooldown = _get_capped_value("spawner_cooldown", float(base_stats["spawner_cooldown"]) * float(upgrades["spawner_cooldown"]), caps["spawner_cooldown"], first_ability_comp.max_cooldown, true)
-				if base_stats.has("max_spawns"):
-					first_ability_comp.max_spawns = int(_get_capped_value("max_spawns", float(base_stats["max_spawns"]) * float(upgrades["max_spawns"]), caps["max_spawns"], first_ability_comp.max_spawns))
+# Helper function to apply ability-specific stat caps.
+func _apply_ability_stats(a: Node, b: Dictionary, m: Dictionary) -> void:
+	match entity.get("current_first_ability"):
+		"Magic":
+			if b.has("area_damage"): a.area_damage = int(_get_capped_value("area_damage", b["area_damage"] * m["area_damage"], max_stats["area_damage"], a.area_damage))
+			if b.has("area_radius"): a.max_radius = _get_capped_value("area_radius", b["area_radius"] * m["area_radius"], max_stats["area_radius"], a.max_radius)
+			if b.has("area_cooldown"): a.max_cooldown = _get_capped_value("area_cooldown", b["area_cooldown"] * m["area_cooldown"], max_stats["area_cooldown"], a.max_cooldown, true)
+		"Teleport":
+			if b.has("teleport_range"): a.max_range = _get_capped_value("teleport_range", b["teleport_range"] * m["teleport_range"], max_stats["teleport_range"], a.max_range)
+			if b.has("teleport_cooldown"): a.max_cooldown = _get_capped_value("teleport_cooldown", b["teleport_cooldown"] * m["teleport_cooldown"], max_stats["teleport_cooldown"], a.max_cooldown, true)
+		"Teleport_Crush":
+			if b.has("area_damage"): a.area_damage = int(_get_capped_value("area_damage", b["area_damage"] * m["area_damage"], max_stats["area_damage"], a.area_damage))
+			if b.has("teleport_range"): a.max_range = _get_capped_value("teleport_range", b["teleport_range"] * m["teleport_range"], max_stats["teleport_range"], a.max_range)
+			if b.has("teleport_cooldown"): a.max_cooldown = _get_capped_value("teleport_cooldown", b["teleport_cooldown"] * m["teleport_cooldown"], max_stats["teleport_cooldown"], a.max_cooldown, true)
+		"Illusion":
+			if b.has("illusion_cooldown"): a.max_cooldown = _get_capped_value("illusion_cooldown", b["illusion_cooldown"] * m["illusion_cooldown"], max_stats["illusion_cooldown"], a.max_cooldown, true)
+			if b.has("illusions_count"): a.illusions_count = int(_get_capped_value("illusions_count", b["illusions_count"] * m["illusions_count"], max_stats["illusions_count"], a.illusions_count))
+		"Stealth":
+			if b.has("stealth_cooldown"): a.max_cooldown = _get_capped_value("stealth_cooldown", b["stealth_cooldown"] * m["stealth_cooldown"], max_stats["stealth_cooldown"], a.max_cooldown, true)
+		"Spawner":
+			if b.has("spawner_cooldown"): a.max_cooldown = _get_capped_value("spawner_cooldown", b["spawner_cooldown"] * m["spawner_cooldown"], max_stats["spawner_cooldown"], a.max_cooldown, true)
+			if b.has("max_spawns"): a.max_spawns = int(_get_capped_value("max_spawns", b["max_spawns"] * m["max_spawns"], max_stats["max_spawns"], a.max_spawns))
 
+# Checks if a specific stat has reached its defined maximum or minimum allowable value.
 func is_stat_maxed(stat_name: String) -> bool:
-	if not class_base_stats.has(player.current_class):
-		return false
+	if not class_base_stats.has(entity.get("current_class")): return false
+	var level: LevelingComponent = entity.get_node("Components/LevelingComponent")
+	var current: float = float(class_base_stats[entity.get("current_class")].get(stat_name, 0.0)) * float(level.stat_multipliers.get(stat_name, 1.0))
+	var cap: float = max_stats.get(stat_name, INF)
+	return current <= cap if (stat_name.contains("cooldown") or stat_name.contains("reload") or stat_name == "regen_speed") else current >= cap
 
-	var leveling: Node = player.get_node("Components/LevelingComponent")
-	var base_val: float = float(class_base_stats[player.current_class].get(stat_name, 0.0))
-	var mult_val: float = float(leveling.stat_multipliers.get(stat_name, 1.0))
-	var cap_val: float = float(leveling.max_stats.get(stat_name, INF))
-
-	var current_total: float = base_val * mult_val
-
-	# Cooldowns and reload speeds are maxed when they hit the minimum allowable value.
-	if stat_name.contains("cooldown") or stat_name.contains("reload") or stat_name == "regen_speed":
-		return current_total <= cap_val
-		
-	return current_total >= cap_val
+# Calculates and logs stat changes, returning the clamped result.
+func _get_capped_value(s_name: String, n_val: float, c_val: float, o_val: float, is_cd: bool = false) -> float:
+	var reached: bool = n_val <= c_val if is_cd else n_val >= c_val
+	var final: float = c_val if reached else n_val
+	if snapped(final, 0.01) != snapped(o_val, 0.01) and entity.is_in_group("player"):
+		print("Stat Log: " + s_name + (" reached MAX CAP: " if reached else " changed to ") + str(snapped(final, 0.01)))
+	return final

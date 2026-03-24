@@ -44,9 +44,9 @@ func request_stealth() -> void:
 # Commands all clients to toggle identifying UI elements for remote observers.
 @rpc("authority", "call_local", "reliable")
 func trigger_ui_visibility(is_hidden: bool) -> void:
-	var player_ui: Node = player.get_node_or_null("PlayerUI")
-	if player_ui and player_ui.has_method("toggle_external_ui"):
-		player_ui.toggle_external_ui(is_hidden)
+	var ui_comp: Node = player.get_node_or_null("UIComponent")
+	if ui_comp and ui_comp.has_method("toggle_external_ui"):
+		ui_comp.toggle_external_ui(is_hidden)
 
 # Commands all clients to fade the player's primary sprite and equipment visibility.
 @rpc("authority", "call_local", "reliable")

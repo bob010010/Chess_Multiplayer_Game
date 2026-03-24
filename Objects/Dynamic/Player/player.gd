@@ -5,8 +5,8 @@ extends CharacterBody2D
 @onready var leveling_component: Node = $Components/LevelingComponent
 @onready var promotion_component: Node = $Components/PromotionComponent
 @onready var manager_component: ComponentManager = $Components/ComponentManager
-@onready var sprite_component: Sprite2D = $PlayerSprite
-@onready var playerUI: Node = $PlayerUI
+@onready var sprite_component: Sprite2D = $SpriteComponent
+@onready var UIComponent: Node = $UIComponent
 
 var ranged_w_component: Node
 var melee_w_component: Node
@@ -21,10 +21,10 @@ var knockback_force: int = 200
 var body_damage: int
 
 #Physics layers TODO use these
-const LAYER_PLAYER_AND_FOOD: int = 1
+const LAYER_AI_PLAYER_AND_FOOD: int = 1
 const LAYER_WORLD_BOUNDARIES: int = 2
 
-@export var current_class: String = "Jester":
+@export var current_class: String = "Pawn":
 	set(value):
 		current_class = value
 		if is_node_ready():
@@ -60,8 +60,8 @@ func _ready() -> void:
 	if is_node_ready():
 		sprite_component._on_promotion_applied(current_class)
 		
-	collision_layer = LAYER_PLAYER_AND_FOOD # Resides on
-	collision_mask = LAYER_PLAYER_AND_FOOD | LAYER_WORLD_BOUNDARIES # Collides with
+	collision_layer = LAYER_AI_PLAYER_AND_FOOD # Resides on
+	collision_mask = LAYER_AI_PLAYER_AND_FOOD | LAYER_WORLD_BOUNDARIES # Collides with
 	
 	# Initialises the weapons and class, uses call_deferred to give the MultiplayerSpawner time to sync sub-nodes
 	if multiplayer.is_server() or name == str(multiplayer.get_unique_id()):
@@ -70,7 +70,7 @@ func _ready() -> void:
 	health_component.died.connect(_on_player_died)
 
 	if name == str(multiplayer.get_unique_id()):
-		$PlayerSprite.modulate = Color(0, 1, 0)
+		$SpriteComponent.modulate = Color(0, 1, 0)
 		$Camera2D.make_current()
 		$HUD.show()
 		$AbilityBar.show()
@@ -81,7 +81,7 @@ func _ready() -> void:
 		for button: Node in $HUD/PromotionUI.get_children():
 			button.type_chosen.connect(_on_type_chosen)
 	else:
-		$PlayerSprite.modulate = Color(1, 0, 0)
+		$SpriteComponent.modulate = Color(1, 0, 0)
 		$HUD.hide()
 		$AbilityBar.hide()
 
@@ -104,6 +104,7 @@ func apply_team_color() -> void:
 func _physics_process(delta: float) -> void:
 	if name == str(multiplayer.get_unique_id()):
 		#if not shielding: # TODO Add this back in
+		check_player_input()
 		check_ranged_input()
 		check_melee_input()
 		check_first_ability_input()
@@ -114,6 +115,21 @@ func _physics_process(delta: float) -> void:
 		velocity = movement_component.get_movement_velocity() + knockback
 		move_and_slide()
 		handle_collisions()
+
+# Reads WASD input and transmits the movement direction to the server.
+func check_player_input() -> void:
+	if movement_component.movement_blocked:
+		movement_component.set_movement_direction(Vector2.ZERO)
+		return
+		
+	var x: float = Input.get_axis("move_left", "move_right")
+	var y: float = Input.get_axis("move_up", "move_down")
+	var new_dir: Vector2 = Vector2(x, y).normalized() if x != 0 or y != 0 else Vector2.ZERO
+	
+	if new_dir != movement_component.input_dir:
+		movement_component.set_movement_direction(new_dir)
+		if not multiplayer.is_server():
+			movement_component.receive_input.rpc_id(1, new_dir)
 
 # Evaluates and triggers continuous shooting input.
 func check_ranged_input() -> void:
@@ -178,7 +194,7 @@ func handle_collisions() -> void:
 				if collider.is_in_group("food"):
 					CandDUtils.knockback_and_damage(collider, body_damage, name, -normal, knockback_force)
 					@warning_ignore("integer_division")
-					health_component.take_damage(body_damage/8) #This needs to be fixed to use the body damage of the other thing
+					health_component.take_damage(min(1, body_damage/8)) #This needs to be fixed to use the body damage of the other thing
 
 # Applies an external physics impulse force to the player.
 func apply_bounce(force: Vector2) -> void:

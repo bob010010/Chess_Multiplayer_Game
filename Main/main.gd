@@ -15,10 +15,10 @@ var respawn_timer: float = 0.0
 
 var leaderboard_timer: float = 0.0
 
-var top_left_x: int = -2500
-var top_left_y: int = -2500
-var bottom_left_x: int = 2500
-var arena_size: int = 5000
+var top_left_x: int = -5000
+var top_left_y: int = -5000
+var bottom_left_x: int = 5000
+var arena_size: int = 10000
 
 # Connects buttons and initializes the game boundary
 func _ready() -> void:
@@ -65,7 +65,17 @@ func broadcast_leaderboard() -> void:
 			scores.append({"id": player.name, "score": leveling_comp.total_score, "team_id": player.team_id})
 		else:
 			printerr("Player has no leveling component: " + str(player.name))
-
+	
+	for npc: Node in $SpawnedNPCs.get_children():
+		if not is_instance_valid(npc) or npc.is_queued_for_deletion():
+			continue
+		
+		var leveling_comp: Node = npc.get_node_or_null("Components/LevelingComponent")
+		if leveling_comp:
+			scores.append({"id": npc.name, "score": leveling_comp.total_score, "team_id": npc.team_id})
+		else:
+			printerr("NPC has no leveling component: " + str(npc.name))
+	
 	# Sort the array from highest score to lowest
 	scores.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return a["score"] > b["score"])
 	
@@ -74,7 +84,7 @@ func broadcast_leaderboard() -> void:
 	for i: int in range(scores.size()):
 		var p_data: Dictionary = scores[i]
 		var prefix: String = "Player " if p_data["id"] != "1" else "Host "
-		lb_text += str(i + 1) + ". " + prefix + p_data["id"].left(4) + " - Score: " + str(p_data["score"]) + " - Team: " + str(p_data["team_id"]) + "\n"
+		lb_text += str(i + 1) + ". " + prefix + p_data["id"].left(7) + " - Score: " + str(p_data["score"]) + " - Team: " + str(p_data["team_id"]) + "\n"
 		
 	# Beam the compiled text to all clients
 	update_leaderboard_rpc.rpc(lb_text)
@@ -86,11 +96,11 @@ func update_leaderboard_rpc(leaderboard_text: String) -> void:
 	var local_player: Node = $SpawnedPlayers.get_node_or_null(local_id)
 	
 	if local_player:
-		var player_UI: Node = local_player.get_node_or_null("PlayerUI")
-		if player_UI and player_UI.has_method("update_leaderboard_ui"):
-			player_UI.update_leaderboard_ui(leaderboard_text)
+		var ui_comp: Node = local_player.get_node_or_null("UIComponent")
+		if ui_comp and ui_comp.has_method("update_leaderboard_ui"):
+			ui_comp.update_leaderboard_ui(leaderboard_text)
 		else:
-			printerr("No player UI")
+			printerr("No player UI (LB)")
 
 
 # Sets up the local client's UI and camera for the spectate phase.

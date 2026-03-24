@@ -1,15 +1,18 @@
 extends Node
 class_name ComponentManager
 
-@onready var player: CharacterBody2D = get_parent().get_parent() as CharacterBody2D
+@onready var entity: CharacterBody2D = get_parent().get_parent() as CharacterBody2D
 @onready var components_container: Node2D = get_parent() as Node2D
-@onready var player_ui: Node2D = player.get_node("PlayerUI")
+@onready var ui_comp: Node2D = entity.get_node("UIComponent")
+
+var is_player_and_UI_valid: bool = false
 
 # Initializes the component states by hiding all equipment and processing the initial class setup.
 func _ready() -> void:
 	_hide_all_components()
+	is_player_and_UI_valid = entity.is_in_group("player") and is_instance_valid(ui_comp)
 
-# Disables only the non-essential equipment and ability components to ensure core player logic remains active.
+# Disables only the non-essential equipment and ability components to ensure core entity logic remains active.
 func _hide_all_components() -> void:
 	var essential_nodes: Array[String] = [
 		"MovementComponent",
@@ -17,7 +20,8 @@ func _hide_all_components() -> void:
 		"LevelingComponent",
 		"PromotionComponent",
 		"ComponentManager",
-		"UIComponent"
+		"UIComponent",
+		"AIControllerComponent"
 	]
 	
 	for child: Node in components_container.get_children():
@@ -26,67 +30,69 @@ func _hide_all_components() -> void:
 			
 		if child is Node2D:
 			child.hide()
-			child.process_mode = Node.PROCESS_MODE_DISABLED
+			child.set_deferred("process_mode", Node.PROCESS_MODE_DISABLED)
 
-# Swaps the active melee weapon component and updates the associated UI labels.
+# Swaps the active melee weapon component and updates UI labels while deferring state changes to avoid physics conflicts.
 func change_melee_weapon(weapon_type: String) -> void:
 	var spear: Node2D = components_container.get_node_or_null("SpearComponent")
 	var sword: Node2D = components_container.get_node_or_null("SwordComponent")
 	
-	if spear:
+	if is_instance_valid(spear):
 		spear.hide()
-		spear.process_mode = Node.PROCESS_MODE_DISABLED
-	if sword:
+		spear.set_deferred("process_mode", Node.PROCESS_MODE_DISABLED)
+	if is_instance_valid(sword):
 		sword.hide()
-		sword.process_mode = Node.PROCESS_MODE_DISABLED
+		sword.set_deferred("process_mode", Node.PROCESS_MODE_DISABLED)
 		
 	match weapon_type:
 		"Spear":
-			player.melee_w_component = spear
-			player_ui.melee_info_label.text = "Melee: Spear"
+			entity.set("melee_w_component", spear)
+			if is_player_and_UI_valid: ui_comp.melee_info_label.text = "Melee: Spear"
 		"Sword":
-			player.melee_w_component = sword
-			player_ui.melee_info_label.text = "Melee: Sword"
+			entity.set("melee_w_component", sword)
+			if is_player_and_UI_valid: ui_comp.melee_info_label.text = "Melee: Sword"
 		"None":
-			player.melee_w_component = null
-			player_ui.melee_info_label.text = "No Melee Weapon"
+			entity.set("melee_w_component", null)
+			if is_player_and_UI_valid: ui_comp.melee_info_label.text = "No Melee Weapon"
 			
-	if player.melee_w_component:
-		player.melee_w_component.show()
-		player.melee_w_component.process_mode = Node.PROCESS_MODE_INHERIT
-		player_ui.melee_w_component = player.melee_w_component
+	var active_melee: Node2D = entity.get("melee_w_component")
+	if is_instance_valid(active_melee):
+		active_melee.show()
+		active_melee.set_deferred("process_mode", Node.PROCESS_MODE_INHERIT)
+		if is_player_and_UI_valid: ui_comp.melee_w_component = active_melee
 
-# Swaps the active ranged weapon component and updates the associated UI labels.
+# Swaps the active ranged weapon component and updates UI labels while deferring state changes to avoid physics conflicts.
 func change_ranged_weapon(weapon_type: String) -> void:
 	var fireball: Node = components_container.get_node_or_null("FireballShooterComponent")
 	var bow: Node = components_container.get_node_or_null("BowComponent")
 	var pin: Node = components_container.get_node_or_null("PinShooterComponent")
 	
 	for node: Node in [fireball, bow, pin]:
-		if node:
+		if is_instance_valid(node):
 			node.hide()
-			node.process_mode = Node.PROCESS_MODE_DISABLED
-			
+			node.set_deferred("process_mode", Node.PROCESS_MODE_DISABLED)
+
 	match weapon_type:
 		"Fireball_Shooter":
-			player.ranged_w_component = fireball
-			player_ui.ranged_info_label.text = "Ranged: Fireball Shooter"
+			entity.set("ranged_w_component", fireball)
+			if is_player_and_UI_valid: ui_comp.ranged_info_label.text = "Ranged: Fireball Shooter"
 		"Bow":
-			player.ranged_w_component = bow
-			player_ui.ranged_info_label.text = "Ranged: Bow"
+			entity.set("ranged_w_component", bow)
+			if is_player_and_UI_valid: ui_comp.ranged_info_label.text = "Ranged: Bow"
 		"Pin_Shooter":
-			player.ranged_w_component = pin
-			player_ui.ranged_info_label.text = "Ranged: Pin Shooter"
+			entity.set("ranged_w_component", pin)
+			if is_player_and_UI_valid: ui_comp.ranged_info_label.text = "Ranged: Pin Shooter"
 		"None":
-			player.ranged_w_component = null
-			player_ui.ranged_info_label.text = "No Ranged Weapon"
+			entity.set("ranged_w_component", null)
+			if is_player_and_UI_valid: ui_comp.ranged_info_label.text = "No Ranged Weapon"
 			
-	if player.ranged_w_component:
-		player.ranged_w_component.show()
-		player.ranged_w_component.process_mode = Node.PROCESS_MODE_INHERIT
-		player_ui.ranged_w_component = player.ranged_w_component
+	var active_ranged: Node2D = entity.get("ranged_w_component")
+	if is_instance_valid(active_ranged):
+		active_ranged.show()
+		active_ranged.set_deferred("process_mode", Node.PROCESS_MODE_INHERIT)
+		if is_player_and_UI_valid: ui_comp.ranged_w_component = active_ranged
 
-# Swaps the active ability component and updates the associated UI labels and logic references.
+# Swaps the active ability component and updates UI labels while deferring state changes to avoid physics conflicts.
 func change_first_ability(ability_type: String) -> void:
 	var abilities: Dictionary = {
 		"Magic": components_container.get_node_or_null("MagicAreaWeaponComponent"),
@@ -98,42 +104,45 @@ func change_first_ability(ability_type: String) -> void:
 	}
 	
 	for key: String in abilities:
-		if abilities[key]:
+		if is_instance_valid(abilities[key]):
 			abilities[key].hide()
-			abilities[key].process_mode = Node.PROCESS_MODE_DISABLED
+			abilities[key].set_deferred("process_mode", Node.PROCESS_MODE_DISABLED)
 			
-	if abilities.has(ability_type) and abilities[ability_type]:
-		player.first_ability_component = abilities[ability_type]
-		player.first_ability_component.show()
-		player.first_ability_component.process_mode = Node.PROCESS_MODE_INHERIT
-		player_ui.ability_info_label.text = "Ability: " + ability_type.replace("_", " ")
+	if abilities.has(ability_type) and is_instance_valid(abilities[ability_type]):
+		entity.set("first_ability_component", abilities[ability_type])
+		var active_ability: Node2D = entity.get("first_ability_component")
+		active_ability.show()
+		active_ability.set_deferred("process_mode", Node.PROCESS_MODE_INHERIT)
+		if is_player_and_UI_valid: ui_comp.ability_info_label.text = "Ability: " + ability_type.replace("_", " ")
 	else:
-		player.first_ability_component = null
-		player_ui.ability_info_label.text = "No First Ability"
+		entity.set("first_ability_component", null)
+		if is_player_and_UI_valid: ui_comp.ability_info_label.text = "No First Ability"
 		
-	player_ui.first_ability_component = player.first_ability_component
-	player_ui.current_first_ability = ability_type
+	if is_player_and_UI_valid:
+		ui_comp.first_ability_component = entity.get("first_ability_component")
+		ui_comp.current_first_ability = ability_type
 
-# Swaps the active shield component and updates the associated physical state.
+# Swaps the active shield component and updates the physical state while deferring property assignments.
 func change_shield(shield_type: String) -> void:
 	var wooden: Node = components_container.get_node_or_null("WoodenShieldComponent")
 	var magic: Node = components_container.get_node_or_null("MagicShieldComponent")
 	
-	if wooden:
+	if is_instance_valid(wooden):
 		wooden.hide()
-		wooden.process_mode = Node.PROCESS_MODE_DISABLED
-	if magic:
+		wooden.set_deferred("process_mode", Node.PROCESS_MODE_DISABLED)
+	if is_instance_valid(magic):
 		magic.hide()
-		magic.process_mode = Node.PROCESS_MODE_DISABLED
+		magic.set_deferred("process_mode", Node.PROCESS_MODE_DISABLED)
 		
 	match shield_type:
 		"Wooden":
-			player.shield_component = wooden
+			entity.set("shield_component", wooden)
 		"Magic":
-			player.shield_component = magic
+			entity.set("shield_component", magic)
 		"None":
-			player.shield_component = null
+			entity.set("shield_component", null)
 			
-	if player.shield_component:
-		player.shield_component.process_mode = Node.PROCESS_MODE_INHERIT
-		player_ui.shield_component = player.shield_component
+	var active_shield: Node2D = entity.get("shield_component")
+	if is_instance_valid(active_shield):
+		active_shield.set_deferred("process_mode", Node.PROCESS_MODE_INHERIT)
+		if is_player_and_UI_valid: ui_comp.shield_component = active_shield

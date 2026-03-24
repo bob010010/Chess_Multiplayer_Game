@@ -43,6 +43,7 @@ shape = SubResource("RectangleShape2D_j1h6l")
 [node name="Area2D" type="Area2D" parent="." unique_id=707570078]
 
 [node name="DetectionArea" type="CollisionShape2D" parent="Area2D" unique_id=737770204]
+position = Vector2(5, 5)
 scale = Vector2(1.5, 1.5)
 shape = SubResource("RectangleShape2D_41amo")
 debug_color = Color(0.5513601, 0.4082944, 0.9865976, 0.1764706)

@@ -56,7 +56,7 @@ func _perform_teleport(target_pos: Vector2) -> void:
 # Executes a localized scaling tween animation on all clients to visually emphasize the teleportation.
 @rpc("authority", "call_local", "reliable")
 func trigger_teleport_visuals(going_out: bool, target_pos: Vector2 = Vector2.ZERO) -> void:
-	var sprite: Sprite2D = player.get_node("PlayerSprite") as Sprite2D
+	var sprite: Sprite2D = player.get_node("SpriteComponent") as Sprite2D
 	var components: Node2D = player.get_node("Components") as Node2D
 	if not sprite or not components:
 		return

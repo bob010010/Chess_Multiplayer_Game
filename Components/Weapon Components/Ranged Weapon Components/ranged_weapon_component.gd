@@ -1,4 +1,4 @@
-extends Node
+extends Node2D
 class_name RangedWeaponComponent
 
 # Tells the parent to apply knockback

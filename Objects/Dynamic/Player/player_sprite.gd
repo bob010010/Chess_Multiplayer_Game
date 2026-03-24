@@ -11,10 +11,12 @@ extends Sprite2D
 @export var flower_knight_texture: Texture2D
 @export var bishop_texture: Texture2D
 @export var rook_texture: Texture2D
-@export var ottoman_knight_texture: Texture2D
+@export var sultans_knight_texture: Texture2D
 @export var rook_knight_texture: Texture2D
 @export var bishop_knight_texture: Texture2D
 @export var king_knight_texture: Texture2D
+@export var king_bishop_texture: Texture2D
+@export var king_rook_texture: Texture2D
 @export var king_texture: Texture2D
 @export var queen_texture: Texture2D
 @export var sultan_texture: Texture2D
@@ -45,14 +47,18 @@ func get_texture_from_type(class_type: String) -> Texture2D:
 			return bishop_texture
 		"Rook":
 			return rook_texture
-		"Ottoman_Knight":
-			return ottoman_knight_texture
+		"Sultans_Knight":
+			return sultans_knight_texture
 		"Rook_Knight":
 			return rook_knight_texture
 		"Bishop_Knight":
 			return bishop_knight_texture
 		"King_Knight":
 			return king_knight_texture
+		"King_Bishop":
+			return king_bishop_texture
+		"King_Rook":
+			return king_rook_texture
 		"King":
 			return king_texture
 		"Queen":

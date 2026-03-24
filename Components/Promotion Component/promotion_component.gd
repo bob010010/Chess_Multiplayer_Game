@@ -10,14 +10,16 @@ var promotion_tree: Dictionary = {
 	"Pawn_II": ["Knight", "Mini_Rook"], #Rank 3
 	"Knight": ["Shadow_Knight", "Flowers_Knight", "Bishop"], #Rank 4
 	"Mini_Rook": ["Rook", "Bishop"],
-	"Shadow_Knight": ["Ottoman_Knight"], #Rank 5
-	"Flowers_Knight": ["Ottoman_Knight"],
+	"Shadow_Knight": ["Sultans_Knight"], #Rank 5
+	"Flowers_Knight": ["Sultans_Knight"],
 	"Rook": ["Rook_Knight"],
 	"Bishop": ["Bishop_Knight"],
-	"Ottoman_Knight": ["King_Knight"], #Rank 6
-	"Rook_Knight": ["King_Knight"], 
-	"Bishop_Knight": ["King_Knight"],
+	"Sultans_Knight": ["King_Knight"], #Rank 6
+	"Rook_Knight": ["King_Rook"], 
+	"Bishop_Knight": ["King_Bishop"],
 	"King_Knight": ["King", "Queen", "Sultan", "Jester"], #Rank 7
+	"King_Rook": ["King", "Queen", "Sultan", "Jester"],
+	"King_Bishop": ["King", "Queen", "Sultan", "Jester"],
 	"King": ["Super_Queen", "Holy_Queen"], #Rank 8
 	"Queen": ["Super_Queen", "Holy_Queen"],
 	"Sultan": ["Super_Queen", "Holy_Queen"],
@@ -180,7 +182,7 @@ var class_base_stats: Dictionary = {
 	},
 
 	# Rank 6
-	"Ottoman_Knight": {
+	"Sultans_Knight": {
 		"player_speed": 500.0,
 		"max_health": 70.0,
 		"regen_speed": 1.5,
@@ -228,6 +230,8 @@ var class_base_stats: Dictionary = {
 
 	# Rank 7
 	"King_Knight": max_tier_template.duplicate(),
+	"King_Bishop": max_tier_template.duplicate(),
+	"King_Rook": max_tier_template.duplicate(),
 
 	# Rank 8
 	"King": max_tier_template.duplicate(),
@@ -340,10 +344,13 @@ func request_promotion(choice: String) -> void:
 		
 		# Notify the specific client's UI about the promotion.
 		var info_bar: Node = player.get_node_or_null("HUD/InfoLabel")
-		if info_bar:
+		# Verify the node exists and is inside the tree before calling an RPC
+		if info_bar and info_bar.is_inside_tree():
 			var formatted_class: String = choice.replace("_", " ")
 			info_bar.display_message.rpc_id(player.name.to_int(), "Promoted to " + formatted_class)
-
+		else:
+			printerr("No info bar when promoting")
+			
 		# Re rolls as player may now have new components > new things to upgrade
 		var level_comp: Node2D = player.get_node_or_null("Components/LevelingComponent")
 		if level_comp:
@@ -374,7 +381,7 @@ func change_weapon(class_choice: String) -> void:
 			new_first_ability = "Stealth"
 			new_shield = "Wooden"
 			
-		"Ottoman_Knight", "King_Knight":
+		"Sultans_Knight", "King_Knight":
 			new_m_weapon = "Sword"
 			new_first_ability = "Teleport_Crush"
 			new_shield = "Wooden"
@@ -382,11 +389,11 @@ func change_weapon(class_choice: String) -> void:
 		"Mini_Rook":
 			new_r_weapon = "Bow"
 			
-		"Rook", "Rook_Knight":
+		"Rook", "Rook_Knight", "King_Rook":
 			new_r_weapon = "Bow"
 			new_first_ability = "Spawner"
 			
-		"Bishop", "Bishop_Knight":
+		"Bishop", "Bishop_Knight", "King_Bishop":
 			new_r_weapon = "Fireball_Shooter"
 			new_first_ability = "Magic"
 			new_shield = "Magic"

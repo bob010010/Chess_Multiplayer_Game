@@ -9,9 +9,9 @@ static func knockback_and_damage(target: Node, damage: int, attacker_name: Strin
 
 # Applies damage to the hit entity
 static func damage_on_collide(target: Node, damage: int, attacker_name: String) -> void:
-	if target.has_method("take_damage"):
-		var health_comp: Node2D = target.get_node_or_null("Components/HealthComponent")
-		if not health_comp:
-			printerr("Trying to do damage to something without a health component")
-		else:
-			health_comp.take_damage(damage, attacker_name)
+	var health_comp: Node2D = target.get_node_or_null("Components/HealthComponent")
+
+	if health_comp:
+		health_comp.take_damage(damage, attacker_name)
+	else:
+		printerr("Trying to do damage to something without a health component")

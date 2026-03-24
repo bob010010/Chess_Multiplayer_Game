@@ -20,3 +20,12 @@ static func strip_physics_and_scripts(node: Node) -> void:
 	# Recursively apply the stripping process to all nested children.
 	for child: Node in node.get_children():
 		strip_physics_and_scripts(child)
+
+#Returns whether a position is within the map
+static func is_position_within_map(main: Node, position: Vector2) -> bool:
+	return (
+		position.x >= main.top_left_x and
+		position.x <= main.top_left_x + main.arena_size and
+		position.y >= main.top_left_y and
+		position.y <= main.top_left_y + main.arena_size
+	)

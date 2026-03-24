@@ -29,7 +29,7 @@ func _process(delta: float) -> void:
 # Receives the requested teleport destination from the client and executes it if the cooldown is ready.
 @rpc("any_peer", "call_local", "reliable")
 func request_teleport(target_pos: Vector2) -> void:
-	if multiplayer.is_server():
+	if multiplayer.is_server() and AbilityUtils.is_position_within_map(get_tree().current_scene, target_pos):
 		if current_cooldown <= 0.0:
 			_perform_teleport(target_pos)
 

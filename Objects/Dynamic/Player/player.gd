@@ -20,7 +20,7 @@ var knockback: Vector2 = Vector2.ZERO
 var knockback_force: int = 200
 var body_damage: int
 
-@export var current_class: String = "Queen":
+@export var current_class: String = "Pawn_II":
 	set(value):
 		current_class = value
 		if is_node_ready():

@@ -94,7 +94,7 @@ offset_right = 50.0
 offset_bottom = -44.0
 grow_horizontal = 2
 grow_vertical = 2
-placeholder_text = "127.0.0.1"
+placeholder_text = "Input IP"
 
 [node name="RespawnButton" type="Button" parent="CanvasLayer" unique_id=15384625]
 visible = false

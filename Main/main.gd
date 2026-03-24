@@ -15,6 +15,11 @@ var respawn_timer: float = 0.0
 
 var leaderboard_timer: float = 0.0
 
+var top_left_x: int = -2500
+var top_left_y: int = -2500
+var bottom_left_x: int = 2500
+var arena_size: int = 5000
+
 # Connects buttons and initializes the game boundary
 func _ready() -> void:
 	$CanvasLayer/HostButton.pressed.connect(_on_host_pressed)
@@ -51,10 +56,16 @@ func broadcast_leaderboard() -> void:
 	var scores: Array = []
 	
 	for player: Node in $SpawnedPlayers.get_children():
+		# Ensure the player node isn't scheduled for deletion
+		if not is_instance_valid(player) or player.is_queued_for_deletion():
+			continue
+			
 		var leveling_comp: Node = player.get_node_or_null("Components/LevelingComponent")
 		if leveling_comp:
 			scores.append({"id": player.name, "score": leveling_comp.total_score, "team_id": player.team_id})
-			
+		else:
+			printerr("Player has no leveling component: " + str(player.name))
+
 	# Sort the array from highest score to lowest
 	scores.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return a["score"] > b["score"])
 	
@@ -72,8 +83,8 @@ func broadcast_leaderboard() -> void:
 @rpc("authority", "call_local", "unreliable")
 func update_leaderboard_rpc(leaderboard_text: String) -> void:
 	var local_id: String = str(multiplayer.get_unique_id())
-	print(str(local_id))
 	var local_player: Node = $SpawnedPlayers.get_node_or_null(local_id)
+	
 	if local_player:
 		var player_UI: Node = local_player.get_node_or_null("PlayerUI")
 		if player_UI and player_UI.has_method("update_leaderboard_ui"):
@@ -101,16 +112,15 @@ func start_spectating(killer_id: String) -> void:
 			# Snap the camera to the killer immediately so it doesn't drag across the entire map
 			spectator_camera.global_position = spectate_target.global_position
 
-# Sets up walls around the arena
 func _create_boundaries() -> void:
 	var boundary_body: StaticBody2D = StaticBody2D.new()
 	boundary_body.add_to_group("boundary")
 	
 	var rects: Array = [
-		Rect2(-2550, -2550, 5100, 50),
-		Rect2(-2550, 2500, 5100, 50),  
-		Rect2(-2550, -2500, 50, 5000), 
-		Rect2(2500, -2500, 50, 5000)   
+		Rect2(top_left_x - 50, top_left_y - 50, arena_size + 100, 50),  # Top wall
+		Rect2(top_left_x - 50, bottom_left_x, arena_size + 100, 50),    # Bottom wall
+		Rect2(top_left_x - 50, top_left_y, 50, arena_size),             # Left wall
+		Rect2(top_left_x + arena_size, top_left_y, 50, arena_size)      # Right wall
 	]
 	
 	for rect in rects:

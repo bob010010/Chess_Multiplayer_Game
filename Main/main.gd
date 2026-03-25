@@ -12,6 +12,11 @@ var respawn_timer: float = 0.0
 @onready var respawn_button: Button = $CanvasLayer/RespawnButton
 @onready var respawn_label: Label = $CanvasLayer/RespawnTimerLabel
 
+const PRESETS: Dictionary = {
+	"1": { "game_type": "FFA", "arena_size": 2500.0, "food_per_player": 1500, "bots_per_player": 1, "bot_classes": ["Rook"]}, # 1 Bot for testing
+	"2": { "game_type": "FFA", "arena_size": 6000.0, "food_per_player": 2500, "bots_per_player": 10, "bot_classes": ["Pawn", "Pawn_I"] } # Large game
+}
+
 var leaderboard_timer: float = 0.0
 
 var arena_size: float = 2500.0
@@ -22,18 +27,49 @@ var bottom_left_x: float = arena_size/2
 var food_per_player: int = 1500
 var max_food: int = 0
 
-var bots_per_player: int = 1
+var bots_per_player: int = 2
 var max_bots: int = 0
+var bot_spawn_classes: Array = ["Pawn", "Pawn_I"]
+
+var game_type = "2_Teams"
 
 # Connects buttons and initializes the game boundary
 func _ready() -> void:
 	$CanvasLayer/HostButton.pressed.connect(_on_host_pressed)
-	$CanvasLayer/HostOPButton.pressed.connect(_on_host_open_port_pressed)
+	$CanvasLayer/HostOPButton.pressed.connect(_on_host_OP_pressed)
 	$CanvasLayer/JoinButton.pressed.connect(_on_join_pressed)
 	$Background.size = Vector2(arena_size, arena_size)
 	$Background.position = Vector2(-arena_size/2, -arena_size/2)
 	respawn_button.pressed.connect(_on_respawn_pressed)
 	_create_boundaries()
+
+# Parses the preset input field and applies matching or custom settings.
+func _apply_preset_or_custom() -> void:
+	var input: String = $CanvasLayer/Preset.text.strip_edges()
+	if input == "":
+		input = "1"
+	var parts: Array = input.split(",")
+
+	# If a single token matches a preset key, apply it directly
+	if parts.size() == 1 and PRESETS.has(parts[0].strip_edges()):
+		var preset: Dictionary = PRESETS[parts[0].strip_edges()]
+		game_type        = preset["game_type"]
+		arena_size       = preset["arena_size"]
+		food_per_player  = preset["food_per_player"]
+		bots_per_player  = preset["bots_per_player"]
+		bot_spawn_classes = preset["bot_classes"]
+		return
+
+	# Otherwise expect: game_type, arena_size, food_per_player, bots_per_player
+	if parts.size() != 4:
+		printerr("Preset input must be a preset number or 4 comma-separated values.")
+		return
+
+	game_type       = parts[0].strip_edges()
+	arena_size      = float(parts[1].strip_edges())
+	food_per_player = int(parts[2].strip_edges())
+	bots_per_player = int(parts[3].strip_edges())
+	bot_spawn_classes = Array(parts[4].strip_edges())
 
 # Handles the countdown timer and smoothly pans the spectator camera to the killer.
 func _process(delta: float) -> void:
@@ -153,10 +189,9 @@ func _create_boundaries() -> void:
 		
 	add_child(boundary_body)
 
-func _on_host_open_port_pressed() -> void:
+func _on_host_OP_pressed() -> void:
 	# Run the UPNP port forwarding before starting the server
 	setup_upnp()
-	
 	_on_host_pressed() 
 
 # Initiates the server and spawns the host player
@@ -167,6 +202,7 @@ func _on_host_pressed() -> void:
 	multiplayer.peer_connected.connect($SpawnedPlayers.add_player)
 	$SpawnedPlayers.add_player(multiplayer.get_unique_id())
 	
+	_apply_preset_or_custom()
 	hide_out_of_game_info()
 	
 	is_hosting = true
@@ -212,12 +248,13 @@ func _on_join_pressed() -> void:
 	
 	hide_out_of_game_info()
 
-
+# Hides the pre game stuff
 func hide_out_of_game_info() -> void:
 	$CanvasLayer/HostButton.hide()
 	$CanvasLayer/HostOPButton.hide()
 	$CanvasLayer/JoinButton.hide()
 	$CanvasLayer/InputIP.hide()
+	$CanvasLayer/Preset.hide()
 	$CanvasLayer/Panel.hide()
 	$CanvasLayer/Panel2.hide()
 	respawn_button.hide()

@@ -68,8 +68,21 @@ func _ready() -> void:
 		promotion_component.change_weapon(current_class)
 		promotion_component.apply_promotion_stats(current_class)
 		
-	if is_instance_valid($SpriteComponent):
-		$SpriteComponent.modulate = Color(0.0, 0.0, 1.0, 1.0)
+	apply_team_color()
+
+func apply_team_color() -> void:
+	var sprite: Sprite2D = get_node_or_null("SpriteComponent") as Sprite2D
+	if not sprite:
+		return
+		
+	var local_id: String = str(multiplayer.get_unique_id())
+	var local_player: Node2D = get_tree().current_scene.find_child(local_id, true, false) as Node2D
+	
+	if local_player and "team_id" in local_player:
+		if self.team_id == local_player.get("team_id"):
+			sprite.modulate = Color(0.0, 1.0, 0.0)
+		else:
+			sprite.modulate = Color(1.0, 0.0, 0.0)
 
 # Manages server-side physics and movement for the NPC entity.
 func _physics_process(delta: float) -> void:

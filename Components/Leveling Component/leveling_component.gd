@@ -4,6 +4,8 @@ class_name LevelingComponent
 signal update_ui_points(val: int)
 signal show_upgrade_menu()
 
+@onready var entity: CharacterBody2D = get_parent().get_parent()
+
 @export var points: int = 0:
 	set(value):
 		points = value
@@ -17,6 +19,8 @@ signal show_upgrade_menu()
 
 var total_score: int = 0
 var pending_upgrades: int = 0
+
+var ai_gains_points: bool = false
 
 # The static increments applied to the multiplier pool upon upgrade selection.
 var upgrade_increments: Dictionary = {
@@ -114,13 +118,13 @@ var stat_multipliers: Dictionary = {
 	"shield_health": 1.0
 }
 
-@onready var entity: CharacterBody2D = get_parent().get_parent()
-
 # Grants score and initiates level up verification.
 func get_points(amount: int) -> void:
 	if not multiplayer.is_server():
 		return
-		
+	
+	
+	
 	points += amount
 	total_score += amount
 	request_level_up_math()
@@ -129,7 +133,11 @@ func get_points(amount: int) -> void:
 func request_level_up_math() -> void:
 	if not multiplayer.is_server():
 		return
-	
+		
+	if entity.is_in_group("npc") and not ai_gains_points:
+		#print("Blocked AI from gaining points")
+		return
+		
 	var is_player: bool = entity.is_in_group("player")
 	var peer_id: int = entity.name.to_int() if is_player else -1
 	
@@ -177,8 +185,7 @@ func _npc_auto_upgrade() -> void:
 	for stat: String in valid_stats:
 		if not promo.is_stat_maxed(stat):
 			available_choices.append(stat)
-		else:
-			print("Trying to upgrade but maxed: " + stat)
+
 			
 	if not available_choices.is_empty():
 		var chosen: String = available_choices.pick_random()

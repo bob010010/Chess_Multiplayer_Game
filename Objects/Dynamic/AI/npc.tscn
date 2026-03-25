@@ -16,6 +16,8 @@
 [ext_resource type="PackedScene" uid="uid://c0n8o6qg5guih" path="res://Components/Weapon Components/Meele Weapon Component/Sword Component/sword_component.tscn" id="12_uk261"]
 [ext_resource type="PackedScene" uid="uid://2p2a116rfkeo" path="res://Components/Weapon Components/Ranged Weapon Components/Fireball Shooter Component/fireball_shooter_component.tscn" id="13_jjm0i"]
 [ext_resource type="PackedScene" uid="uid://c15lyias44lvs" path="res://Components/Weapon Components/Ranged Weapon Components/Pin Shooter Component/pin_shooter_component.tscn" id="14_snteq"]
+[ext_resource type="PackedScene" uid="uid://bktkawpolxble" path="res://Components/Ability Components/Stealth Components/stealth_component.tscn" id="16_snteq"]
+[ext_resource type="PackedScene" uid="uid://qsi0va4ssotc" path="res://Components/Ability Components/Spawner Component/spawner_component.tscn" id="17_l1orh"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_t2tx2"]
 size = Vector2(72, 95)
@@ -60,6 +62,9 @@ properties/10/replication_mode = 1
 properties/11/path = NodePath("Components/HealthComponent:regen_amount")
 properties/11/spawn = true
 properties/11/replication_mode = 2
+properties/12/path = NodePath("Components/StealthComponent:current_cooldown")
+properties/12/spawn = true
+properties/12/replication_mode = 1
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xfw1d"]
 bg_color = Color(0.6, 0.6, 0.9607843, 0.6)
@@ -128,6 +133,10 @@ script = ExtResource("10_bl8rq")
 
 [node name="PinShooterComponent" parent="Components" unique_id=1351820741 instance=ExtResource("14_snteq")]
 
+[node name="StealthComponent" parent="Components" unique_id=577867912 instance=ExtResource("16_snteq")]
+
+[node name="SpawnerComponent" parent="Components" unique_id=1294504567 instance=ExtResource("17_l1orh")]
+
 [node name="HealthBar" parent="." unique_id=1748738400 instance=ExtResource("6_bl8rq")]
 offset_left = -60.0
 offset_top = 130.0
@@ -153,9 +162,9 @@ vertical_alignment = 1
 
 [node name="State" type="Label" parent="." unique_id=1894124550]
 offset_left = -400.0
-offset_top = -560.0
+offset_top = -360.0
 offset_right = -360.0
-offset_bottom = -464.0
+offset_bottom = -264.0
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 1, 1)
 theme_override_font_sizes/font_size = 70

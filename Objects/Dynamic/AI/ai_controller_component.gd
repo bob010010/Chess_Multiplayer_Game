@@ -60,12 +60,12 @@ func _physics_process(delta: float) -> void:
 	var threat: Node2D = _get_dangerous_threat(my_score) # Gets the most dangerous threat 
 
 	npc.get_node("State").text = state + " B:" + str(snapped(boldness_factor,0.01)) + " K:" + str(snapped(kindness_factor,0.01)) + " S:" + str(my_score) + "G_C:" + str(snapped(give_up_chase_time,0.01))
-	
-
 
 	# Always try to clear blacklist. 
 	_clear_blacklist(delta)
-
+	
+	_spawn_towers()
+	
 	# Stats and handles fleeing from threats, If you are still fleeing or have found something new to flee from > Do nothing else
 	if _process_fleeing(threat):
 		return
@@ -87,6 +87,15 @@ func _physics_process(delta: float) -> void:
 	 # If there is nothing else to do, wander around
 	if not in_combat:
 		_process_wander_state()
+
+# Spawn towers 
+func _spawn_towers():
+	var spawn_comp = npc.get_node_or_null("Components/SpawnerComponent")
+	if is_instance_valid(spawn_comp) and spawn_comp.current_cooldown <= 0.0:
+		spawn_comp.request_spawn.rpc(npc.global_position)
+		#print("AI spawned tower")
+		return true
+	return false
 
 # Clears the blacklisted targets
 func _clear_blacklist(delta) -> void:
@@ -152,6 +161,8 @@ func _process_fleeing(threat: Node2D) -> bool:
 	if is_instance_valid(threat): # If there is a threat, flee
 		last_threat_pos = threat.global_position
 		flee_timer = 3.0
+		if _action_stealth(): # Try and stealth, if sucessful return > Do nothing else
+			return true
 		_action_flee(last_threat_pos)
 		return true
 	
@@ -163,6 +174,14 @@ func _process_fleeing(threat: Node2D) -> bool:
 			is_fleeing = false
 		return true
 		
+	return false
+
+func _action_stealth() -> bool:
+	var stealth_comp = npc.get_node_or_null("Components/StealthComponent")
+	if stealth_comp.current_cooldown <= 0.0:
+		print("NPC requesting Stealth")
+		stealth_comp.request_stealth.rpc()
+		return true
 	return false
 
 # ACTION

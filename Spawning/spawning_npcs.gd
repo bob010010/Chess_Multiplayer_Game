@@ -23,7 +23,14 @@ func _spawn_npc(spawn_pos: Vector2) -> void:
 	var npc_instance: CharacterBody2D = npc_scene.instantiate() as CharacterBody2D
 	npc_instance.name = "AI_" + str(Time.get_ticks_msec()) + "_" + str(randi())
 	npc_instance.global_position = spawn_pos
-	npc_instance.team_id = randi_range(10,1000)
-	npc_instance.current_class = ["Pawn", "Pawn_I"].pick_random()
+	
+	match owner.game_type:
+		"FFA":
+			npc_instance.team_id = randi_range(10,1000)
+		"2_Teams":
+			npc_instance.team_id = (get_child_count() % 2) + 1
+	
+	
+	npc_instance.current_class = owner.bot_spawn_classes.pick_random()
 	add_child(npc_instance, true)
 	print("Spawned npc")

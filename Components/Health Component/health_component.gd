@@ -65,6 +65,10 @@ func heal(amount: float) -> void:
 # Deducts health, emits death signal if empty, and triggers floating damage text.
 func take_damage(amount: int, attacker_id: String = "") -> void:
 	if multiplayer.is_server():
+		
+		if owner.is_in_group("tower") and attacker_id != "":
+			print("Tower Hit by: " + attacker_id + " Owner: " + owner.name.left(24))
+		
 		health -= amount
 		regen_cooldown = regen_speed
 		spawn_floating_text.rpc(amount, false)

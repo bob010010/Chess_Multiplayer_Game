@@ -18,6 +18,8 @@ func request_stealth() -> void:
 	if multiplayer.is_server() and current_cooldown <= 0.0:
 		current_cooldown = max_cooldown
 		
+		print("Stealth activating")
+		
 		var info_label: Node = player.get_node_or_null("HUD/InfoLabel")
 		if info_label:
 			info_label.display_message.rpc_id(player.name.to_int(), "Ability Used: Stealth")

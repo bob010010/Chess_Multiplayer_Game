@@ -11,11 +11,12 @@ func add_player(id: int) -> void:
 	var random_y: float = randf_range(-300, 300)
 	player_instance.position = Vector2(random_x, random_y)
 	
-	# FFA
-	player_instance.team_id = 1 if id == 1 else get_child_count() + 1
+	match owner.game_type:
+		"FFA":
+			player_instance.team_id = 1 if id == 1 else get_child_count() + 1
+		"2_Teams":
+			player_instance.team_id = 1 if id == 1 else (get_child_count() % 2) + 1
 
-	# 2 teams
-	#player_instance.team_id = 1 if id == 1 else (get_child_count() % 2) + 1
 	
 	add_child(player_instance, true)
 	

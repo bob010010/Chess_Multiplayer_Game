@@ -86,7 +86,7 @@ func _ready() -> void:
 		$AbilityBar.hide()
 
 func apply_team_color() -> void:
-	var sprite: Sprite2D = get_node_or_null("PlayerSprite") as Sprite2D
+	var sprite: Sprite2D = get_node_or_null("SpriteComponent") as Sprite2D
 	if not sprite:
 		return
 		

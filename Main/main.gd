@@ -15,11 +15,12 @@ var respawn_timer: float = 0.0
 
 var leaderboard_timer: float = 0.0
 
-
-var arena_size: float = 2000.0
+var arena_size: float = 10000.0
 var top_left_x: float = -arena_size/2
 var top_left_y: float = -arena_size/2
 var bottom_left_x: float = arena_size/2
+
+var food_per_player: int = 10000
 
 # Connects buttons and initializes the game boundary
 func _ready() -> void:
@@ -105,12 +106,11 @@ func update_leaderboard_rpc(leaderboard_text: String) -> void:
 		else:
 			printerr("No player UI (LB)")
 
-
 # Sets up the local client's UI and camera for the spectate phase.
 func start_spectating(killer_id: String) -> void:
 	respawn_button.hide()
 	respawn_label.show()
-	respawn_timer = 10.0
+	respawn_timer = 4.0
 	
 	# Swap the active camera to the main scene's spectator camera
 	spectator_camera.enabled = true

@@ -1,10 +1,10 @@
 extends Node
 class_name TargetingUtils
 
-static var all_passive: bool = true
+static var all_passive: bool = false
 
 # Evaluates targets within an area to find the closest enemy while prioritizing players/NPCs and filtering by score.
-static func get_closest_enemy(origin: Vector2, detection_area: Area2D, my_team: int, ignore_score: bool, my_score: int, exclude_target: Node2D = null) -> Node2D:
+static func get_closest_enemy(origin: Vector2, detection_area: Area2D, my_team: int, ignore_score: bool, my_score: int, exclude_target: Node = null) -> Node2D:
 	var target_players_npcs: Array[Node2D] = []
 	var target_others: Array[Node2D] = []
 
@@ -30,10 +30,10 @@ static func _is_food_accessible(food: Node2D, score: int) -> bool:
 	var shape: String = food.get("shape_type")
 	match shape:
 		"Circle": return score <= 150
-		"Square": return score >= 100 and score <= 500
-		"Triangle": return score >= 400 and score <= 2500
-		"Hexagon": return score >= 2000 and score <= 22000
-		"Decagon": return score >= 20000
+		"Triangle": return score >= 100 and score <= 400
+		"Square": return score >= 500 and score <= 52000
+		"Hexagon": return score >= 2000
+		"Decagon": return score >= 50000
 		_: return true
 
 # Iterates through a provided array of nodes to identify the one with the shortest distance to the origin.

@@ -27,7 +27,6 @@ bg_color = Color(0.3372549, 0.6156863, 0.62352943, 0.38039216)
 script = ExtResource("1_ig7tw")
 
 [node name="Background" type="ColorRect" parent="." unique_id=706016326]
-visible = false
 material = SubResource("ShaderMaterial_7mycd")
 offset_left = -2500.0
 offset_top = -2500.0

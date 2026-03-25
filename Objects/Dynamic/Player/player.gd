@@ -24,7 +24,7 @@ var body_damage: int
 const LAYER_AI_PLAYER_AND_FOOD: int = 1
 const LAYER_WORLD_BOUNDARIES: int = 2
 
-@export var current_class: String = "Pawn":
+@export var current_class: String = "Jester":
 	set(value):
 		current_class = value
 		if is_node_ready():

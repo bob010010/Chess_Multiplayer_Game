@@ -4,7 +4,6 @@
 [ext_resource type="PackedScene" uid="uid://5mf4ol8pweaw" path="res://Components/Sprite Component/sprite_component.tscn" id="1_ge44a"]
 [ext_resource type="Script" uid="uid://d04412dn2ik0y" path="res://Objects/Dynamic/AI/npcui.gd" id="2_eflwn"]
 [ext_resource type="Script" uid="uid://grm2y86px8ee" path="res://Components/Movement Component/movement_component.gd" id="3_5yobt"]
-[ext_resource type="Script" uid="uid://bkhfort3xr3a8" path="res://Objects/Dynamic/AI/looking_area.gd" id="3_jjm0i"]
 [ext_resource type="PackedScene" uid="uid://bah68f313cuc3" path="res://Components/Health Component/health_component.tscn" id="4_7k8bs"]
 [ext_resource type="PackedScene" uid="uid://drldjkjxrdrg" path="res://Components/Weapon Components/Ranged Weapon Components/Bow Component/bow_component.tscn" id="5_0gikb"]
 [ext_resource type="PackedScene" uid="uid://b0tv68ilswjsh" path="res://UI/Bars/Health Bar/health_bar.tscn" id="6_bl8rq"]
@@ -19,6 +18,9 @@
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_t2tx2"]
 size = Vector2(72, 95)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_uk261"]
+radius = 343.35
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_p2f8y"]
 radius = 50.0
@@ -80,18 +82,18 @@ scale = Vector2(1.5, 1.5)
 shape = SubResource("RectangleShape2D_t2tx2")
 debug_color = Color(0.125988, 0.4824381, 0.5932888, 0.41960785)
 
+[node name="AviodanceArea" type="Area2D" parent="." unique_id=377142298]
+scale = Vector2(0.99999994, 0.99999994)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AviodanceArea" unique_id=1989759729]
+shape = SubResource("CircleShape2D_uk261")
+debug_color = Color(0.4285721, 0.06164383, 0.34154946, 0.41960785)
+
 [node name="DetectionArea" type="Area2D" parent="." unique_id=1304377030]
 scale = Vector2(20, 20)
 
 [node name="DetectionHitbox" type="CollisionShape2D" parent="DetectionArea" unique_id=2122327938]
 shape = SubResource("CircleShape2D_p2f8y")
-
-[node name="LookingArea" type="Area2D" parent="." unique_id=1195215265]
-script = ExtResource("3_jjm0i")
-
-[node name="LookingHitbox" type="CollisionPolygon2D" parent="LookingArea" unique_id=1932836793]
-modulate = Color(1, 0.30980393, 1, 1)
-polygon = PackedVector2Array(0, 0, 900, -250, 900, 250)
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=1525879322]
 replication_config = SubResource("SceneReplicationConfig_c7qqn")
@@ -108,6 +110,11 @@ script = ExtResource("3_5yobt")
 
 [node name="AIControllerComponent" type="Node2D" parent="Components" unique_id=1295278930]
 script = ExtResource("6_eflwn")
+attack_range = null
+wander_radius = null
+melee_range = null
+give_up_time = null
+flee_distance = null
 
 [node name="PromotionComponent" type="Node2D" parent="Components" unique_id=822742509]
 script = ExtResource("8_7k8bs")
@@ -146,17 +153,7 @@ offset_bottom = 223.0
 grow_horizontal = 2
 grow_vertical = 0
 theme_override_colors/font_color = Color(0, 0, 0, 1)
-theme_override_font_sizes/font_size = 70
+theme_override_font_sizes/font_size = 50
 theme_override_styles/normal = SubResource("StyleBoxFlat_xfw1d")
 horizontal_alignment = 1
 vertical_alignment = 1
-
-[node name="State" type="Label" parent="." unique_id=1894124550]
-offset_left = -16.0
-offset_top = -560.0
-offset_right = 24.0
-offset_bottom = -464.0
-theme_override_colors/font_color = Color(0, 0, 0, 1)
-theme_override_colors/font_outline_color = Color(0, 0, 1, 1)
-theme_override_font_sizes/font_size = 70
-horizontal_alignment = 1

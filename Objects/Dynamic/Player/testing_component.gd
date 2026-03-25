@@ -24,7 +24,7 @@ func send_command(command_text: String) -> void:
 	execute_server_command.rpc_id(1, command_text)
 
 # Validates the command system state and parses the incoming string on the server.
-@rpc("any_peer", "call_remote", "reliable")
+@rpc("any_peer", "call_local", "reliable")
 func execute_server_command(command_text: String) -> void:
 	if not multiplayer.is_server() or not commands_enabled:
 		return

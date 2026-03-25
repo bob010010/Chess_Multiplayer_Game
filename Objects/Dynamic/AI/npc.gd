@@ -1,4 +1,5 @@
 extends CharacterBody2D
+class_name NPC
 
 @onready var movement_component: Node = $Components/MovementComponent
 @onready var health_component: Node = $Components/HealthComponent
@@ -74,7 +75,10 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	if multiplayer.is_server():
 		_decrease_knockback(delta)
-		velocity = (movement_component.get_movement_velocity() * 0.8) + knockback
+		if not movement_component.movement_blocked:
+			velocity = (movement_component.get_movement_velocity() * 0.8) + knockback
+		else:
+			velocity = Vector2.ZERO
 		move_and_slide()
 		_handle_collisions()
 

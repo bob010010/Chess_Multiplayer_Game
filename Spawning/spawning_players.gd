@@ -2,7 +2,7 @@ extends Node2D
 
 @export var player_scene: PackedScene = preload("res://Objects/Dynamic/Player/player.tscn")
 
-@export var food_per_player: int = 5000
+@onready var food_per_player: int = get_parent().food_per_player
 
 func add_player(id: int) -> void:
 	var player_instance: CharacterBody2D = player_scene.instantiate() as CharacterBody2D

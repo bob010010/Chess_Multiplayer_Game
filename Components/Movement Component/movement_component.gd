@@ -3,6 +3,7 @@ extends Node
 @export var move_speed: int = 100
 var input_dir: Vector2 = Vector2.ZERO
 var movement_blocked: bool = false
+var steering_offset: Vector2 = Vector2.ZERO
 
 @onready var player: Node = get_parent().get_parent()
 
@@ -20,4 +21,12 @@ func get_movement_velocity() -> Vector2:
 
 # Processes the movement direction received from either player input or AI logic.
 func set_movement_direction(dir: Vector2) -> void:
-	input_dir = dir
+	if movement_blocked:
+		return
+	
+	input_dir = (dir + steering_offset).normalized()
+
+	if dir != Vector2.ZERO:
+		var looking_area: Node2D = player.get_node_or_null("LookingArea")
+		if is_instance_valid(looking_area):
+			looking_area.rotation = dir.angle()

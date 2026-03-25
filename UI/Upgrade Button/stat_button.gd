@@ -25,7 +25,7 @@ func _on_pressed() -> void:
 # Updates the button colour 
 func update_button_color() -> void:
 	var new_style: StyleBoxFlat = get_theme_stylebox("normal").duplicate() as StyleBoxFlat
-	new_style.bg_color = get_colour_based_on_type(stat_id)
+	new_style.bg_color = get_colour_based_on_type(stat_id.split(" ")[0])
 	
 	add_theme_stylebox_override("normal", new_style)
 

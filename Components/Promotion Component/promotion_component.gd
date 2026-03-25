@@ -30,7 +30,7 @@ var promotion_tree: Dictionary = {
 }
 
 var max_tier_template: Dictionary = {
-	"move_speed": 500.0,
+	"move_speed": 250.0,
 	"max_health": 200.0,
 	"regen_speed": 3.0,
 	"regen_amount": 10.0,
@@ -59,7 +59,7 @@ var class_base_stats: Dictionary = {
 	
 	# Rank 1
 	"Pawn": {
-		"move_speed": 300.0,
+		"move_speed": 150.0,
 		"max_health": 50.0,
 		"regen_speed": 1.0,
 		"regen_amount": 1.0,
@@ -72,7 +72,7 @@ var class_base_stats: Dictionary = {
 	
 	# Rank 2
 	"Pawn_I": {
-		"move_speed": 320.0,
+		"move_speed": 160.0,
 		"max_health": 65.0,
 		"regen_speed": 1.2,
 		"regen_amount": 2.0,
@@ -85,7 +85,7 @@ var class_base_stats: Dictionary = {
 	
 	# Rank 3
 	"Pawn_II": {
-		"move_speed": 340.0,
+		"move_speed": 170.0,
 		"max_health": 80.0,
 		"regen_speed": 1.5,
 		"regen_amount": 2.0,
@@ -98,7 +98,7 @@ var class_base_stats: Dictionary = {
 
 	# Rank 4
 	"Knight": {
-		"move_speed": 450.0,
+		"move_speed": 150.0,
 		"max_health": 60.0,
 		"regen_speed": 1.5,
 		"regen_amount": 2.0,
@@ -111,7 +111,7 @@ var class_base_stats: Dictionary = {
 		"shield_health": 40.0
 	},
 	"Mini_Rook": {
-		"move_speed": 200.0,
+		"move_speed": 150.0,
 		"max_health": 150.0,
 		"regen_speed": 1.0,
 		"regen_amount": 2.0,
@@ -126,7 +126,7 @@ var class_base_stats: Dictionary = {
 
 	# Rank 5
 	"Shadow_Knight": { 
-		"move_speed": 550.0,
+		"move_speed": 200.0,
 		"max_health": 45.0,
 		"regen_speed": 1.0,
 		"regen_amount": 1.0,
@@ -139,7 +139,7 @@ var class_base_stats: Dictionary = {
 		"shield_health": 25.0
 	},
 	"Flowers_Knight": {
-		"move_speed": 400.0,
+		"move_speed": 175.0,
 		"max_health": 80.0,
 		"regen_speed": 2.5,
 		"regen_amount": 5.0,
@@ -166,7 +166,7 @@ var class_base_stats: Dictionary = {
 		"shield_health": 120.0
 	},
 	"Bishop": {
-		"move_speed": 350.0,
+		"move_speed": 225.0,
 		"max_health": 45.0,
 		"regen_speed": 1.0,
 		"regen_amount": 3.0,
@@ -184,7 +184,7 @@ var class_base_stats: Dictionary = {
 
 	# Rank 6
 	"Sultans_Knight": {
-		"move_speed": 500.0,
+		"move_speed": 250.0,
 		"max_health": 70.0,
 		"regen_speed": 1.5,
 		"regen_amount": 3.0,
@@ -197,7 +197,7 @@ var class_base_stats: Dictionary = {
 		"shield_health": 50.0
 	},
 	"Rook_Knight": {
-		"move_speed": 300.0,
+		"move_speed": 150.0,
 		"max_health": 170.0,
 		"regen_speed": 1.5,
 		"regen_amount": 3.0,
@@ -213,7 +213,7 @@ var class_base_stats: Dictionary = {
 		"shield_health": 100.0
 	},
 	"Bishop_Knight": {
-		"move_speed": 420.0,
+		"move_speed": 210.0,
 		"max_health": 60.0,
 		"regen_speed": 1.5,
 		"regen_amount": 4.0,
@@ -240,7 +240,7 @@ var class_base_stats: Dictionary = {
 	"Sultan": max_tier_template.duplicate(),
 
 	"Jester": {
-		"move_speed": 520.0,
+		"move_speed": 260.0,
 		"max_health": 110.0,
 		"regen_speed": 2.0,
 		"regen_amount": 5.0,
@@ -261,7 +261,7 @@ var class_base_stats: Dictionary = {
 }
 
 var max_stats: Dictionary = {
-	"move_speed": 800.0,
+	"move_speed": 400.0,
 	"body_damage": 40.0,
 	
 	#Health & Regen

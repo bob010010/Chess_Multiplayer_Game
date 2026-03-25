@@ -114,8 +114,6 @@ var stat_multipliers: Dictionary = {
 	"shield_health": 1.0
 }
 
-
-
 @onready var entity: CharacterBody2D = get_parent().get_parent()
 
 # Grants score and initiates level up verification.
@@ -179,6 +177,8 @@ func _npc_auto_upgrade() -> void:
 	for stat: String in valid_stats:
 		if not promo.is_stat_maxed(stat):
 			available_choices.append(stat)
+		else:
+			print("Trying to upgrade but maxed: " + stat)
 			
 	if not available_choices.is_empty():
 		var chosen: String = available_choices.pick_random()
@@ -192,9 +192,11 @@ func request_upgrade(stat_name: String) -> void:
 		apply_upgrade(stat_name)
 
 # Updates stat multipliers and refreshes the entity's base attributes.
-func apply_upgrade(stat_name: String) -> void:
+func apply_upgrade(button_info: String) -> void:
 	if pending_upgrades > 0:
 		pending_upgrades -= 1
+		
+		var stat_name: String = button_info.split(" ")[0]
 		
 		var increment: float = upgrade_increments.get(stat_name, 1.0)
 		stat_multipliers[stat_name] *= increment
@@ -202,9 +204,20 @@ func apply_upgrade(stat_name: String) -> void:
 		var promo: PromotionComponent = entity.get_node("Components/PromotionComponent") as PromotionComponent
 		promo.apply_promotion_stats(entity.get("current_class"))
 		
+		# If the stat is maxed
+		if promo.is_stat_maxed(stat_name):
+			printerr("Trying to upgrade manual but maxed: " + stat_name)
+			pending_upgrades += 1
+			trigger_upgrade_ui.rpc_id(multiplayer.get_remote_sender_id()) # Re show the upgrade buttons
+			
+			var info: Node = entity.get_node_or_null("HUD/InfoLabel")
+			if info:
+				info.display_message.rpc_id(entity.name.to_int(), "ERROR STAT MAXED")
+			return
+			
 		if entity.is_in_group("player"):
 			if pending_upgrades > 0: 
-				trigger_upgrade_ui.rpc_id(multiplayer.get_remote_sender_id()) # Notify the specific client's UI about the upgrade.
+				trigger_upgrade_ui.rpc_id(multiplayer.get_remote_sender_id())  # Re show the upgrade buttons
 			var info: Node = entity.get_node_or_null("HUD/InfoLabel")
 			if info:
 				info.display_message.rpc_id(entity.name.to_int(), "Upgraded " + stat_name)

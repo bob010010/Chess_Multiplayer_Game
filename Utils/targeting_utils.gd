@@ -30,8 +30,8 @@ static func _is_food_accessible(food: Node2D, score: int) -> bool:
 	var shape: String = food.get("shape_type")
 	match shape:
 		"Circle": return score <= 150
-		"Triangle": return score >= 100 and score <= 400
-		"Square": return score >= 500 and score <= 52000
+		"Triangle": return score >= 100
+		"Square": return score >= 500
 		"Hexagon": return score >= 2000
 		"Decagon": return score >= 50000
 		_: return true

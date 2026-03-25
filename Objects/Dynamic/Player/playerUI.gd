@@ -74,12 +74,23 @@ func _show_upgrade_menu() -> void:
 				valid_stats.append_array(["spawner_cooldown", "max_spawns"])
 			"Teleport_Crush":
 				valid_stats.append_array(["teleport_cooldown", "teleport_range", "area_damage", "area_knockback", "area_radius"])
-		
-	for button: Node in upgrade_UI.get_children():
-		var stat: String = valid_stats.pick_random()
-		button.stat_id = stat
-		button.refresh_text()
-		
+	
+	# Remove any stats that are already maxed
+	valid_stats = valid_stats.filter(func(stat): return not promotion_component.is_stat_maxed(stat))
+
+	var buttons: Array[Node] = upgrade_UI.get_children()
+
+	for button: Node in buttons:
+		button.hide()
+
+	valid_stats.shuffle()
+
+	for i: int in min(buttons.size(), valid_stats.size()):
+		var stat: String = valid_stats[i]
+		buttons[i].stat_id = stat + " X" + str(snapped(leveling_component.stat_multipliers.get(stat), 0.01))
+		buttons[i].refresh_text()
+		buttons[i].show()
+
 	upgrade_UI.show()
 
 # Populates the promotion UI with the available class types
@@ -87,7 +98,7 @@ func _show_promotion_menu(available_classes: Array[String]) -> void:
 	var buttons: Array[Node] = promotion_UI.get_children()
 	for i: int in buttons.size():
 		var button: Node = buttons[i]
-		
+	
 		if i < available_classes.size():
 			var type: String = available_classes[i]
 			button.type_id = type

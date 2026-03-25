@@ -1,7 +1,7 @@
 extends Node2D
 class_name SpawningNPCs
 
-var max_npcs: int = 30
+var max_npcs: int = 25
 
 @onready var npc_spawn_range: int = owner.arena_size/2 - 50
 
@@ -26,6 +26,6 @@ func _spawn_npc(spawn_pos: Vector2) -> void:
 	npc_instance.name = "AI_" + str(Time.get_ticks_msec()) + "_" + str(randi())
 	npc_instance.global_position = spawn_pos
 	npc_instance.team_id = randi_range(10,1000)
-	npc_instance.current_class = ["Pawn_I", "Pawn_II"].pick_random()
+	npc_instance.current_class = ["Pawn", "Pawn_I"].pick_random()
 	add_child(npc_instance, true)
 	print("Spawned npc")

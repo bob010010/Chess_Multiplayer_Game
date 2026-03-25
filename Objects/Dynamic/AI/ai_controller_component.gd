@@ -26,6 +26,7 @@ var attack_range: float = 400.0
 var melee_range: float = 70.0
 var current_target: Node2D = null
 var boldness_factor: float = 1.0
+var kindness_factor: float = 1.0
 
 #Chasing
 var give_up_chase_time: float = 5.0 # For chasing

@@ -10,7 +10,6 @@ func _ready() -> void:
 	if "next_level_points" in leveling_component:
 		max_value = float(leveling_component.next_level_points)
 
-		
 
 # Triggers a visual tween sequence to match the server's absolute points value.
 func queue_points(new_points: int) -> void:

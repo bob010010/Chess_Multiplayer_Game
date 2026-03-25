@@ -15,12 +15,12 @@ var respawn_timer: float = 0.0
 
 var leaderboard_timer: float = 0.0
 
-var arena_size: float = 10000.0
+var arena_size: float = 5000.0
 var top_left_x: float = -arena_size/2
 var top_left_y: float = -arena_size/2
 var bottom_left_x: float = arena_size/2
 
-var food_per_player: int = 10000
+var food_per_player: int = 2500
 
 # Connects buttons and initializes the game boundary
 func _ready() -> void:

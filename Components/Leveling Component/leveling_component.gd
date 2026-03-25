@@ -137,6 +137,8 @@ func request_level_up_math() -> void:
 	
 	while points >= next_level_points:
 		entity_level += 1
+		spawn_floating_text.rpc(1)
+		
 		var leftover: int = points - next_level_points
 		
 		if is_player:
@@ -207,6 +209,31 @@ func apply_upgrade(stat_name: String) -> void:
 			if info:
 				info.display_message.rpc_id(entity.name.to_int(), "Upgraded " + stat_name)
 
+# Spawns or updates a floating, vanishing label on all clients to stack level changes dynamically from the base position.
+@rpc("authority", "call_local", "unreliable")
+func spawn_floating_text(amount: int) -> void:
+	if not entity:
+		return
+
+	var vertical_offset: float = -20.0 * entity.scale.y
+	var random_offset_x: float = randf_range(-15.0, 15.0) - 18.0 
+	var label: Label = Label.new()
+	
+	label.top_level = true
+	label.text = "+" + str(amount)
+	label.add_theme_font_size_override("font_size", 30)
+	label.modulate = Color(0.0, 0.0, 1.0, 1.0)
+	
+	label.global_position = entity.global_position + Vector2(random_offset_x, vertical_offset)
+	
+	entity.add_child(label)
+	
+	var tween: Tween = create_tween()
+	tween.set_parallel(true)
+	tween.tween_property(label, "global_position:y", label.global_position.y - 50.0, 1.0).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tween.tween_property(label, "scale", Vector2(0.5, 0.5), 1.0).from(Vector2(1.5, 1.5)).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tween.tween_property(label, "modulate:a", 0.0, 1.0).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	tween.chain().tween_callback(label.queue_free)
 
 # Commands the local client to open the upgrade selection interface via signal.
 @rpc("authority", "call_local", "reliable")

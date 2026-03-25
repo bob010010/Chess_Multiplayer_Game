@@ -10,7 +10,6 @@ var current_spawns: int = 0
 
 var active_towers: Array[Node2D] = []
 
-
 func _process(delta: float) -> void:
 	if multiplayer.is_server() and current_cooldown > 0.0:
 		current_cooldown -= delta

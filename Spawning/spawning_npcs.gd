@@ -1,7 +1,6 @@
 extends Node2D
 class_name SpawningNPCs
 
-@onready var npc_spawn_range: int = owner.arena_size/2 - 50
 
 # Periodically spawns NPCs on the server to maintain world population.
 func _process(delta: float) -> void:
@@ -12,8 +11,8 @@ func _process(delta: float) -> void:
 func _handle_npc_spawning(_delta: float) -> void:
 	if not multiplayer.is_server():
 		return
-		
 	if is_instance_valid(self) and get_child_count() < owner.max_bots:
+		var npc_spawn_range = owner.arena_size/2 - 50
 		var spawn_pos: Vector2 = Vector2(randf_range(-npc_spawn_range, npc_spawn_range), randf_range(-npc_spawn_range, npc_spawn_range))
 		_spawn_npc(spawn_pos)
 
@@ -28,9 +27,7 @@ func _spawn_npc(spawn_pos: Vector2) -> void:
 		"FFA":
 			npc_instance.team_id = randi_range(10,1000)
 		"2_Teams":
-			npc_instance.team_id = (get_child_count() % 2) + 1
-	
-	
+			npc_instance.team_id = randi_range(1,2)
+
 	npc_instance.current_class = owner.bot_spawn_classes.pick_random()
 	add_child(npc_instance, true)
-	print("Spawned npc")

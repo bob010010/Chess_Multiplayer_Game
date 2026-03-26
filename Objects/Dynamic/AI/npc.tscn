@@ -25,6 +25,9 @@ size = Vector2(72, 95)
 [sub_resource type="CircleShape2D" id="CircleShape2D_p2f8y"]
 radius = 50.0
 
+[sub_resource type="ConvexPolygonShape2D" id="ConvexPolygonShape2D_l1orh"]
+points = PackedVector2Array(0, 0, 900, -400, 900, 400)
+
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_c7qqn"]
 properties/0/path = NodePath(".:position")
 properties/0/spawn = true
@@ -90,13 +93,14 @@ scale = Vector2(20, 20)
 
 [node name="DetectionHitbox" type="CollisionShape2D" parent="DetectionArea" unique_id=2122327938]
 shape = SubResource("CircleShape2D_p2f8y")
+debug_color = Color(0, 0.6, 0.69803923, 0.2901961)
 
 [node name="LookingArea" type="Area2D" parent="." unique_id=1195215265]
 script = ExtResource("3_jjm0i")
 
-[node name="LookingHitbox" type="CollisionPolygon2D" parent="LookingArea" unique_id=1932836793]
-modulate = Color(1, 0.30980393, 1, 1)
-polygon = PackedVector2Array(0, 0, 900, -400, 900, 400)
+[node name="LookingHitbox" type="CollisionShape2D" parent="LookingArea" unique_id=584567132]
+shape = SubResource("ConvexPolygonShape2D_l1orh")
+debug_color = Color(0.9843137, 0.05882353, 0.3019608, 0.2901961)
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=1525879322]
 replication_config = SubResource("SceneReplicationConfig_c7qqn")

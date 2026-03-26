@@ -64,10 +64,23 @@ func heal(amount: float) -> void:
 
 # Deducts health, emits death signal if empty, and triggers floating damage text.
 func take_damage(amount: int, attacker_id: String = "") -> void:
-	if multiplayer.is_server():
+	if not multiplayer.is_server():
+		return
 		
-		if owner.is_in_group("tower") and attacker_id != "":
-			print("Tower Hit by: " + attacker_id + " Owner: " + owner.name.left(24))
+	# Friendly Fire Check
+	if attacker_id != "" and entity != null:
+		var attacker_node = _find_attacker_node(attacker_id)
+		
+		if attacker_node:
+			var attacker_team = attacker_node.get("team_id")
+			var my_team = entity.get("team_id")
+			
+			# If both have valid teams and they match, ignore the damage
+			# We check != -1 to ensure unassigned/neutral entities can still be damaged
+			if attacker_team != null and my_team != null:
+				if attacker_team == my_team and my_team != -1:
+					print("Friendly fire blocked between " + attacker_id + " and " + entity.name)
+					return
 		
 		health -= amount
 		regen_cooldown = regen_speed
@@ -75,6 +88,23 @@ func take_damage(amount: int, attacker_id: String = "") -> void:
 
 		if health <= 0:
 			died.emit(attacker_id)
+
+# Helper function to find the attacker node in the world
+func _find_attacker_node(id: String) -> Node:
+	var scene = get_tree().current_scene
+	# Check players first
+	var p_container = scene.get_node_or_null("SpawnedPlayers")
+	if p_container:
+		var p = p_container.get_node_or_null(id)
+		if p: return p
+		
+	# Check NPCs
+	var n_container = scene.get_node_or_null("SpawnedNPCs")
+	if n_container:
+		var n = n_container.get_node_or_null(id)
+		if n: return n
+		
+	return null
 
 # Spawns or updates a floating, vanishing label on all clients to stack health changes dynamically from the base position.
 @rpc("authority", "call_local", "unreliable")

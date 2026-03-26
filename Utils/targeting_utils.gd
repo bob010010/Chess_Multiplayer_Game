@@ -11,8 +11,10 @@ static func get_closest_enemy(origin: Vector2, detection_area: Area2D, my_team: 
 	for body: Node2D in detection_area.get_overlapping_bodies():
 		if body == exclude_target:
 			continue
-			
-		if "team_id" in body and body.get("team_id") != my_team:
+		
+		var body_team = body.get("team_id") if "team_id" in body else -1
+		
+		if body_team != -1 and body_team != my_team:
 			if (not all_passive and body.is_in_group("player")) or body.is_in_group("npc"):
 				target_players_npcs.append(body)
 			elif body.is_in_group("food"):

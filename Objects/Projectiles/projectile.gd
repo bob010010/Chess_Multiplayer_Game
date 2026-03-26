@@ -39,6 +39,12 @@ func _on_body_entered(body: Node2D) -> void:
 		if body.has_method("get") and body.get("team_id") == get_meta("team_id", -1):
 			return
 		
+		if "team_id" in body:
+			var target_team = body.get("team_id")
+			var my_team = get_meta("team_id", -1)
+			if target_team == my_team and target_team != -1: # Don't hit teammates
+				return
+		
 		CandDUtils.knockback_and_damage(body, damage, shooter_id, direction, bullet_knockback)
 				
 		# Trigger the custom subclass hit behavior

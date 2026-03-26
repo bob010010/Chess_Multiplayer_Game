@@ -6,7 +6,7 @@ var current_cooldown: float = 0.0
 @export var max_spawns: int = 2
 var current_spawns: int = 0
 
-@onready var player: CharacterBody2D = get_parent().get_parent() as CharacterBody2D
+@onready var entity: CharacterBody2D = get_parent().get_parent() as CharacterBody2D
 
 var active_towers: Array[Node2D] = []
 
@@ -28,11 +28,11 @@ func request_spawn(spawn_pos: Vector2) -> void:
 		if tower_manager and tower_manager.has_method("spawn_tower"):
 			current_cooldown = max_cooldown
 			
-			var info_label: Node = player.get_node_or_null("HUD/InfoLabel")
+			var info_label: Node = entity.get_node_or_null("HUD/InfoLabel")
 			if info_label:
-				info_label.display_message.rpc_id(player.name.to_int(), "Ability Used: Spawn Tower")
+				info_label.display_message.rpc_id(entity.name.to_int(), "Ability Used: Spawn Tower")
 			
-			var new_tower: Node2D = tower_manager.spawn_tower(spawn_pos, player.name, player.team_id)
+			var new_tower: Node2D = tower_manager.spawn_tower(spawn_pos, entity.name, entity.team_id)
 			if new_tower:
 				active_towers.append(new_tower)
 

@@ -12,14 +12,14 @@ func _ready() -> void:
 func display_message(message: String) -> void:
 	var label = Label.new()
 	get_parent().get_parent().add_child(label)
-	print(message)
+	#print(message)
 	
 	if message.contains("Upgraded"):
 		var stat_button: Node = get_parent().get_node_or_null("UpgradeUI/StatButton")
 		if stat_button:
 			label.text = stat_button.format_stat_name(message)
 			label.modulate = stat_button.get_colour_based_on_type(message.split(" ")[1])
-			print(label.text)
+			#print(label.text)
 		else:
 			label.text = message
 	else:
@@ -29,9 +29,9 @@ func display_message(message: String) -> void:
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
 	
-	label.add_theme_constant_override("outline_size", 4)
+	#label.add_theme_constant_override("outline_size", 4)
 	label.add_theme_font_size_override("font_size", 70)
-	label.add_theme_color_override("font_outline_color", Color.BLACK)
+	#label.add_theme_color_override("font_outline_color", Color.BLACK)
 	
 	var vertical_offset: float = -200.0 * entity.scale.y
 	

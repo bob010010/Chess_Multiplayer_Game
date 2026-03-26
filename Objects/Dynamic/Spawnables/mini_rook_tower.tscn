@@ -43,8 +43,6 @@ shape = SubResource("RectangleShape2D_j1h6l")
 [node name="Area2D" type="Area2D" parent="." unique_id=707570078]
 
 [node name="DetectionArea" type="CollisionShape2D" parent="Area2D" unique_id=737770204]
-position = Vector2(5, 5)
-scale = Vector2(1.5, 1.5)
 shape = SubResource("RectangleShape2D_41amo")
 debug_color = Color(0.5513601, 0.4082944, 0.9865976, 0.1764706)
 
@@ -63,3 +61,10 @@ offset_bottom = 70.0
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=168763180]
 replication_config = SubResource("SceneReplicationConfig_2373d")
+
+[node name="TeamLabel" type="Label" parent="." unique_id=1835874258]
+offset_left = -27.499998
+offset_top = -117.49999
+offset_right = 12.500002
+offset_bottom = -94.49999
+horizontal_alignment = 1

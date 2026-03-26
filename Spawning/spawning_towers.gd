@@ -9,9 +9,14 @@ func spawn_tower(spawn_pos: Vector2, owner_id: String, team: int) -> Node2D:
 		
 	var tower: StaticBody2D = tower_scene.instantiate() as StaticBody2D
 	
-	# Ensures the node name is unique so the MultiplayerSpawner can track it across peers.
+	# Ensures the node name is unique so the MultiplayerSpawner can track it across peers
 	tower.name = "Tower_" + owner_id + "_" + str(Time.get_ticks_msec())
 	tower.global_position = spawn_pos
+	
+	# Assign the team_id property directly to the script before adding to tree
+	# This helps server-side AI logic immediately recognize it as a teammate
+	if "team_id" in tower:
+		tower.team_id = team
 	
 	add_child(tower, true)
 	

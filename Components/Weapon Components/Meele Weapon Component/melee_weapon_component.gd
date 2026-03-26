@@ -50,8 +50,10 @@ func _on_target_entered(target: Node2D) -> void:
 	# Instantly ignore overlaps if we aren't swinging, or if we hit ourselves
 	if not is_attacking or target == player or has_hit:
 		return
-		
-
+	
+	if "team_id" in target and target.get("team_id") == player.team_id: # Same team
+		return
+	
 	var dir: Vector2 = global_position.direction_to(target.global_position)
 	CandDUtils.knockback_and_damage(target, melee_damage, player.name, dir, knockback_force)
 

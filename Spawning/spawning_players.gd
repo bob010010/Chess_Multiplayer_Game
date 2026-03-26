@@ -7,8 +7,8 @@ func add_player(id: int) -> void:
 	var player_instance: CharacterBody2D = player_scene.instantiate() as CharacterBody2D
 	player_instance.name = str(id) 
 	
-	var random_x: float = randf_range(-300, 300)
-	var random_y: float = randf_range(-300, 300)
+	var random_x: float = randf_range(-(owner.arena_size/2 - 50), (owner.arena_size/2 - 50))
+	var random_y: float = randf_range(-(owner.arena_size/2 - 50), (owner.arena_size/2 - 50))
 	player_instance.position = Vector2(random_x, random_y)
 	
 	match owner.game_type:

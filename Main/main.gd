@@ -14,7 +14,8 @@ var respawn_timer: float = 0.0
 
 const PRESETS: Dictionary = {
 	"1": { "game_type": "FFA", "arena_size": 2500.0, "food_per_player": 1500, "bots_per_player": 1, "bot_classes": ["Rook"]}, # 1 Bot for testing
-	"2": { "game_type": "FFA", "arena_size": 6000.0, "food_per_player": 2500, "bots_per_player": 10, "bot_classes": ["Pawn", "Pawn_I"] } # Large game
+	"2": { "game_type": "FFA", "arena_size": 6000.0, "food_per_player": 2500, "bots_per_player": 20, "bot_classes": ["Pawn", "Pawn_I", "Pawn_II"] }, # Large game FFA
+	"3": { "game_type": "2_Teams", "arena_size": 6000.0, "food_per_player": 2500, "bots_per_player": 20, "bot_classes": ["Pawn", "Pawn_I", "Pawn_II"] } # Large game 2 teams
 }
 
 var leaderboard_timer: float = 0.0
@@ -38,10 +39,7 @@ func _ready() -> void:
 	$CanvasLayer/HostButton.pressed.connect(_on_host_pressed)
 	$CanvasLayer/HostOPButton.pressed.connect(_on_host_OP_pressed)
 	$CanvasLayer/JoinButton.pressed.connect(_on_join_pressed)
-	$Background.size = Vector2(arena_size, arena_size)
-	$Background.position = Vector2(-arena_size/2, -arena_size/2)
 	respawn_button.pressed.connect(_on_respawn_pressed)
-	_create_boundaries()
 
 # Parses the preset input field and applies matching or custom settings.
 func _apply_preset_or_custom() -> void:
@@ -49,15 +47,17 @@ func _apply_preset_or_custom() -> void:
 	if input == "":
 		input = "1"
 	var parts: Array = input.split(",")
-
+	print(str(parts))
 	# If a single token matches a preset key, apply it directly
 	if parts.size() == 1 and PRESETS.has(parts[0].strip_edges()):
 		var preset: Dictionary = PRESETS[parts[0].strip_edges()]
+		print(str(preset))
 		game_type        = preset["game_type"]
 		arena_size       = preset["arena_size"]
 		food_per_player  = preset["food_per_player"]
 		bots_per_player  = preset["bots_per_player"]
 		bot_spawn_classes = preset["bot_classes"]
+		print(str(food_per_player))
 		return
 
 	# Otherwise expect: game_type, arena_size, food_per_player, bots_per_player
@@ -124,7 +124,7 @@ func broadcast_leaderboard() -> void:
 	
 	# Format the text block
 	var lb_text: String = "--- Leaderboard ---\n"
-	for i: int in range(scores.size()):
+	for i: int in range(min(scores.size(), 10)): # Show top 10
 		var p_data: Dictionary = scores[i]
 		var prefix: String = "Player " if p_data["id"] != "1" else "Host "
 		lb_text += str(i + 1) + ". " + prefix + p_data["id"].left(7) + " - Score: " + str(p_data["score"]) + " - Team: " + str(p_data["team_id"]) + "\n"
@@ -172,6 +172,10 @@ func _create_boundaries() -> void:
 	boundary_body.collision_layer = 2
 	boundary_body.collision_mask = 0
 	
+	top_left_x = -arena_size/2
+	top_left_y = -arena_size/2
+	bottom_left_x = arena_size/2
+	
 	var rects: Array = [
 		Rect2(top_left_x - 50, top_left_y - 50, arena_size + 100, 50),  # Top wall
 		Rect2(top_left_x - 50, bottom_left_x, arena_size + 100, 50),    # Bottom wall
@@ -199,13 +203,17 @@ func _on_host_pressed() -> void:
 	peer.create_server(PORT) 
 	multiplayer.multiplayer_peer = peer
 	
-	multiplayer.peer_connected.connect($SpawnedPlayers.add_player)
-	$SpawnedPlayers.add_player(multiplayer.get_unique_id())
-	
+	# Set up the game
 	_apply_preset_or_custom()
 	hide_out_of_game_info()
-	
+	_create_boundaries()
+	$Background.size = Vector2(arena_size, arena_size)
+	$Background.position = Vector2(-arena_size/2, -arena_size/2)
 	is_hosting = true
+	
+	# Spawn the host
+	multiplayer.peer_connected.connect($SpawnedPlayers.add_player)
+	$SpawnedPlayers.add_player(multiplayer.get_unique_id())
 
 # Attempts to automatically forward the game port on the host's router.
 func setup_upnp() -> void:

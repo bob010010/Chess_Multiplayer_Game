@@ -154,7 +154,7 @@ func request_level_up_math() -> void:
 		pending_upgrades += 1
 		points = leftover
 		
-		if not is_player and entity_level % 5 == 0:
+		if not is_player and entity_level % 3 == 0:
 			var promo: Node = entity.get_node("Components/PromotionComponent")
 			promo.add_pending_promotion(peer_id)
 

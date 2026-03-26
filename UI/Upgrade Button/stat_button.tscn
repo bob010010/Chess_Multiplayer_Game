@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://bxfwklemd5f4o"]
 
 [ext_resource type="Script" uid="uid://cmui42tdnn0ob" path="res://UI/Upgrade Button/stat_button.gd" id="1_xcqn4"]
+[ext_resource type="Script" uid="uid://2lr61aueyl58" path="res://UI/Bars/entity_bar.gd" id="2_iuot1"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_drecd"]
 bg_color = Color(0.6, 0.6, 0.6, 0.6039216)
@@ -13,3 +14,19 @@ theme_override_colors/font_focus_color = Color(0, 0, 0, 1)
 theme_override_styles/normal = SubResource("StyleBoxFlat_drecd")
 text = "Upgrade"
 script = ExtResource("1_xcqn4")
+
+[node name="EntityBar" type="ProgressBar" parent="." unique_id=1510759209]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -33.5
+offset_top = -44.0
+offset_right = -25.5
+grow_horizontal = 2
+min_value = 11.095
+value = 11.095
+fill_mode = 3
+show_percentage = false
+script = ExtResource("2_iuot1")
+metadata/_custom_type_script = "uid://2lr61aueyl58"

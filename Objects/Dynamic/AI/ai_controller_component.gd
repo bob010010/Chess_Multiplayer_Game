@@ -48,7 +48,7 @@ var action_to_take: bool = false
 
 func _ready() -> void:
 	boldness_factor = randf_range(0.5, 10.0) 
-	kindness_factor = randf_range(0.1, 0.4) 
+	kindness_factor = randf_range(0.3, 0.5) 
 	give_up_chase_time = randf_range(1.0, 3.0)
 
 # Orchestrates the AI decision-making loop, prioritizing flee persistence and combat state transitions.
@@ -59,13 +59,14 @@ func _physics_process(delta: float) -> void:
 	var my_score: int = TargetingUtils.get_entity_score(npc)
 	var threat: Node2D = _get_dangerous_threat(my_score) # Gets the most dangerous threat 
 
-	npc.get_node("State").text = state + " B:" + str(snapped(boldness_factor,0.01)) + " K:" + str(snapped(kindness_factor,0.01)) + " S:" + str(my_score)
-	npc.get_node("State").text += " G_C:" + str(snapped(give_up_chase_time,0.01)) + " T:" + str(npc.team_id)
+	npc.get_node("State").text = state + "  B:" + str(snapped(boldness_factor,0.01)) + "  K:" + str(snapped(kindness_factor,0.01)) + "  S:" + str(my_score)
+	npc.get_node("State").text += "  G_C:" + str(snapped(give_up_chase_time,0.01)) + "  T:" + str(npc.team_id)
 	# Always try to clear blacklist. 
 	_clear_blacklist(delta)
 	
 	# Always try to spawn towers
-	_spawn_towers()
+	if npc.current_class == "Rook" or npc.current_class == "Rook_Knight" or npc.current_class == "King_Rook" or npc.current_class == "Sultan":
+		_spawn_towers()
 	
 	# Stats and handles fleeing from threats, If you are still fleeing or have found something new to flee from > Do nothing else
 	if _process_fleeing(threat):

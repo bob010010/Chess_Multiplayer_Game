@@ -5,9 +5,28 @@
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_drecd"]
 bg_color = Color(0.6, 0.6, 0.6, 0.6039216)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_iuot1"]
+bg_color = Color(0.8862745, 0.8862745, 0.8862745, 0.08235294)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_huhax"]
+bg_color = Color(1, 0.6, 0.6, 0.44313726)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+corner_detail = 10
 
 [node name="StatButton" type="Button" unique_id=802052301]
-offset_right = 40.0
+offset_right = 67.0
 offset_bottom = 40.0
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_colors/font_focus_color = Color(0, 0, 0, 1)
@@ -15,18 +34,17 @@ theme_override_styles/normal = SubResource("StyleBoxFlat_drecd")
 text = "Upgrade"
 script = ExtResource("1_xcqn4")
 
-[node name="EntityBar" type="ProgressBar" parent="." unique_id=1510759209]
+[node name="StatProgressBar" type="ProgressBar" parent="." unique_id=1510759209]
 layout_mode = 1
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -33.5
-offset_top = -44.0
-offset_right = -25.5
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 24.0
+offset_bottom = 24.0
 grow_horizontal = 2
-min_value = 11.095
-value = 11.095
-fill_mode = 3
-show_percentage = false
+grow_vertical = 2
+theme_override_constants/outline_size = 1
+theme_override_styles/background = SubResource("StyleBoxFlat_iuot1")
+theme_override_styles/fill = SubResource("StyleBoxFlat_huhax")
 script = ExtResource("2_iuot1")
 metadata/_custom_type_script = "uid://2lr61aueyl58"

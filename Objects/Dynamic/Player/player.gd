@@ -24,7 +24,7 @@ var body_damage: int
 const LAYER_AI_PLAYER_AND_FOOD: int = 1
 const LAYER_WORLD_BOUNDARIES: int = 2
 
-@export var current_class: String = "Pawn":
+@export var current_class: String = "Jester":
 	set(value):
 		current_class = value
 		if is_node_ready():
@@ -76,10 +76,12 @@ func _ready() -> void:
 		$AbilityBar.show()
 		$HUD/UpgradeUI.hide()
 		for button: Node in $HUD/UpgradeUI.get_children():
-			button.stat_chosen.connect(_on_stat_chosen)
+			if button is Button:
+				button.stat_chosen.connect(_on_stat_chosen)
 		$HUD/PromotionUI.hide()
 		for button: Node in $HUD/PromotionUI.get_children():
-			button.type_chosen.connect(_on_type_chosen)
+			if button is Button:
+				button.type_chosen.connect(_on_type_chosen)
 	else:
 		$SpriteComponent.modulate = Color(1, 0, 0)
 		$HUD.hide()

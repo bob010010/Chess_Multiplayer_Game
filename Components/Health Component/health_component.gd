@@ -79,7 +79,7 @@ func take_damage(amount: int, attacker_id: String = "") -> void:
 			# We check != -1 to ensure unassigned/neutral entities can still be damaged
 			if attacker_team != null and my_team != null:
 				if attacker_team == my_team and my_team != -1:
-					print("Friendly fire blocked between " + attacker_id + " and " + entity.name)
+					#print("Friendly fire blocked between " + attacker_id + " and " + entity.name)
 					return
 		
 		health -= amount

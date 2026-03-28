@@ -20,7 +20,7 @@ signal show_upgrade_menu()
 var total_score: int = 0
 var pending_upgrades: int = 0
 
-var ai_gains_points: bool = false
+var ai_gains_points: bool = true
 
 # The static increments applied to the multiplier pool upon upgrade selection.
 var upgrade_increments: Dictionary = {
@@ -122,9 +122,6 @@ var stat_multipliers: Dictionary = {
 func get_points(amount: int) -> void:
 	if not multiplayer.is_server():
 		return
-	
-	
-	
 	points += amount
 	total_score += amount
 	request_level_up_math()
@@ -173,24 +170,20 @@ func request_level_up_math() -> void:
 
 # Identifies non-maxed stats relevant to current equipment and applies a random upgrade for NPCs.
 func _npc_auto_upgrade() -> void:
-	var promo: PromotionComponent = entity.get_node("Components/PromotionComponent") as PromotionComponent
-	var valid_stats: Array[String] = ["move_speed", "body_damage", "max_health", "regen_speed", "regen_amount"]
+	var promo_comp: PromotionComponent = entity.get_node("Components/PromotionComponent") as PromotionComponent
 	
-	if entity.get("melee_w_component") != null:
-		valid_stats.append_array(["melee_damage", "melee_knockback", "melee_cooldown"])
-	if entity.get("ranged_w_component") != null:
-		valid_stats.append_array(["projectile_damage", "projectile_speed", "reload_speed", "accuracy"])
-	
-	var available_choices: Array[String] = []
-	for stat: String in valid_stats:
-		if not promo.is_stat_maxed(stat):
-			available_choices.append(stat)
-
+	var curr_class: String = entity.current_class
+	var valid_stats_dict: Dictionary = promo_comp.class_base_stats[curr_class] # The base stats
+	var available_choices: Array = valid_stats_dict.keys() # The stats the class has
+	#print(str(available_choices))
+	available_choices = available_choices.filter(func(stat): return not promo_comp.is_stat_maxed(stat)) # Remove any stats that are already maxed
 			
 	if not available_choices.is_empty():
 		var chosen: String = available_choices.pick_random()
 		#print("Ai upgraded: " + chosen)
 		apply_upgrade(chosen)
+	else:
+		printerr("No valid")
 
 # Requests a specific stat upgrade from the server.
 @rpc("any_peer", "call_remote", "reliable")

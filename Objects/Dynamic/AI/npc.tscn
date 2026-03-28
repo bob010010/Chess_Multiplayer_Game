@@ -89,11 +89,11 @@ shape = SubResource("RectangleShape2D_t2tx2")
 debug_color = Color(0.125988, 0.4824381, 0.5932888, 0.41960785)
 
 [node name="DetectionArea" type="Area2D" parent="." unique_id=1304377030]
-scale = Vector2(20, 20)
+scale = Vector2(25, 25)
 
 [node name="DetectionHitbox" type="CollisionShape2D" parent="DetectionArea" unique_id=2122327938]
 shape = SubResource("CircleShape2D_p2f8y")
-debug_color = Color(0, 0.6, 0.69803923, 0.2901961)
+debug_color = Color(0, 0.6, 0.69803923, 0.05882353)
 
 [node name="LookingArea" type="Area2D" parent="." unique_id=1195215265]
 script = ExtResource("3_jjm0i")
@@ -143,8 +143,8 @@ script = ExtResource("10_bl8rq")
 
 [node name="HealthBar" parent="." unique_id=1748738400 instance=ExtResource("6_bl8rq")]
 offset_left = -60.0
-offset_top = 130.0
-offset_bottom = 145.0
+offset_top = 100.0
+offset_bottom = 115.0
 
 [node name="Name" type="Label" parent="." unique_id=865800907]
 anchors_preset = 7

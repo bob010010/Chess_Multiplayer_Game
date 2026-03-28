@@ -1,6 +1,7 @@
 extends Node2D
 class_name SpawningNPCs
 
+const NPC_NAMES: Array[String] = ["Bob", "Jack", "Lily", "Harvey", "Luke", "John", "Sam", "Ruby", "Jack", "Tom", "Mary", "Alf", "Mike", "Zara", "Kael", "Nyx", "Dusk", "Vex", "Oryn", "Thal", "Mira", "Blaze", "Crix", "Lyra", "Gorn", "Skye", "Rune", "Fael", "Zolt", "Wren", "Drax", "Sola", "Kira", "Ox", "Ryker", "Fen", "Talon", "Zed", "Casix", "Ivo", "Brynn", "Ace", "Voren"]
 
 # Periodically spawns NPCs on the server to maintain world population.
 func _process(delta: float) -> void:
@@ -20,7 +21,7 @@ func _handle_npc_spawning(_delta: float) -> void:
 func _spawn_npc(spawn_pos: Vector2) -> void:
 	var npc_scene: PackedScene = load("res://Objects/Dynamic/AI/npc.tscn")
 	var npc_instance: CharacterBody2D = npc_scene.instantiate() as CharacterBody2D
-	npc_instance.name = "AI_" + str(Time.get_ticks_msec()) + "_" + str(randi())
+	npc_instance.name = NPC_NAMES.pick_random() + "-" + str(Time.get_ticks_msec()) + "_" + str(randi())
 	npc_instance.global_position = spawn_pos
 	
 	match owner.game_type:

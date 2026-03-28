@@ -27,7 +27,7 @@ var current_first_ability: String
 @onready var stats_label_two: Label = $"../HUD/StatsLabel2"
 @onready var level_label: Label = $"../HUD/LevelBar/LevelLabel"
 
-@onready var upgrade_UI: HBoxContainer = $"../HUD/UpgradeUI"
+@onready var upgrade_UI: VBoxContainer = $"../HUD/UpgradeUI"
 @onready var promotion_UI: HBoxContainer = $"../HUD/PromotionUI"
 
 @onready var leaderboard_label: Label = $"../HUD/LeaderboardLabel"
@@ -52,45 +52,47 @@ func _show_upgrade_menu() -> void:
 	if leveling_component.pending_upgrades < 1:
 		printerr("Called to show upgrade menu without an upgrade")
 		return
-
-	var valid_stats: Array[String] = ["max_health", "regen_amount", "regen_speed", "body_damage", "move_speed"]
 	
-	if ranged_w_component:
-		valid_stats.append_array(["projectile_damage", "projectile_speed", "reload_speed", "accuracy"])
-	if melee_w_component:
-		valid_stats.append_array(["melee_damage", "melee_knockback", "melee_cooldown"])
+	# Hides all (Incl "Upgrade")
+	var ui_children: Array[Node] = upgrade_UI.get_children()
+	for child: Node in ui_children: 
+		child.hide()
 	
-	if first_ability_component:
-		match current_first_ability:
-			"Magic":
-				valid_stats.append_array(["area_damage", "area_knockback", "area_radius", "area_cooldown"])
-			"Teleport":
-				valid_stats.append_array(["teleport_cooldown", "teleport_range"])
-			"Illusion":
-				valid_stats.append_array(["illusion_cooldown", "illusion_duration"])
-			"Stealth":
-				valid_stats.append_array(["stealth_cooldown", "stealth_duration"])
-			"Spawner":
-				valid_stats.append_array(["spawner_cooldown", "max_spawns"])
-			"Teleport_Crush":
-				valid_stats.append_array(["teleport_cooldown", "teleport_range", "area_damage", "area_knockback", "area_radius"])
+	var curr_class: String = player.current_class
+	var valid_stats_dict: Dictionary = promotion_component.class_base_stats[curr_class] # The base stats
+	var valid_stats: Array = valid_stats_dict.keys() # The stats the class has
+	#print("Valid stats for your class: " + str(valid_stats) + "\n")
+	valid_stats = valid_stats.filter(func(stat): return not promotion_component.is_stat_maxed(stat)) # Remove any stats that are already maxed
+	#print("Valid stats (Not max) for your class: " + str(valid_stats)) 
+
+	if valid_stats.size() <= 0:
+		upgrade_UI.hide()
+		return
 	
-	# Remove any stats that are already maxed
-	valid_stats = valid_stats.filter(func(stat): return not promotion_component.is_stat_maxed(stat))
-
-	var buttons: Array[Node] = upgrade_UI.get_children()
-
-	for button: Node in buttons:
-		button.hide()
+	var buttons: Array[Node] = ui_children.filter(func(b): return b is Button)  # Removes the label
 
 	valid_stats.shuffle()
 
-	for i: int in min(buttons.size(), valid_stats.size()):
+	var button_w_valid_count: int = min(buttons.size(), valid_stats.size())
+
+	for i: int in button_w_valid_count:
 		var stat: String = valid_stats[i]
 		buttons[i].stat_id = stat + " X" + str(snapped(leveling_component.stat_multipliers.get(stat), 0.01))
 		buttons[i].refresh_text()
-		buttons[i].show()
+		
+		if not valid_stats_dict.keys().has(stat):
+			printerr("Not found " + stat + " In " + curr_class )
+		
+		var curr_class_stat_base = valid_stats_dict[stat]
+		if not promotion_component.max_stats.has(stat):
+			printerr("Stat not in max stats: " + str(promotion_component.max_stats))
 
+		var stat_max = promotion_component.max_stats[stat]
+		
+		buttons[i].update_progress_bar((curr_class_stat_base/stat_max)*100)
+		buttons[i].show()
+	
+	ui_children[0].show() # Shows "Upgrades"
 	upgrade_UI.show()
 
 # Populates the promotion UI with the available class types
@@ -98,7 +100,10 @@ func _show_promotion_menu(available_classes: Array[String]) -> void:
 	var buttons: Array[Node] = promotion_UI.get_children()
 	for i: int in buttons.size():
 		var button: Node = buttons[i]
-	
+		
+		if button is not Button: # The label
+			continue
+		
 		if i < available_classes.size():
 			var type: String = available_classes[i]
 			button.type_id = type
@@ -175,29 +180,29 @@ func show_debug_info() -> void:
 				var area_radius_text: String = "Area Radius: " + str(first_ability_component.max_radius) + "\n"
 				var area_cooldown_text: String = "Area Cooldown: " + str(first_ability_component.max_cooldown) + "\n"
 				var area_duration_text: String = "Area Attack Duration: " + str(first_ability_component.attack_duration) + "\n\n"
-				stats_label_one.text += area_damage_text + area_kb_text + area_radius_text + area_cooldown_text + area_duration_text
+				stats_label_two.text = area_damage_text + area_kb_text + area_radius_text + area_cooldown_text + area_duration_text
 			"Teleport":
 				var tele_cooldown_text: String = "Teleport Cooldown: " + str(first_ability_component.max_cooldown) + "\n"
 				var tele_duration_text: String = "Til next: " + str(snapped(first_ability_component.current_cooldown, 0.1)) + "\n"
 				var tele_range_text: String = "Teleport Range: " + str(first_ability_component.max_range) + "\n\n"
-				stats_label_one.text += tele_cooldown_text + tele_duration_text + tele_range_text
+				stats_label_two.text = tele_cooldown_text + tele_duration_text + tele_range_text
 			"Illusion":
 				var illu_cooldown_text: String = "Illusion Cooldown: " + str(first_ability_component.max_cooldown) + "\n"
 				var illu_duration_text: String = "Illusion Duration: " + str(first_ability_component.illusion_duration) + "\n"
 				var illu_time_text: String = "Til next: " + str(snapped(first_ability_component.current_cooldown, 0.1)) + "\n"
 				var illu_amount_text: String = "Illusion Amount: " + str(first_ability_component.illusions_count) + "\n\n"
-				stats_label_one.text += illu_cooldown_text + illu_time_text + illu_duration_text + illu_amount_text
+				stats_label_two.text = illu_cooldown_text + illu_time_text + illu_duration_text + illu_amount_text
 			"Stealth":
 				var stealth_cd_text: String = "Stealth Cooldown: " + str(first_ability_component.max_cooldown) + "\n"
 				var stealth_dur_text: String = "Stealth Duration: " + str(first_ability_component.stealth_duration) + "\n"
 				var stealth_time_text: String = "Til next: " + str(snapped(first_ability_component.current_cooldown, 0.1)) + "\n\n"
-				stats_label_one.text += stealth_cd_text + stealth_dur_text + stealth_time_text
+				stats_label_two.text = stealth_cd_text + stealth_dur_text + stealth_time_text
 			"Spawner":
 				var spawner_cd_text: String = "Spawner Cooldown: " + str(first_ability_component.max_cooldown) + "\n"
 				var spawner_time_text: String = "Til next: " + str(snapped(first_ability_component.current_cooldown, 0.1)) + "\n"
 				var spawner_spawns_text: String = "Current spawns: " + str(first_ability_component.current_spawns) + "\n"
 				var spawner_max_spawns_text: String = "Max spawns: " + str(first_ability_component.max_spawns) + "\n\n"
-				stats_label_one.text += spawner_cd_text + spawner_time_text + spawner_spawns_text + spawner_max_spawns_text
+				stats_label_two.text = spawner_cd_text + spawner_time_text + spawner_spawns_text + spawner_max_spawns_text
 			"Teleport_Crush":
 				var tpc_damage_text: String = "Teleport Damage: " + str(first_ability_component.area_damage) + "\n"
 				var tpc_kb_text: String = "Teleport Knockback: " + str(first_ability_component.knockback_force) + "\n"
@@ -206,20 +211,20 @@ func show_debug_info() -> void:
 				var tpc_cooldown_text: String = "Teleport Cooldown: " + str(first_ability_component.max_cooldown) + "\n"
 				var tpc_duration_text: String = "Til next: " + str(snapped(first_ability_component.current_cooldown, 0.1)) + "\n"
 				var tpc_range_text: String = "Teleport Range: " + str(first_ability_component.max_range) + "\n\n"
-				stats_label_one.text += tpc_damage_text + tpc_kb_text + tpc_radius_text + tpc_area_duration_text + tpc_cooldown_text + tpc_duration_text + tpc_range_text
+				stats_label_two.text = tpc_damage_text + tpc_kb_text + tpc_radius_text + tpc_area_duration_text + tpc_cooldown_text + tpc_duration_text + tpc_range_text
 	else:
 		var no_ability_text: String = "No First Ability" + "\n" + "\n"
-		stats_label_one.text += no_ability_text
+		stats_label_two.text = no_ability_text
 		
 	# SHIELD
 	if shield_component:
 		var max_shield_health_text = "Max Shield Health: " + str(shield_component.max_shield_health) + "\n"
 		var shield_health_text = "Shield Health: " + str(shield_component.shield_health) + "\n"
 		var duration_text = "Total Shield Duration: " + str(shield_component.active_duration) + "\n\n"
-		stats_label_two.text = max_shield_health_text + shield_health_text + duration_text
+		stats_label_two.text += max_shield_health_text + shield_health_text + duration_text
 	else:
 		var no_shield_text: String = "No Shield" + "\n" + "\n"
-		stats_label_two.text = no_shield_text
+		stats_label_two.text += no_shield_text
 	
 	#PROMOTIONS AND UPGRADES
 	var pending_upgrades_text: String = "Pending upgrades: " + str(leveling_component.pending_upgrades) + "\n"

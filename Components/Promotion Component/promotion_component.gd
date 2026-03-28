@@ -29,31 +29,6 @@ var promotion_tree: Dictionary = {
 	"Holy_Queen": ["Holy_Queen", "Pawn_II"]
 }
 
-var max_tier_template: Dictionary = {
-	"move_speed": 250.0,
-	"max_health": 200.0,
-	"regen_speed": 3.0,
-	"regen_amount": 10.0,
-	"body_damage": 20.0,
-	"melee_damage": 60.0,
-	"melee_knockback": 800.0,
-	"melee_cooldown": 0.2, 
-	"projectile_damage": 40.0,
-	"projectile_speed": 1000.0,
-	"reload_speed": 0.3,
-	"accuracy": 100.0, 
-	"area_damage": 75.0,
-	"area_knockback": 1000.0,
-	"area_radius": 500.0,
-	"area_cooldown": 2.0,
-	"teleport_range": 1000.0,
-	"teleport_cooldown": 2.0,
-	"stealth_cooldown": 12.0,
-	"stealth_duration": 3.0,
-	"spawner_cooldown": 12.0,
-	"max_spawns": 7.0,
-	"shield_health": 200.0
-}
 
 var class_base_stats: Dictionary = {
 	
@@ -134,8 +109,8 @@ var class_base_stats: Dictionary = {
 		"melee_damage": 40.0,
 		"melee_knockback": 150.0,
 		"melee_cooldown": 0.4,
-		"teleport_range": 600.0,
-		"teleport_cooldown": 3.5,
+		"stealth_cooldown": 12.0,
+		"stealth_duration": 3.0,
 		"shield_health": 25.0
 	},
 	"Flowers_Knight": {
@@ -194,6 +169,9 @@ var class_base_stats: Dictionary = {
 		"melee_cooldown": 0.5,
 		"teleport_range": 450.0,
 		"teleport_cooldown": 4.0,
+		"area_damage": 25.0,
+		"area_knockback": 500.0,
+		"area_radius": 300.0,
 		"shield_health": 50.0
 	},
 	"Rook_Knight": {
@@ -230,14 +208,98 @@ var class_base_stats: Dictionary = {
 	},
 
 	# Rank 7
-	"King_Knight": max_tier_template.duplicate(),
-	"King_Bishop": max_tier_template.duplicate(),
-	"King_Rook": max_tier_template.duplicate(),
+	"King_Knight": {
+		"move_speed": 250.0,
+		"max_health": 200.0,
+		"regen_speed": 3.0,
+		"regen_amount": 10.0,
+		"body_damage": 20.0,
+		"melee_damage": 60.0,
+		"melee_knockback": 800.0,
+		"melee_cooldown": 0.2, 
+		"area_damage": 75.0,
+		"area_knockback": 1000.0,
+		"area_radius": 500.0,
+		"teleport_range": 1000.0,
+		"teleport_cooldown": 2.0,
+	},
+	"King_Bishop": {
+		"move_speed": 250.0,
+		"max_health": 200.0,
+		"regen_speed": 3.0,
+		"regen_amount": 10.0,
+		"body_damage": 20.0,
+		"projectile_damage": 40.0,
+		"projectile_speed": 1000.0,
+		"reload_speed": 0.3,
+		"accuracy": 100.0, 
+		"area_damage": 75.0,
+		"area_knockback": 1000.0,
+		"area_radius": 500.0,
+		"area_cooldown": 2.0,
+	},
+	"King_Rook": {
+		"move_speed": 250.0,
+		"max_health": 200.0,
+		"regen_speed": 3.0,
+		"regen_amount": 10.0,
+		"body_damage": 20.0,
+		"projectile_damage": 40.0,
+		"projectile_speed": 1000.0,
+		"reload_speed": 0.3,
+		"accuracy": 100.0, 
+		"spawner_cooldown": 12.0,
+		"max_spawns": 7.0,
+		"shield_health": 200.0
+	},
 
 	# Rank 8
-	"King": max_tier_template.duplicate(),
-	"Queen": max_tier_template.duplicate(),
-	"Sultan": max_tier_template.duplicate(),
+	"King": {
+		"move_speed": 250.0,
+		"max_health": 200.0,
+		"regen_speed": 3.0,
+		"regen_amount": 10.0,
+		"body_damage": 20.0,
+		"melee_damage": 60.0,
+		"melee_knockback": 800.0,
+		"melee_cooldown": 0.2, 
+		"area_damage": 75.0,
+		"area_knockback": 1000.0,
+		"area_radius": 500.0,
+		"area_cooldown": 2.0,
+		"shield_health": 200.0
+	},
+	"Queen": {
+		"move_speed": 250.0,
+		"max_health": 200.0,
+		"regen_speed": 3.0,
+		"regen_amount": 10.0,
+		"body_damage": 20.0,
+		"projectile_damage": 40.0,
+		"projectile_speed": 1000.0,
+		"reload_speed": 0.3,
+		"accuracy": 100.0, 
+		"area_damage": 75.0,
+		"area_knockback": 1000.0,
+		"area_radius": 500.0,
+		"area_cooldown": 2.0,
+		"teleport_range": 1000.0,
+		"teleport_cooldown": 2.0,
+		"shield_health": 200.0
+	},
+	"Sultan": {
+		"move_speed": 250.0,
+		"max_health": 200.0,
+		"regen_speed": 3.0,
+		"regen_amount": 10.0,
+		"body_damage": 20.0,
+		"melee_damage": 60.0,
+		"melee_knockback": 800.0,
+		"melee_cooldown": 0.2, 
+		"spawner_cooldown": 12.0,
+		"max_spawns": 7.0,
+		"shield_health": 200.0
+	},
 
 	"Jester": {
 		"move_speed": 260.0,
@@ -252,12 +314,49 @@ var class_base_stats: Dictionary = {
 		"illusion_cooldown": 12.0,
 		"illusion_duration": 5.0,
 		"illusions_count": 6.0,
-		"shield_health": 70.0
+		"shield_health": 70.0,
 	},
 
 	# Rank 9
-	"Super_Queen": max_tier_template.duplicate(),
-	"Holy_Queen": max_tier_template.duplicate()
+	"Super_Queen": {
+		"move_speed": 250.0,
+		"max_health": 200.0,
+		"regen_speed": 3.0,
+		"regen_amount": 10.0,
+		"body_damage": 20.0,
+		"melee_damage": 60.0,
+		"melee_knockback": 800.0,
+		"melee_cooldown": 0.2, 
+		"projectile_damage": 40.0,
+		"projectile_speed": 1000.0,
+		"reload_speed": 0.3,
+		"accuracy": 100.0, 
+		"area_damage": 75.0,
+		"area_knockback": 1000.0,
+		"area_radius": 500.0,
+		"area_cooldown": 2.0,
+		"teleport_range": 1000.0,
+		"teleport_cooldown": 2.0,
+		"shield_health": 200.0
+	},
+	"Holy_Queen": {
+		"move_speed": 250.0,
+		"max_health": 200.0,
+		"regen_speed": 3.0,
+		"regen_amount": 10.0,
+		"body_damage": 20.0,
+		"melee_damage": 60.0,
+		"melee_knockback": 800.0,
+		"melee_cooldown": 0.2, 
+		"projectile_damage": 40.0,
+		"projectile_speed": 1000.0,
+		"reload_speed": 0.3,
+		"accuracy": 100.0, 
+		"illusion_cooldown": 12.0,
+		"illusion_duration": 5.0,
+		"illusions_count": 6.0,
+		"shield_health": 200.0
+	},
 }
 
 var max_stats: Dictionary = {

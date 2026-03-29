@@ -6,4 +6,4 @@
 desktop.ini
 
 #Temp import files
-.tmp
+*.tmp

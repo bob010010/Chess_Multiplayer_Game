@@ -123,17 +123,22 @@ func update_leaderboard_ui(board_text: String) -> void:
 func display_message(message: String) -> void:
 	var label = Label.new()
 	add_child(label)
+
+	var text: String = ""
+	var colour: Color
 	
 	if message.contains("Upgraded"):
-		var stat_button: Node = get_parent().get_node_or_null("HUD/UpgradeUI/StatButton")
-		if stat_button:
-			label.text = stat_button.format_stat_name(message)
-			label.modulate = ColourUtils.get_colour_based_on_type(message.split(" ")[1])
-		else:
-			label.text = message
+		text = NameUtils.format_stat_name(message)
+		colour = ColourUtils.get_colour_based_on_type(message.split(" ")[1])
+	elif message.contains("Promoted"):
+		text = message
+		colour = Color(0.0, 1.0, 0.0, 1.0)
 	else:
-		label.text = message
-		label.modulate = Color(1.0, 1.0, 1.0, 1.0)
+		text = message
+		colour = Color(0.965, 0.0, 0.0, 0.788)
+
+	label.text = text
+	label.modulate = colour
 
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)

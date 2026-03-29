@@ -19,4 +19,4 @@ static func get_colour_based_on_type(stat: String) -> Color:
 		"max_cooldown", "illusion_duration", "illusions_count":
 			return Color(0.0, 0.337, 0.0, 0.6)
 		_:
-			return Color(0.424, 0.396, 0.388, 0.6)
+			return Color(0.587, 0.575, 0.565, 0.6)

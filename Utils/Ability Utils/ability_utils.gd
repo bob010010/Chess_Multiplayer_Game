@@ -1,4 +1,4 @@
-extends Node
+extends Node2D
 class_name AbilityUtils
 
 # Recursively removes logic and collisions from a node to ensure it only acts as a visual prop.
@@ -22,10 +22,10 @@ static func strip_physics_and_scripts(node: Node) -> void:
 		strip_physics_and_scripts(child)
 
 #Returns whether a position is within the map
-static func is_position_within_map(main: Node, position: Vector2) -> bool:
+static func is_position_within_map(main: Node, pos: Vector2) -> bool:
 	return (
-		position.x >= main.top_left_x and
-		position.x <= main.top_left_x + main.arena_size and
-		position.y >= main.top_left_y and
-		position.y <= main.top_left_y + main.arena_size
+		pos.x >= main.top_left_x and
+		pos.x <= main.top_left_x + main.arena_size and
+		pos.y >= main.top_left_y and
+		pos.y <= main.top_left_y + main.arena_size
 	)

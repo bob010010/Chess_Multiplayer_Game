@@ -1,4 +1,4 @@
-extends Node
+extends Node2D
 
 @export var move_speed: int = 100
 var input_dir: Vector2 = Vector2.ZERO

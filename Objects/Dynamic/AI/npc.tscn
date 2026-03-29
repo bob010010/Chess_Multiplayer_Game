@@ -18,6 +18,7 @@
 [ext_resource type="PackedScene" uid="uid://c15lyias44lvs" path="res://Components/Weapon Components/Ranged Weapon Components/Pin Shooter Component/pin_shooter_component.tscn" id="14_snteq"]
 [ext_resource type="PackedScene" uid="uid://bktkawpolxble" path="res://Components/Ability Components/Stealth Components/stealth_component.tscn" id="16_snteq"]
 [ext_resource type="PackedScene" uid="uid://qsi0va4ssotc" path="res://Components/Ability Components/Spawner Component/spawner_component.tscn" id="17_l1orh"]
+[ext_resource type="PackedScene" uid="uid://dn8boj5kwnei2" path="res://Components/Ability Components/Stealth Components/Illusion Component/illusion_component.tscn" id="18_q7cir"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_t2tx2"]
 size = Vector2(72, 95)
@@ -140,6 +141,8 @@ script = ExtResource("10_bl8rq")
 [node name="StealthComponent" parent="Components" unique_id=577867912 instance=ExtResource("16_snteq")]
 
 [node name="SpawnerComponent" parent="Components" unique_id=1294504567 instance=ExtResource("17_l1orh")]
+
+[node name="IllusionComponent" parent="Components" unique_id=1196718733 instance=ExtResource("18_q7cir")]
 
 [node name="HealthBar" parent="." unique_id=1748738400 instance=ExtResource("6_bl8rq")]
 offset_left = -60.0

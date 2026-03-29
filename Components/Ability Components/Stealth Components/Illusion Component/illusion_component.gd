@@ -15,17 +15,24 @@ func _physics_process(_delta: float) -> void:
 		last_player_position = entity.global_position
 		return
 
+	# Calculates how far the player moved this frame to apply the same movement to decoys.
 	var movement_delta: float = entity.global_position.distance_to(last_player_position)
 	
 	if movement_delta > 0.0:
 		for i: int in range(active_illusions.size() - 1, -1, -1):
 			var data: Dictionary = active_illusions[i]
-			var illusion_node: Variant = data.get("node")
-			if is_instance_valid(illusion_node):
+			var raw_node: Variant = data.get("node")
+			
+			# Verifies the decoy still exists before attempting to cast the reference or update its position.
+			if is_instance_valid(raw_node):
+				var illusion_node: Node2D = raw_node as Node2D
+				# Multiplies the assigned decoy direction by the player's movement distance to mirror the chase.
 				var move_vec: Vector2 = data["dir"] * movement_delta
 				illusion_node.global_position += move_vec
 			else:
 				active_illusions.remove_at(i)
+
+	last_player_position = entity.global_position
 
 	last_player_position = entity.global_position
 
@@ -35,19 +42,21 @@ func request_illusion(spawn_pos: Vector2) -> void:
 	if multiplayer.is_server() and current_cooldown <= 0.0:
 		current_cooldown = max_cooldown
 		
+		# Grants the player temporary invulnerability and invisibility before the decoy emerges.
 		var original_layer: int = entity.collision_layer
 		var original_mask: int = entity.collision_mask
 		entity.collision_layer = 0
 		entity.collision_mask = entity.LAYER_WORLD_BOUNDARIES
 		
 		trigger_ui_visibility.rpc(true)
-		trigger_stealth_visuals.rpc(true) # invisible 
+		trigger_stealth_visuals.rpc(true) 
 		
 		await get_tree().create_timer(1.0).timeout
 		
 		if not is_instance_valid(entity):
 			return
 			
+		# Restores the player's presence while the decoy begins its distraction.
 		entity.collision_layer = original_layer
 		entity.collision_mask = original_mask
 		trigger_stealth_visuals.rpc(false)
@@ -69,13 +78,13 @@ func request_scattered_illusions() -> void:
 		if ui_comp and entity.is_in_group("player"):
 			ui_comp.display_message.rpc_id(entity.name.to_int(), "Used your illusion!")
 		
+		# Removes the player's physical presence and health bar during the confusion phase.
 		var original_layer: int = entity.collision_layer
 		var original_mask: int = entity.collision_mask
 
 		entity.collision_layer = 0
 		entity.collision_mask = entity.LAYER_WORLD_BOUNDARIES
 		
-		# Hide both alpha and identifying UI.
 		trigger_ui_visibility.rpc(true)
 		trigger_stealth_visuals.rpc(true)
 		
@@ -87,23 +96,24 @@ func request_scattered_illusions() -> void:
 		var positions: Array[Vector2] = []
 		var directions: Array[Vector2] = []
 		
+		# Generates multiple random spawn points and escape paths for the decoy squad.
 		for i: int in range(int(illusions_count)):
 			positions.append(get_position_for_illusion())
 			directions.append(Vector2.RIGHT.rotated(randf() * TAU))
 			
-		# Restore alpha so player is visible, but identifying UI stays hidden.
+		# Re-materializes the player so they are hidden among the identical decoys.
 		entity.collision_layer = original_layer
 		entity.collision_mask = original_mask
 		trigger_stealth_visuals.rpc(false)
 		trigger_scattered_illusions.rpc(positions, directions)
 		
-		# Wait for the moving stage to conclude before showing the username and health bar.
 		await get_tree().create_timer(illusion_duration).timeout
 		
 		if is_instance_valid(entity):
+			# Restores the player's identifying username and health bar once the decoys fade.
 			trigger_ui_visibility.rpc(false)
 
-# Calculates a valid random position for an illusion while ensuring it remains within map boundaries and avoiding infinite recursion.
+# Calculates a valid random position for an illusion while ensuring it remains within map boundaries.
 func get_position_for_illusion() -> Vector2:
 	var max_attempts: int = 15
 	for i: int in range(max_attempts):
@@ -122,9 +132,10 @@ func trigger_illusion_visuals(spawn_pos: Vector2, move_dir: Vector2) -> void:
 	var main_scene: Node = get_tree().current_scene
 	if not main_scene:
 		return
-		
+	
 	_cleanup_illusions()
 	
+	# Creates the visual decoy and starts the gradual fade-out timer.
 	var illusion: Node2D = _build_illusion_node(spawn_pos, main_scene)
 	active_illusions.append({"node": illusion, "dir": move_dir})
 	
@@ -141,6 +152,7 @@ func trigger_scattered_illusions(positions: Array[Vector2], directions: Array[Ve
 		
 	_cleanup_illusions()
 	
+	# Deploys the decoy army, making them emerge with a brief flash to hide the player's real position.
 	for i: int in range(positions.size()):
 		var pos: Vector2 = positions[i]
 		var dir: Vector2 = directions[i]
@@ -157,8 +169,9 @@ func trigger_scattered_illusions(positions: Array[Vector2], directions: Array[Ve
 # Commands all clients to rapidly fade out and destroy all tracked active illusions.
 @rpc("authority", "call_local", "reliable")
 func stop_illusion_visuals() -> void:
+	# Instantly ends the decoy effect across the network if the ability is cancelled.
 	for data: Dictionary in active_illusions:
-		var illusion_node: Variant = data.get("node")
+		var illusion_node: Node2D = data.get("node")
 		if is_instance_valid(illusion_node):
 			var tween: Tween = create_tween()
 			tween.tween_property(illusion_node, "modulate:a", 0.0, 0.2).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
@@ -168,7 +181,7 @@ func stop_illusion_visuals() -> void:
 # Instantly removes all currently active illusions to prevent orphaned visual nodes.
 func _cleanup_illusions() -> void:
 	for data: Dictionary in active_illusions:
-		var illusion_node: Variant = data.get("node")
+		var illusion_node: Node2D = data.get("node")
 		if is_instance_valid(illusion_node):
 			illusion_node.queue_free()
 	active_illusions.clear()
@@ -179,28 +192,31 @@ func _build_illusion_node(spawn_pos: Vector2, parent_scene: Node) -> Node2D:
 	illusion_node.global_position = spawn_pos
 	parent_scene.add_child(illusion_node)
 	
-	var player_sprite: Sprite2D = entity.get_node_or_null("PlayerSprite") as Sprite2D
-	if player_sprite:
-		var sprite_dup: Sprite2D = player_sprite.duplicate(0) as Sprite2D
+	# Copies the player's current skin and equipment so the decoy is visually indistinguishable.
+	var source_sprite: Sprite2D = entity.get_node_or_null("SpriteComponent") as Sprite2D
+	if source_sprite:
+		var sprite_dup: Sprite2D = source_sprite.duplicate(0) as Sprite2D
 		AbilityUtils.strip_physics_and_scripts(sprite_dup)
 		sprite_dup.modulate.a = 1.0 
 		illusion_node.add_child(sprite_dup)
-		illusion_node.scale *= 0.25
+		illusion_node.scale = entity.scale
 		
 	var comp_container: Node2D = Node2D.new()
 	comp_container.name = "Components"
 	illusion_node.add_child(comp_container)
 	
+	# Fetches all currently visible gear to ensure the decoy's loadout matches the player's.
 	var active_comps: Array[Node] = [
-		entity.melee_w_component,
-		entity.ranged_w_component,
-		entity.first_ability_component,
-		entity.shield_component
+		entity.get("melee_w_component"),
+		entity.get("ranged_w_component"),
+		entity.get("first_ability_component"),
+		entity.get("shield_component")
 	]
 	
-	for comp: Node in active_comps:
-		if comp and comp.visible:
+	for comp in active_comps:
+		if is_instance_valid(comp) and comp.visible:
 			var comp_dup: Node = comp.duplicate(0)
+			# Removes all damage-dealing logic and scripts so the decoy is purely cosmetic.
 			AbilityUtils.strip_physics_and_scripts(comp_dup)
 			comp_container.add_child(comp_dup)
 			

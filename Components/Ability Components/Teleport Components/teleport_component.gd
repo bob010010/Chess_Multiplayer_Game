@@ -63,7 +63,7 @@ func trigger_teleport_visuals(going_out: bool, target_pos: Vector2 = Vector2.ZER
 	
 	var ui_comp: Node = entity.get_node_or_null("UIComponent")
 	if ui_comp and entity.is_in_group("player"):
-		ui_comp.display_message.rpc_id(entity.name.to_int(), "Used Stealth!")
+		ui_comp.display_message.rpc_id(entity.name.to_int(), "Teleported!")
 
 	# Kill any ongoing scaling tweens to prevent them from overriding the new manual scale.
 	if active_tween_sprite and active_tween_sprite.is_valid():

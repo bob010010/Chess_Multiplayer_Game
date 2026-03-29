@@ -8,6 +8,7 @@ class_name AIControllerComponent
 @onready var move_comp: Node = npc.get_node("Components/MovementComponent")
 @onready var detection_area: Area2D = npc.get_node("DetectionArea")
 
+var curr_class: String = "Pawn"
 var state: String = "Wander"
 
 #Fleeing
@@ -56,16 +57,19 @@ func _physics_process(delta: float) -> void:
 	if not multiplayer.is_server():
 		return
 	
+	curr_class = npc.current_class
+	
 	var my_score: int = TargetingUtils.get_entity_score(npc)
 	var threat: Node2D = _get_dangerous_threat(my_score) # Gets the most dangerous threat 
 
 	npc.get_node("State").text = state + "  B:" + str(snapped(boldness_factor,0.01)) + "  K:" + str(snapped(kindness_factor,0.01)) + "  S:" + str(my_score)
 	npc.get_node("State").text += "  G_C:" + str(snapped(give_up_chase_time,0.01)) + "  T:" + str(npc.team_id)
+	
 	# Always try to clear blacklist. 
 	_clear_blacklist(delta)
 	
-	# Always try to spawn towers
-	if npc.current_class == "Rook" or npc.current_class == "Rook_Knight" or npc.current_class == "King_Rook" or npc.current_class == "Sultan":
+	# If you are a spawner try and spawn towers
+	if curr_class == "Rook" or curr_class == "Rook_Knight" or curr_class == "King_Rook" or curr_class == "Sultan":
 		_spawn_towers()
 	
 	# Stats and handles fleeing from threats, If you are still fleeing or have found something new to flee from > Do nothing else
@@ -163,7 +167,9 @@ func _process_fleeing(threat: Node2D) -> bool:
 	if is_instance_valid(threat): # If there is a threat, flee
 		last_threat_pos = threat.global_position
 		flee_timer = 3.0
-		if _action_stealth(): # Try and stealth, if sucessful return > Do nothing else
+		if curr_class == "Shadow_Knight" and _action_stealth(): # Try and stealth, if sucessful return > Do nothing else
+			return true
+		elif (curr_class == "Jester" or curr_class == "Holy_Queen") and _action_illusion():
 			return true
 		_action_flee(last_threat_pos)
 		return true
@@ -183,6 +189,14 @@ func _action_stealth() -> bool:
 	if stealth_comp.current_cooldown <= 0.0:
 		print("NPC requesting Stealth")
 		stealth_comp.request_stealth.rpc()
+		return true
+	return false
+
+func _action_illusion() -> bool:
+	var illusion_comp = npc.get_node_or_null("Components/IllusionComponent")
+	if illusion_comp.current_cooldown <= 0.0:
+		print("NPC requesting Illusion")
+		illusion_comp.request_scattered_illusions.rpc()
 		return true
 	return false
 

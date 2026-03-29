@@ -60,6 +60,10 @@ func _perform_teleport_area(target_pos: Vector2) -> void:
 	var distance: float = minf(start_pos.distance_to(target_pos), max_range)
 	var final_position: Vector2 = start_pos + (direction * distance)
 	
+	var ui_comp: Node = player.get_node_or_null("UIComponent")
+	if ui_comp and player.is_in_group("player"):
+		ui_comp.display_message.rpc_id(player.name.to_int(), "Crushing Teleport!")
+
 	current_cooldown = max_cooldown
 	move_comp.movement_blocked = true
 	
@@ -88,7 +92,7 @@ func trigger_teleport_visuals(going_out: bool, target_pos: Vector2 = Vector2.ZER
 		active_tween_sprite.kill()
 	if active_tween_components and active_tween_components.is_valid():
 		active_tween_components.kill()
-		
+
 	if going_out:
 		active_tween_sprite = create_tween()
 		active_tween_components = create_tween()

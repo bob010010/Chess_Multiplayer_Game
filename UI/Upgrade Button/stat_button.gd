@@ -8,7 +8,7 @@ signal stat_chosen(stat_id: String)
 
 # Initializes the button text and connects the press event
 func _ready() -> void:
-	text = format_stat_name(stat_id)
+	text = NameUtils.format_stat_name(stat_id)
 	update_button_color()
 	pressed.connect(_on_pressed)
 	if not stat_bar:
@@ -17,12 +17,9 @@ func _ready() -> void:
 
 # Updates the visual text to match the currently assigned stat_id
 func refresh_text() -> void:
-	text = format_stat_name(stat_id)
+	text = NameUtils.format_stat_name(stat_id)
 	update_button_color()
 	
-
-func format_stat_name(stat: String) -> String: # Turns reload_speed into Reload Speed
-	return " ".join(Array(stat.split("_")).map(func(w): return w.capitalize()))
 
 # Emits the selected stat_id to the listening components
 func _on_pressed() -> void:

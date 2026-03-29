@@ -1,4 +1,4 @@
-extends Node
+extends Node2D
 class_name PromotionComponent
 
 signal show_promotion_menu(available_classes: Array[String])
@@ -110,7 +110,7 @@ var class_base_stats: Dictionary = {
 		"melee_knockback": 150.0,
 		"melee_cooldown": 0.4,
 		"stealth_cooldown": 12.0,
-		"stealth_duration": 3.0,
+		"stealth_duration": 2.0,
 		"shield_health": 25.0
 	},
 	"Flowers_Knight": {
@@ -581,6 +581,8 @@ func _apply_ability_stats(a: Node, b: Dictionary, m: Dictionary) -> void:
 			if b.has("illusions_count"): a.illusions_count = int(_get_capped_value("illusions_count", b["illusions_count"] * m["illusions_count"], max_stats["illusions_count"], a.illusions_count))
 		"Stealth":
 			if b.has("stealth_cooldown"): a.max_cooldown = _get_capped_value("stealth_cooldown", b["stealth_cooldown"] * m["stealth_cooldown"], max_stats["stealth_cooldown"], a.max_cooldown, true)
+			print("Current: " + str(a.stealth_duration), " Max: " + str(m["stealth_duration"]))
+			if b.has("stealth_duration"): a.stealth_duration = _get_capped_value("stealth_duration", b["stealth_duration"] * m["stealth_duration"], max_stats["stealth_duration"], a.stealth_duration, true)
 		"Spawner":
 			if b.has("spawner_cooldown"): a.max_cooldown = _get_capped_value("spawner_cooldown", b["spawner_cooldown"] * m["spawner_cooldown"], max_stats["spawner_cooldown"], a.max_cooldown, true)
 			if b.has("max_spawns"): a.max_spawns = int(_get_capped_value("max_spawns", b["max_spawns"] * m["max_spawns"], max_stats["max_spawns"], a.max_spawns))

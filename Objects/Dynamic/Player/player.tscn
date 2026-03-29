@@ -435,8 +435,8 @@ layout_mode = 2
 
 [node name="HealthBar" parent="." unique_id=1748738400 instance=ExtResource("3_i3pqv")]
 offset_left = -60.0
-offset_top = 130.0
-offset_bottom = 145.0
+offset_top = 108.0
+offset_bottom = 123.0
 
 [node name="AbilityBar" parent="." unique_id=980408302 instance=ExtResource("26_xyotm")]
 anchors_preset = 5

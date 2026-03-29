@@ -1,4 +1,4 @@
-extends Node
+extends Node2D
 class_name TargetingUtils
 
 static var all_passive: bool = false

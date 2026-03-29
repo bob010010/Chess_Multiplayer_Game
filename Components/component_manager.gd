@@ -1,4 +1,4 @@
-extends Node
+extends Node2D
 class_name ComponentManager
 
 @onready var entity: CharacterBody2D = get_parent().get_parent() as CharacterBody2D

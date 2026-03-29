@@ -26,7 +26,20 @@ bg_color = Color(0.3372549, 0.6156863, 0.62352943, 0.38039216)
 [node name="Main" type="Node2D" unique_id=769039100]
 script = ExtResource("1_ig7tw")
 
-[node name="Background" type="ColorRect" parent="." unique_id=706016326]
+[node name="MYBG" type="ColorRect" parent="." unique_id=1730053322]
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -5000.0
+offset_top = -5000.0
+offset_right = 5000.0
+offset_bottom = 5000.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)
+
+[node name="Tiles" type="ColorRect" parent="." unique_id=706016326]
 material = SubResource("ShaderMaterial_7mycd")
 offset_left = -2500.0
 offset_top = -2500.0

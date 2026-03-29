@@ -30,7 +30,8 @@ var current_first_ability: String
 @onready var upgrade_UI: VBoxContainer = $"../HUD/UpgradeUI"
 @onready var promotion_UI: HBoxContainer = $"../HUD/PromotionUI"
 
-@onready var leaderboard_label: Label = $"../HUD/LeaderboardLabel"
+@onready var leaderboard_container: VBoxContainer = $"../HUD/LBPanel/Leaderboard"
+@export var lb_entry_scene: PackedScene
 
 func _ready() -> void:
 	name_label.text = "Player " + entity.name.substr(0, 4)
@@ -113,11 +114,41 @@ func _show_promotion_menu(available_classes: Array[String]) -> void:
 	promotion_UI.show()
 
 # Updates the local leaderboard UI with data broadcasted from the server.
-func update_leaderboard_ui(board_text: String) -> void:
-	if leaderboard_label:
-		leaderboard_label.text = board_text
-	else:
-		printerr("No leaderboard label")
+func update_leaderboard_ui(entries: Array) -> void:
+	if not leaderboard_container:
+		printerr("No leaderboard container found")
+		return
+		
+	for child in leaderboard_container.get_children():
+		child.queue_free()
+		
+	var my_id: String = str(multiplayer.get_unique_id())
+	
+	for i: int in range(entries.size()):
+		var p_data: Dictionary = entries[i]
+		var entry_text = str(i + 1) + ". " + p_data["id"].left(7) + " - Score: " + str(p_data["score"]) + " - T: " + str(p_data["team_id"])
+		
+		if lb_entry_scene:
+			var entry = lb_entry_scene.instantiate()
+			var label_to_color: Label = null
+			
+			if entry is Label:
+				entry.text = entry_text
+				label_to_color = entry
+			elif entry.has_node("Label"):
+				var lbl = entry.get_node("Label")
+				lbl.text = entry_text
+				label_to_color = lbl
+			else:
+				var lbl = Label.new()
+				lbl.text = entry_text
+				entry.add_child(lbl)
+				label_to_color = lbl
+			
+			if p_data["id"] == my_id and label_to_color:
+				label_to_color.modulate = Color.GREEN
+				
+			leaderboard_container.add_child(entry)
 		
 @rpc("any_peer", "call_local", "reliable")
 func display_message(message: String) -> void:

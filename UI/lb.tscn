@@ -1,0 +1,23 @@
+[gd_scene format=3 uid="uid://edwx33vq4kou"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_27m2f"]
+bg_color = Color(0.39607844, 0, 0.67058825, 0.38431373)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[node name="LB1" type="Label" unique_id=345748816]
+offset_right = 200.0
+offset_bottom = 28.0
+theme_override_colors/font_color = Color(0.5921569, 0.6117647, 0.9764706, 0.38431373)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 1
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBoxFlat_27m2f")
+text = "Number 2: Bob_2432"

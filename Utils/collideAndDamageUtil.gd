@@ -10,8 +10,8 @@ static func knockback_and_damage(target: Node, damage: int, attacker_name: Strin
 # Applies damage to the hit entity
 static func damage_on_collide(target: Node, damage: int, attacker_name: String) -> void:
 	var health_comp: Node2D = target.get_node_or_null("Components/HealthComponent")
-
+	#print("UTIL " + str(target.get_groups()))
 	if health_comp:
 		health_comp.take_damage(damage, attacker_name)
-	else:
-		printerr("Trying to do damage to something without a health component")
+	elif not target.is_in_group("boundary"):
+		printerr("Trying to do damage to something without a health component" + str(target.get_groups()))

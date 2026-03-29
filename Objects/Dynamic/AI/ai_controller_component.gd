@@ -5,8 +5,10 @@ class_name AIControllerComponent
 
 @export var give_up_attack_time: float = 30.0 # For attacking
 @onready var npc: CharacterBody2D = get_parent().get_parent() as CharacterBody2D
-@onready var move_comp: Node = npc.get_node("Components/MovementComponent")
+@onready var move_comp: Node2D = npc.get_node("Components/MovementComponent")
 @onready var detection_area: Area2D = npc.get_node("DetectionArea")
+@onready var health_comp: Node2D = npc.get_node("Components/HealthComponent")
+@onready var kill_zone: Area2D = npc.get_node("KillArea")
 
 var curr_class: String = "Pawn"
 var state: String = "Wander"
@@ -28,6 +30,7 @@ var melee_range: float = 70.0
 var current_target: Node2D = null
 var boldness_factor: float = 1.0 # Only runs away from things more than n * npc's score
 var kindness_factor: float = 1.0 # Doesnt go for things less than n * npc's score
+var health_scale: float = 1.0
 
 #Chasing
 var give_up_chase_time: float = 3.0 # For chasing
@@ -36,7 +39,6 @@ var blacklisted_target: Node2D = null # Target you have just chased and failed t
 var blacklist_timer: float = 0.0
 var last_dist_to_target: float = INF # For checking if you are getting closer/further in a chase
 
-#TODO
 var inp_delay: float = 1.0 # Delay in taking actions
 var inp_delay_timer: float = 1.0 
 var action_to_take: bool = false
@@ -49,21 +51,31 @@ var action_to_take: bool = false
 
 func _ready() -> void:
 	boldness_factor = randf_range(0.5, 10.0) 
-	kindness_factor = randf_range(0.3, 0.5) 
+	kindness_factor = randf_range(0.01, 0.2) 
 	give_up_chase_time = randf_range(1.0, 3.0)
+	inp_delay = randf_range(0.2, 0.6)
+	inp_delay_timer = inp_delay
+
 
 # Orchestrates the AI decision-making loop, prioritizing flee persistence and combat state transitions.
 func _physics_process(delta: float) -> void:
 	if not multiplayer.is_server():
 		return
-	
+
+	inp_delay_timer -= delta
+	if inp_delay_timer > 0.0:
+		return
+	inp_delay_timer = inp_delay
+
 	curr_class = npc.current_class
+	health_scale = health_comp.health/health_comp.max_health
 	
 	var my_score: int = TargetingUtils.get_entity_score(npc)
 	var threat: Node2D = _get_dangerous_threat(my_score) # Gets the most dangerous threat 
 
 	npc.get_node("State").text = state + "  B:" + str(snapped(boldness_factor,0.01)) + "  K:" + str(snapped(kindness_factor,0.01)) + "  S:" + str(my_score)
-	npc.get_node("State").text += "  G_C:" + str(snapped(give_up_chase_time,0.01)) + "  T:" + str(npc.team_id)
+	npc.get_node("State").text += "  G_C:" + str(snapped(give_up_chase_time,0.01)) + "  T:" + str(npc.team_id) + " H: " + str(snapped(health_scale,0.01))
+	npc.get_node("State").text += "  RT: " + str(snapped(inp_delay,0.01))
 	
 	# Always try to clear blacklist. 
 	_clear_blacklist(delta)
@@ -72,10 +84,14 @@ func _physics_process(delta: float) -> void:
 	if curr_class == "Rook" or curr_class == "Rook_Knight" or curr_class == "King_Rook" or curr_class == "Sultan":
 		_spawn_towers()
 	
-	# Stats and handles fleeing from threats, If you are still fleeing or have found something new to flee from > Do nothing else
-	if _process_fleeing(threat):
-		return
-		
+	if threat:
+		_adj_last_stand(threat)
+
+		# Stats and handles fleeing from threats, If you are still fleeing or have found something new to flee from > Do nothing else
+		if state != "Last Stand" and _process_fleeing(threat):
+			return
+
+
 	# Create a safe reference that is guaranteed to be either a valid Node2D or null to satisfy the static type checker.
 	var safe_exclude: Node2D = blacklisted_target if is_instance_valid(blacklisted_target) else null
 	
@@ -122,18 +138,21 @@ func _get_dangerous_threat(my_score: int) -> Node2D:
 	var highest_threat_rating: float = 0.0
 	
 	for body: Node2D in detection_area.get_overlapping_bodies():
-		# Only consider enemies on a different team
-		if not "team_id" in body or body.get("team_id") == npc.team_id:
-			continue
 		
 		# Only consider players and NPCs
 		if not body.is_in_group("player") and not body.is_in_group("npc"):
 			continue
 		
+		# Only consider enemies on a different team
+		if not "team_id" in body or body.get("team_id") == npc.team_id:
+			continue
+		
 		var enemy_score: int = TargetingUtils.get_entity_score(body)
 		
-		# Only consider entities that are actually a threat (higher score than us)
-		if enemy_score <= my_score * boldness_factor:
+		var weighted_boldness_threshold: float = my_score * boldness_factor * health_scale
+		
+		# Only consider entities that are actually a threat (higher score than our threashold)
+		if enemy_score <= weighted_boldness_threshold:
 			continue
 		
 		# How much stronger the enemy is than us — larger gap = more dangerous
@@ -152,7 +171,7 @@ func _get_dangerous_threat(my_score: int) -> Node2D:
 		# - Example: score_diff=500, distance=100  -> rating=5.0  (close, very dangerous)
 		# - Example: score_diff=500, distance=1000 -> rating=0.5  (far, less urgent)
 		# - Example: score_diff=100, distance=50   -> rating=2.0  (close, moderately dangerous)
-		var threat_rating: float = score_difference / distance
+		var threat_rating: float = (score_difference / distance) / health_scale
 		
 		if threat_rating > highest_threat_rating:
 			highest_threat_rating = threat_rating
@@ -160,6 +179,13 @@ func _get_dangerous_threat(my_score: int) -> Node2D:
 			#print("New highest threat: %s | score diff: %d | distance: %.1f | rating: %.2f" % [body.name, score_difference, distance, threat_rating])
 	
 	return highest_threat
+
+# Handles taking final stands when being hunted down
+func _adj_last_stand(threat: Node2D) -> void:
+	var active_melee: MeleeWeaponComponent = npc.get("melee_w_component")
+	if active_melee != null and threat in kill_zone.get_overlapping_bodies():
+		state = "Last Stand"
+
 
 # Handles whether to keep fleeing, is far enough away 
 func _process_fleeing(threat: Node2D) -> bool:

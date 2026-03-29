@@ -13,10 +13,19 @@ var respawn_timer: float = 0.0
 @onready var respawn_label: Label = $CanvasLayer/RespawnTimerLabel
 
 const PRESETS: Dictionary = {
-	"1-Bot": { "game_type": "FFA", "arena_size": 2500.0, "food_per_player": 1500, "bots_per_player": 1, "bot_classes": ["Jester"]}, # 1 Bot for testing
-	"Alone": { "game_type": "FFA", "arena_size": 2500.0, "food_per_player": 1500, "bots_per_player": 0, "bot_classes": ["Jester"]}, # 1 Bot for testing
-	"FFA": { "game_type": "FFA", "arena_size": 6000.0, "food_per_player": 2500, "bots_per_player": 20, "bot_classes": ["Pawn", "Pawn_I", "Pawn_II"] }, # Large game FFA
-	"2T": { "game_type": "2_Teams", "arena_size": 6000.0, "food_per_player": 2500, "bots_per_player": 20, "bot_classes": ["Pawn_II"] } # Large game 2 teams
+	"Alone": { "game_type": "FFA", "arena_size": 2500.0, "food_per_player": 1500, "bots_per_player": 0, "bot_classes": ["Mini_Rook"]}, # Alone for testing
+	
+	"1-Bot": { "game_type": "FFA", "arena_size": 2500.0, "food_per_player": 1500, "bots_per_player": 1, "bot_classes": ["Mini_Rook"]}, # 1 Bot for testing
+	
+	"1 Bot": { "game_type": "FFA", "arena_size": 2500.0, "food_per_player": 1500, "bots_per_player": 1, "bot_classes": ["Mini_Rook"]}, # 1 Bot for testing
+	
+	"2-Bot": { "game_type": "FFA", "arena_size": 2500.0, "food_per_player": 1500, "bots_per_player": 2, "bot_classes": ["Pawn"]}, # 2 Bots for testing
+	
+	"FFA": { "game_type": "FFA", "arena_size": 6000.0, "food_per_player": 2500, "bots_per_player": 20, "bot_classes": ["Pawn"] }, # Large game FFA
+	"2T": { "game_type": "2_Teams", "arena_size": 6000.0, "food_per_player": 2500, "bots_per_player": 20, "bot_classes": ["Pawn"] }, # Large game 2 teams
+	
+	"FFA-L": { "game_type": "FFA", "arena_size": 12000.0, "food_per_player": 12000, "bots_per_player": 40, "bot_classes": ["Pawn"] }, # Large game FFA
+	"2T-L": { "game_type": "2_Teams", "arena_size": 12000.0, "food_per_player": 12000, "bots_per_player": 40, "bot_classes": ["Pawn"] } # Large game 2 teams
 }
 
 var leaderboard_timer: float = 0.0
@@ -46,7 +55,7 @@ func _ready() -> void:
 func _apply_preset_or_custom() -> void:
 	var input: String = $CanvasLayer/Preset.text.strip_edges()
 	if input == "":
-		input = "1"
+		input = "1 Bot"
 	var parts: Array = input.split(",")
 	print(str(parts))
 	# If a single token matches a preset key, apply it directly
@@ -100,52 +109,37 @@ func broadcast_leaderboard() -> void:
 	var scores: Array = []
 	
 	for player: Node in $SpawnedPlayers.get_children():
-		# Ensure the player node isn't scheduled for deletion
 		if not is_instance_valid(player) or player.is_queued_for_deletion():
 			continue
-			
 		var leveling_comp: Node = player.get_node_or_null("Components/LevelingComponent")
 		if leveling_comp:
 			scores.append({"id": player.name, "score": leveling_comp.total_score, "team_id": player.team_id})
-		else:
-			printerr("Player has no leveling component: " + str(player.name))
 	
 	for npc: Node in $SpawnedNPCs.get_children():
 		if not is_instance_valid(npc) or npc.is_queued_for_deletion():
 			continue
-		
 		var leveling_comp: Node = npc.get_node_or_null("Components/LevelingComponent")
 		if leveling_comp:
 			scores.append({"id": npc.name, "score": leveling_comp.total_score, "team_id": npc.team_id})
-		else:
-			printerr("NPC has no leveling component: " + str(npc.name))
 	
-	# Sort the array from highest score to lowest
 	scores.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return a["score"] > b["score"])
 	
-	# Format the text block
-	var lb_text: String = "--- Leaderboard ---\n"
-	for i: int in range(min(scores.size(), 10)): # Show top 10
-		var p_data: Dictionary = scores[i]
-		var prefix: String = "Player " if p_data["id"] != "1" else "Host "
-		lb_text += str(i + 1) + ". " + prefix + p_data["id"].left(7) + " - Score: " + str(p_data["score"]) + " - Team: " + str(p_data["team_id"]) + "\n"
+	var lb_data_slice: Array = []
+	for i: int in range(min(scores.size(), 10)):
+		lb_data_slice.append(scores[i])
 		
-	# Beam the compiled text to all clients
-	update_leaderboard_rpc.rpc(lb_text)
+	update_leaderboard_rpc.rpc(lb_data_slice)
 
-# Receives the formatted leaderboard string from the server and passes it to the local player.
+# Sends the leaderboard list to players
 @rpc("authority", "call_local", "unreliable")
-func update_leaderboard_rpc(leaderboard_text: String) -> void:
+func update_leaderboard_rpc(leaderboard_data: Array) -> void:
 	var local_id: String = str(multiplayer.get_unique_id())
 	var local_player: Node = $SpawnedPlayers.get_node_or_null(local_id)
 	
 	if local_player:
 		var ui_comp: Node = local_player.get_node_or_null("UIComponent")
 		if ui_comp and ui_comp.has_method("update_leaderboard_ui"):
-			ui_comp.update_leaderboard_ui(leaderboard_text)
-		else:
-			printerr("No player UI (LB)")
-
+			ui_comp.update_leaderboard_ui(leaderboard_data)
 # Sets up the local client's UI and camera for the spectate phase.
 func start_spectating(killer_id: String) -> void:
 	respawn_button.hide()
@@ -208,8 +202,8 @@ func _on_host_pressed() -> void:
 	_apply_preset_or_custom()
 	hide_out_of_game_info()
 	_create_boundaries()
-	$Background.size = Vector2(arena_size, arena_size)
-	$Background.position = Vector2(-arena_size/2, -arena_size/2)
+	$Tiles.size = Vector2(arena_size, arena_size)
+	$Tiles.position = Vector2(-arena_size/2, -arena_size/2)
 	is_hosting = true
 	
 	# Spawn the host

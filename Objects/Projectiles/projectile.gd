@@ -8,9 +8,17 @@ var shooter_id: String = ""
 var time_to_live: float = 3.0
 var bullet_knockback: float = 250.0
 
+#Physics layers TODO use these
+const LAYER_AI_PLAYER_AND_FOOD: int = 1
+const LAYER_WORLD_BOUNDARIES: int = 2
+
 # Connects the collision signal on the server
 func _ready() -> void:
 	add_to_group("shield_blockable")
+	
+	collision_layer = LAYER_AI_PLAYER_AND_FOOD # Resides on
+	collision_mask = LAYER_AI_PLAYER_AND_FOOD | LAYER_WORLD_BOUNDARIES # Collides with
+	
 	if multiplayer.is_server():
 		body_entered.connect(_on_body_entered)
 
@@ -34,6 +42,9 @@ func _on_body_entered(body: Node2D) -> void:
 		# Ignores collision with the shooter
 		if body.name == shooter_id:
 			return 
+		
+		if body.is_in_group("boundary"):
+			queue_free()
 		
 		# Checks if the target shares the same team ID as the projectile
 		if body.has_method("get") and body.get("team_id") == get_meta("team_id", -1):

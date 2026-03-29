@@ -29,4 +29,4 @@ func _physics_process(delta: float) -> void:
 		time_to_live -= delta
 		if (time_to_live <= 0):
 			queue_free()
-		rotation += delta * 12 # Spins the pin as it moves
+		rotation += delta * 15 # Spins the pin as it moves

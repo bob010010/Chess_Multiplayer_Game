@@ -562,7 +562,7 @@ func apply_promotion_stats(class_choice: String) -> void:
 	if a_comp:
 		_apply_ability_stats(a_comp, base, mults)
 
-# Helper function to apply ability-specific stat caps.
+# Applies ability upgrades
 func _apply_ability_stats(a: Node, b: Dictionary, m: Dictionary) -> void:
 	match entity.get("current_first_ability"):
 		"Magic":
@@ -581,8 +581,8 @@ func _apply_ability_stats(a: Node, b: Dictionary, m: Dictionary) -> void:
 			if b.has("illusions_count"): a.illusions_count = int(_get_capped_value("illusions_count", b["illusions_count"] * m["illusions_count"], max_stats["illusions_count"], a.illusions_count))
 		"Stealth":
 			if b.has("stealth_cooldown"): a.max_cooldown = _get_capped_value("stealth_cooldown", b["stealth_cooldown"] * m["stealth_cooldown"], max_stats["stealth_cooldown"], a.max_cooldown, true)
-			print("Current: " + str(a.stealth_duration), " Max: " + str(m["stealth_duration"]))
-			if b.has("stealth_duration"): a.stealth_duration = _get_capped_value("stealth_duration", b["stealth_duration"] * m["stealth_duration"], max_stats["stealth_duration"], a.stealth_duration, true)
+			print("Current: " + str(a.stealth_duration), " M: " + str(m["stealth_duration"]) + " B: " + str(b["stealth_duration"]))
+			if b.has("stealth_duration"): a.stealth_duration = _get_capped_value("stealth_duration", b["stealth_duration"] * m["stealth_duration"], max_stats["stealth_duration"], a.stealth_duration, false)
 		"Spawner":
 			if b.has("spawner_cooldown"): a.max_cooldown = _get_capped_value("spawner_cooldown", b["spawner_cooldown"] * m["spawner_cooldown"], max_stats["spawner_cooldown"], a.max_cooldown, true)
 			if b.has("max_spawns"): a.max_spawns = int(_get_capped_value("max_spawns", b["max_spawns"] * m["max_spawns"], max_stats["max_spawns"], a.max_spawns))

@@ -75,9 +75,9 @@ func _apply_stats_for_shape() -> void:
 			points_value = randi_range(100, 10000)
 			weight = 5
 		"Decagon":
-			temp_health = 100000
+			temp_health = 50000
 			points_value = randi_range(10000, 100000)
-			weight = 12
+			weight = 30
 
 	health_component.max_health = temp_health
 	health_component.health = temp_health

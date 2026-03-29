@@ -29,6 +29,9 @@ radius = 50.0
 [sub_resource type="ConvexPolygonShape2D" id="ConvexPolygonShape2D_l1orh"]
 points = PackedVector2Array(0, 0, 900, -400, 900, 400)
 
+[sub_resource type="CircleShape2D" id="CircleShape2D_q7cir"]
+radius = 50.0
+
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_c7qqn"]
 properties/0/path = NodePath(".:position")
 properties/0/spawn = true
@@ -102,6 +105,13 @@ script = ExtResource("3_jjm0i")
 [node name="LookingHitbox" type="CollisionShape2D" parent="LookingArea" unique_id=584567132]
 shape = SubResource("ConvexPolygonShape2D_l1orh")
 debug_color = Color(0.9843137, 0.05882353, 0.3019608, 0.2901961)
+
+[node name="KillArea" type="Area2D" parent="." unique_id=133820070]
+scale = Vector2(10, 10)
+
+[node name="KillHitbox" type="CollisionShape2D" parent="KillArea" unique_id=1852263935]
+shape = SubResource("CircleShape2D_q7cir")
+debug_color = Color(0.7764706, 0.42352942, 0.35686275, 0.1764706)
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=1525879322]
 replication_config = SubResource("SceneReplicationConfig_c7qqn")

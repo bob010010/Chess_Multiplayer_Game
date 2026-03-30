@@ -9,17 +9,19 @@ const PORT: int = 8910
 var spectate_target: Node2D = null
 var respawn_timer: float = 0.0
 @onready var spectator_camera: Camera2D = $SpectatorCamera
-@onready var respawn_button: Button = $CanvasLayer/RespawnButton
-@onready var respawn_label: Label = $CanvasLayer/RespawnTimerLabel
+@onready var respawn_button: Button = $RespawnLayer/RespawnPanel/RespawnButton
+@onready var respawn_label: Label = $RespawnLayer/RespawnPanel/RespawnTimerLabel
+
+@onready var ip_label: Label = $CanvasLayer/SharingIPLabel
 
 const PRESETS: Dictionary = {
-	"Alone": { "game_type": "FFA", "arena_size": 2500.0, "food_per_player": 1500, "bots_per_player": 0, "bot_classes": ["Mini_Rook"]}, # Alone for testing
+	"Alone": { "game_type": "FFA", "arena_size": 2500.0, "food_per_player": 1500, "bots_per_player": 0, "bot_classes": ["Bishop"]}, # Alone for testing
 	
-	"1-Bot": { "game_type": "FFA", "arena_size": 2500.0, "food_per_player": 1500, "bots_per_player": 1, "bot_classes": ["Mini_Rook"]}, # 1 Bot for testing
+	"1-Bot": { "game_type": "FFA", "arena_size": 2500.0, "food_per_player": 1500, "bots_per_player": 1, "bot_classes": ["Bishop"]}, # 1 Bot for testing
 	
-	"1 Bot": { "game_type": "FFA", "arena_size": 2500.0, "food_per_player": 1500, "bots_per_player": 1, "bot_classes": ["Mini_Rook"]}, # 1 Bot for testing
+	"1 Bot": { "game_type": "FFA", "arena_size": 2500.0, "food_per_player": 1500, "bots_per_player": 1, "bot_classes": ["Bishop"]}, # 1 Bot for testing
 	
-	"2-Bot": { "game_type": "FFA", "arena_size": 2500.0, "food_per_player": 1500, "bots_per_player": 2, "bot_classes": ["Mini_Rook"]}, # 2 Bots for testing
+	"2-Bot": { "game_type": "FFA", "arena_size": 2500.0, "food_per_player": 1500, "bots_per_player": 2, "bot_classes": ["Pawn"]}, # 2 Bots for testing
 	
 	"FFA": { "game_type": "FFA", "arena_size": 6000.0, "food_per_player": 7500, "bots_per_player": 20, "bot_classes": ["Pawn"] }, # Large game FFA
 	"2T": { "game_type": "2_Teams", "arena_size": 6000.0, "food_per_player": 2500, "bots_per_player": 20, "bot_classes": ["Pawn"] }, # Large game 2 teams
@@ -46,14 +48,16 @@ var game_type = "2_Teams"
 
 # Connects buttons and initializes the game boundary
 func _ready() -> void:
-	$CanvasLayer/HostButton.pressed.connect(_on_host_pressed)
-	$CanvasLayer/HostOPButton.pressed.connect(_on_host_OP_pressed)
-	$CanvasLayer/JoinButton.pressed.connect(_on_join_pressed)
+	$TitleScreen/HostPanel/HostButton.pressed.connect(_on_host_pressed)
+	$TitleScreen/HostPanel/HostOPButton.pressed.connect(_on_host_OP_pressed)
+	$TitleScreen/JoinPanel/JoinButton.pressed.connect(_on_join_pressed)
 	respawn_button.pressed.connect(_on_respawn_pressed)
+	$RespawnLayer.hide()
+	ip_label.hide()
 
 # Parses the preset input field and applies matching or custom settings.
 func _apply_preset_or_custom() -> void:
-	var input: String = $CanvasLayer/Preset.text.strip_edges()
+	var input: String = $TitleScreen/HostPanel/Preset.text.strip_edges()
 	if input == "":
 		input = "1 Bot"
 	var parts: Array = input.split(",")
@@ -140,24 +144,8 @@ func update_leaderboard_rpc(leaderboard_data: Array) -> void:
 		var ui_comp: Node = local_player.get_node_or_null("UIComponent")
 		if ui_comp and ui_comp.has_method("update_leaderboard_ui"):
 			ui_comp.update_leaderboard_ui(leaderboard_data)
-# Sets up the local client's UI and camera for the spectate phase.
-func start_spectating(killer_id: String) -> void:
-	respawn_button.hide()
-	respawn_label.show()
-	respawn_timer = 4.0
-	
-	# Swap the active camera to the main scene's spectator camera
-	spectator_camera.enabled = true
-	spectator_camera.make_current()
 
-	
-	# Attempt to find the killer. If environmental or missing, the camera stays where the player died.
-	if killer_id != "":
-		var killer_node = $SpawnedPlayers.get_node_or_null(killer_id)
-		if killer_node:
-			spectate_target = killer_node
-			# Snap the camera to the killer immediately so it doesn't drag across the entire map
-			spectator_camera.global_position = spectate_target.global_position
+
 
 func _create_boundaries() -> void:
 	var boundary_body: StaticBody2D = StaticBody2D.new()
@@ -200,7 +188,7 @@ func _on_host_pressed() -> void:
 	
 	# Set up the game
 	_apply_preset_or_custom()
-	hide_out_of_game_info()
+	$TitleScreen.hide()
 	_create_boundaries()
 	$Tiles.size = Vector2(arena_size, arena_size)
 	$Tiles.position = Vector2(-arena_size/2, -arena_size/2)
@@ -218,30 +206,32 @@ func setup_upnp() -> void:
 	var discover_result: int = upnp.discover()
 	if discover_result != UPNP.UPNP_RESULT_SUCCESS:
 		print("UPNP Discover Failed! Error: %s" % discover_result)
-		$CanvasLayer/SharingIPLabel.text = "UPNP Discover Failed! Error: %s" % discover_result
+		ip_label.text = "UPNP Discover Failed! Error: %s" % discover_result
 		return
 
 	# Verify the router is a valid gateway that accepts commands
 	if not upnp.get_gateway() or not upnp.get_gateway().is_valid_gateway():
 		print("UPNP Invalid Gateway!")
-		$CanvasLayer/SharingIPLabel.text = "UPNP Invalid Gateway!"
+		ip_label.text = "UPNP Invalid Gateway!"
 		return
 
 	# Ask the router to open the UDP port (ENet uses UDP)
 	var map_result: int = upnp.add_port_mapping(PORT, PORT, "My Godot Game", "UDP")
 	if map_result != UPNP.UPNP_RESULT_SUCCESS:
 		print("UPNP Port Mapping Failed! Error: %s" % map_result)
-		$CanvasLayer/SharingIPLabel.text = "UPNP Port Mapping Failed! Error: %s" % map_result
+		ip_label.text = "UPNP Port Mapping Failed! Error: %s" % map_result
 		return
 		
 	# Prints the public IP so the host can share it
 	print("UPNP Success! Port %s is open." % PORT)
 	print("Your public IP to give to friends is: %s" % upnp.query_external_address())
-	$CanvasLayer/SharingIPLabel.text = "Your public IP to give to friends is: %s" % upnp.query_external_address()
+	ip_label.text = "Your public IP to give to friends is: %s" % upnp.query_external_address()
+	
+	ip_label.show()
 
 # Attempts to connect to a server IP
 func _on_join_pressed() -> void:
-	var ip_to_join: String = $CanvasLayer/InputIP.text
+	var ip_to_join: String = $TitleScreen/InputIP.text
 	
 	if ip_to_join == "":
 		ip_to_join = "127.0.0.1"
@@ -249,22 +239,40 @@ func _on_join_pressed() -> void:
 	peer.create_client(ip_to_join, PORT)
 	multiplayer.multiplayer_peer = peer
 	
-	hide_out_of_game_info()
+	$TitleScreen.hide()
 
-# Hides the pre game stuff
-func hide_out_of_game_info() -> void:
-	$CanvasLayer/HostButton.hide()
-	$CanvasLayer/HostOPButton.hide()
-	$CanvasLayer/JoinButton.hide()
-	$CanvasLayer/InputIP.hide()
-	$CanvasLayer/Preset.hide()
-	$CanvasLayer/Panel.hide()
-	$CanvasLayer/Panel2.hide()
+# Sets up the local client's UI and camera for the spectate phase.
+func start_spectating(killer_id: String) -> void:
+	$RespawnLayer.show()
 	respawn_button.hide()
+	respawn_label.show()
+	respawn_timer = 4.0
+	
+	# Swap the active camera to the main scene's spectator camera
+	spectator_camera.enabled = true
+	spectator_camera.make_current()
+
+	
+	# Attempt to find the killer. If environmental or missing, the camera stays where the player died.
+	if killer_id != "":
+		var killer_node = $SpawnedPlayers.get_node_or_null(killer_id)
+		if not killer_node:
+			killer_node = $SpawnedNPCs.get_node_or_null(killer_id)
+		if not killer_node:
+			var npcs_to_spectate: Array = $SpawnedNPCs.get_children()
+			if npcs_to_spectate.size() <= 0:
+				printerr("No one to specate")
+			else:
+				killer_node = npcs_to_spectate[0]
+		if killer_node:
+			spectate_target = killer_node
+			# Snap the camera to the killer immediately so it doesn't drag across the entire map
+			spectator_camera.global_position = spectate_target.global_position
 
 # Hides the button locally and asks the server for a new body.
 func _on_respawn_pressed() -> void:
 	respawn_button.hide()
+	$RespawnLayer.hide()
 	request_respawn.rpc_id(1)
 
 # Deletes the old dead player node with a temporary unique name and spawns a fresh one to prevent synchronization race conditions.

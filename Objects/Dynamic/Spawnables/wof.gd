@@ -45,7 +45,6 @@ func initialise(p_owner_id: String, p_team_id: int, s_p: Vector2, e_p: Vector2) 
 	wall_length = start_pos.distance_to(end_pos)
 	starting_length = wall_length
 	hitbox.shape.size = Vector2(0.0, hitbox_width)
-	print(str("Starting: " + str(starting_length)))
 	
 	# Position at midpoint, rotated to face point_b
 	particles.global_position = start_pos.lerp(end_pos, 0.5)
@@ -111,21 +110,20 @@ func _physics_process(delta: float) -> void:
 
 # Calculates current intensity based on elapsed time and updates damage, collision size, and particle density.
 func _update_wall_progression() -> void:
-	var phase_duration: float = total_lifetime / 5.0
+	var phase_duration: float = total_lifetime / 20.0
 	var intensity: float = 0.0
 	contact_damage = 0
 	
-	if elapsed_time < phase_duration: # First 5th
+	if elapsed_time < phase_duration: # First 20th
 		intensity = elapsed_time / phase_duration
-	elif elapsed_time < 4.0 * phase_duration: # Middle 3/5ths
+	elif elapsed_time < 19.0 * phase_duration: # Middle 18/20ths
 		intensity = 1.0
-	else: # Last 1/5
-		intensity = 1.0 - ((elapsed_time - 4.0 * phase_duration) / phase_duration)
-		print(str(intensity))
+	else: # Last 20th
+		intensity = 1.0 - ((elapsed_time - 19.0 * phase_duration) / phase_duration)
 	
 	intensity = clampf(intensity, 0.0, 1.0)
 	
-	if elapsed_time < phase_duration or elapsed_time < phase_duration * 4: # No damage right at the start and the end
+	if elapsed_time < phase_duration or elapsed_time < phase_duration * 19: # No damage right at the start and the end
 		contact_damage = 0
 		
 	contact_damage = int(float(base_contact_damage) * intensity)

@@ -30,10 +30,11 @@ var wander_target: Vector2 = Vector2.ZERO # Position to wander to
 var wander_radius: float = 1000.0
 
 #Combat
-@onready var max_shoot_range: float = detection_area.get_node("DetectionHitbox").shape.radius # They can shoot as far as they can see
-@onready var min_shoot_range: float = max_shoot_range * 0.66
-var melee_range: float = 70.0
+@onready var max_shoot_range: float = detection_area.get_node("DetectionHitbox").shape.radius * 0.9 * npc.global_scale.x # They can shoot nearly as far as they can see
+@onready var min_shoot_range: float = max_shoot_range * 0.4
+@onready var melee_range: float = 280.0 * npc.global_scale.x
 var current_target: Node2D = null
+var move_target:Vector2 = Vector2.ZERO  # The position to re-position to
 var boldness_factor: float = 1.0 # Only runs away from things more than n * npc's score
 var kindness_factor: float = 1.0 # Doesnt go for things less than n * npc's score
 var health_scale: float = 1.0
@@ -242,9 +243,9 @@ func _action_illusion() -> bool:
 	return false
 
 # ACTION
-# Flee away from a threat and sets the fleeing state
+# Flee away from a threat and sets the fleeing state (Also handles repositioning)
 func _action_flee(from_pos: Vector2) -> void:
-	state = "Fleeing"
+	state = "Fleeing" 
 	is_fleeing = true
 	current_target = null # No targeting whilst fleeing
 	target_out_of_range_timer = give_up_chase_time
@@ -305,20 +306,26 @@ func _process_combat_state(target: Node2D, delta: float) -> bool:
 	
 	var active_melee: MeleeWeaponComponent = npc.get("melee_w_component")
 	var active_ranged: RangedWeaponComponent = npc.get("ranged_w_component")
-	
+	#print("Distance from target: " + str(dist) + " Min " + str(min_shoot_range) + " Max " + str(max_shoot_range))
+	#print(" In range: "  + str(dist <= max_shoot_range) + " In Reposition Range: " + str(dist < min_shoot_range * 0.95))
 	if is_instance_valid(active_melee) and dist <= melee_range:
+		
 		_action_melee(active_melee, target)
 		if not is_instance_valid(active_ranged):
 			_move_towards(npc.global_position, target.global_position)
 			return true
-
+	
 	if is_instance_valid(active_ranged):
+		
+		
+		var reposition_threshold = min_shoot_range * 0.95
+		
 		if dist <= max_shoot_range:
 			_action_ranged(active_ranged, target)
 		
-		if dist < min_shoot_range and not target.is_in_group("food"):
+		if dist < reposition_threshold: #and not target.is_in_group("food"):
 			state = "Repositioning"
-			_action_flee(target.global_position)
+			_action_reposition(target.global_position)
 			return true
 		elif dist > max_shoot_range:
 			state = "Chasing"
@@ -366,6 +373,19 @@ func _action_ranged(active_ranged: RangedWeaponComponent, target: Node2D) -> voi
 	if active_ranged.shot_cooldown <= 0.0:
 		active_ranged.shoot(target.global_position)
 
+# ACTION
+# Moves away if too close whilst shooting
+func _action_reposition(from_pos: Vector2):
+	state = "Repositioning"
+	
+	var move_dir: Vector2 = from_pos.direction_to(npc.global_position)
+	var probe_pos = npc.global_position + (move_dir * 50.0)
+	
+	if not AbilityUtils.is_position_within_map(get_tree().current_scene, probe_pos):
+		move_dir = Vector2(-move_dir.y, move_dir.x)
+	
+	move_comp.set_movement_direction(move_dir)
+
 # Wanders to a random position
 func _process_wander_state() -> bool:
 	if wander_target == Vector2.ZERO or npc.global_position.distance_to(wander_target) < 50.0:
@@ -398,7 +418,7 @@ func _move_towards(pos: Vector2, t_pos: Vector2) -> bool:
 	var dist: float = pos.distance_to(t_pos)
 	var arrival_threshold: float = 120.0
 	var min_speed_ratio: float = 0.2
-	
+	print("Dist: " + str(dist))
 	if state == "Chasing" or state == "Melee_Attack":
 		move_comp.speed_limit_multiplier = clamp(dist / arrival_threshold, min_speed_ratio, 1.0)
 	else:
@@ -408,12 +428,20 @@ func _move_towards(pos: Vector2, t_pos: Vector2) -> bool:
 
 # Provides the raw heading toward the current target for the context steering system.
 func get_desired_direction() -> Vector2:
+	# Moving away from a target
+	if state == "Fleeing" and last_threat_pos != Vector2.ZERO:
+		return last_threat_pos.direction_to(npc.global_position)
+		
+	if state == "Repositioning" and is_instance_valid(current_target):
+		return current_target.global_position.direction_to(npc.global_position)
+	
+	# Moving towards a target
 	if is_instance_valid(current_target):
 		return global_position.direction_to(current_target.global_position)
-	elif state == "Wandering" and wander_target != Vector2.ZERO:
+		
+	if state == "Wandering" and wander_target != Vector2.ZERO:
 		return global_position.direction_to(wander_target)
-	elif state == "Fleeing":
-		return last_threat_pos.direction_to(npc.global_position)
+		
 	return Vector2.ZERO
 
 func _draw() -> void:

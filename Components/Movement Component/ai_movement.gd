@@ -22,7 +22,7 @@ const MAX_DETECTION_DIST: float = 600.0
 @onready var looking_area: Area2D = entity.get_node("LookingArea") as Area2D
 @onready var ai_controller: AIControllerComponent = entity.get_node("Components/AIControllerComponent") as AIControllerComponent
 
-# Initializes the 16-direction arrays for context mapping.
+# Initializes the 32-direction arrays for context mapping.
 func _ready() -> void:
 	for i: int in range(NUM_RAYS):
 		var angle: float = i * TAU / NUM_RAYS
@@ -53,45 +53,53 @@ func get_movement_velocity(delta: float) -> Vector2:
 		
 	return current_velocity
 
-# Evaluates steering maps and applies a hard-stop multiplier based on the controller's equipment ranges.
+# Evaluates steering maps and applies tactical deceleration while permitting full-speed repositioning and fleeing.
 func _compute_context_steering(delta: float) -> void:
 	var desired_dir: Vector2 = ai_controller.get_desired_direction()
 	var obstacles: Array[Node2D] = looking_area.get_overlapping_bodies()
 	
-	var forward_danger: float = 0.0
 	var avoidance_speed_mult: float = 1.0
 	var target_arrival_mult: float = 1.0
 	
-	# Reference existing controller ranges for tactical stopping distances.
-	var arrival_threshold: float = 100.0
-	var stop_threshold: float = 0
-	
-	# Determines the stopping distance based on whether the AI is engaging in melee or ranged combat.
+	# Determine stopping distance
+	var stop_threshold: float = 0.0
 	if is_instance_valid(entity.get("melee_w_component")):
-		stop_threshold = ai_controller.melee_range * 0.85
+		stop_threshold = ai_controller.melee_range * 0.75
 	elif is_instance_valid(entity.get("ranged_w_component")):
-		stop_threshold = ai_controller.max_shoot_range * 0.85
+		stop_threshold = ai_controller.min_shoot_range
 	else:
-		stop_threshold = 60.0 # Default fallback for body damage/contact
+		stop_threshold = 60.0 
 	
 	# Maps the interest based on the controller's desired heading.
 	for i: int in range(NUM_RAYS):
 		interest[i] = max(0.0, directions[i].dot(desired_dir))
 		danger[i] = 0.0
 
-	# Manages deceleration and hard-stopping based on distance to the active target.
+	# Scales movement speed based on proximity to the tactical stop threshold, but only when pursuing a target.
 	if is_instance_valid(ai_controller.current_target):
 		var dist_to_target: float = entity.global_position.distance_to(ai_controller.current_target.global_position)
 		
-		# If within the tactical range, kill interest and movement immediately.
-		if dist_to_target < stop_threshold:
-			target_arrival_mult = 0.0
-			for i: int in range(NUM_RAYS):
-				interest[i] = 0.0
+		# Deceleration logic for both moving TOWARD and moving AWAY
+		if ai_controller.state in ["Chasing", "Wandering", "Melee_Attack"]:
+			if dist_to_target < stop_threshold:
+				target_arrival_mult = 0.0
+				for i: int in range(NUM_RAYS): interest[i] = 0.0
+			else:
+				target_arrival_mult = clamp((dist_to_target - stop_threshold) / 150.0, 0.0, 1.0)
+				
+		elif ai_controller.state == "Repositioning":
+			# Slow down as we approach the "Safe Distance" (min_shoot_range)
+			# This prevents the AI from overshooting the retreat
+			var safe_dist = ai_controller.min_shoot_range * 1.1
+			if dist_to_target > safe_dist:
+				target_arrival_mult = 0.0
+			else:
+				# Scale speed down as we get closer to the safe distance
+				target_arrival_mult = clamp((safe_dist - dist_to_target) / 100.0, 0.0, 1.0)
 		else:
-			# Scale speed down as the NPC enters the arrival threshold.
-			target_arrival_mult = clamp((dist_to_target - stop_threshold) / (arrival_threshold - stop_threshold), 0.0, 1.0)
+			target_arrival_mult = 1.0
 
+	# Maps environmental dangers to rays to influence the final steering direction.
 	for body: Node2D in obstacles:
 		if body == entity:
 			continue
@@ -101,7 +109,7 @@ func _compute_context_steering(delta: float) -> void:
 		var dir_to_obstacle: Vector2 = to_obstacle.normalized()
 		
 		var danger_weight: float = 1.5 if body.is_in_group("boundary") else 1.0
-		var danger_arc: float = atan2(entity_radius, max(dist, 1.0))
+		var danger_arc: float = atan2(entity_radius * 1.5, max(dist, 1.0))
 
 		for i: int in range(NUM_RAYS):
 			var angle_to_ray: float = abs(directions[i].angle_to(dir_to_obstacle))
@@ -109,15 +117,10 @@ func _compute_context_steering(delta: float) -> void:
 			if angle_to_ray < danger_arc:
 				var proximity_weight: float = 1.0 - (dist / MAX_DETECTION_DIST)
 				danger[i] = max(danger[i], proximity_weight * danger_weight)
-				
-				if directions[i].dot(context_dir) > 0.9:
-					forward_danger = max(forward_danger, danger[i])
-
-	if forward_danger > 0.85:
-		avoidance_speed_mult = lerp(1.0, 0.2, (forward_danger - 0.85) * 8.0)
 
 	speed_limit_multiplier = min(avoidance_speed_mult, target_arrival_mult)
 
+	# Harmonizes interest and danger maps into a single synchronized movement vector.
 	var chosen_dir: Vector2 = Vector2.ZERO
 	for i: int in range(NUM_RAYS):
 		var score: float = interest[i] - danger[i]

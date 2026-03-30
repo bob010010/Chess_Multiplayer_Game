@@ -23,16 +23,16 @@ func request_spawn(spawn_pos: Vector2) -> void:
 	_cleanup_dead_towers()
 	
 	if current_cooldown <= 0.0 and active_towers.size() < max_spawns:
-		var tower_manager: Node = get_tree().current_scene.get_node_or_null("SpawnedTowers")
+		var trap_manager: Node = get_tree().current_scene.get_node_or_null("SpawnedTraps")
 		
-		if tower_manager and tower_manager.has_method("spawn_tower"):
+		if trap_manager and trap_manager.has_method("spawn_tower"):
 			current_cooldown = max_cooldown
 			
 			var ui_comp: Node = entity.get_node_or_null("UIComponent")
 			if ui_comp and entity.is_in_group("player"):
 				ui_comp.display_message.rpc_id(entity.name.to_int(), "Spawned a sentry tower!")
 			
-			var new_tower: Node2D = tower_manager.spawn_tower(spawn_pos, entity.name, entity.team_id)
+			var new_tower: Node2D = trap_manager.spawn_tower(spawn_pos, entity.name, entity.team_id)
 			if new_tower:
 				active_towers.append(new_tower)
 

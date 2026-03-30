@@ -11,6 +11,9 @@ class_name AIControllerComponent
 var curr_class: String = "Pawn"
 var state: String = "Wander"
 
+#View distances
+
+
 #Score
 var my_score: int = 0
 
@@ -20,14 +23,15 @@ var flee_target: Vector2 = Vector2.ZERO # Position to flee to
 var is_fleeing: bool = false
 var last_threat_pos: Vector2 = Vector2.ZERO
 var flee_timer: float = 0.0
-var flee_distance: float = 50.0
+var flee_distance: float = 100.0
 
 #Wanderng
 var wander_target: Vector2 = Vector2.ZERO # Position to wander to
 var wander_radius: float = 1000.0
 
 #Combat
-var attack_range: float = 400.0
+@onready var max_shoot_range: float = detection_area.get_node("DetectionHitbox").shape.radius # They can shoot as far as they can see
+@onready var min_shoot_range: float = max_shoot_range * 0.66
 var melee_range: float = 70.0
 var current_target: Node2D = null
 var boldness_factor: float = 1.0 # Only runs away from things more than n * npc's score
@@ -86,7 +90,7 @@ func _physics_process(delta: float) -> void:
 		_spawn_towers()
 	
 	if threat:
-		_adj_last_stand()
+		_last_stand()
 
 		# Stats and handles fleeing from threats, If you are still fleeing or have found something new to flee from > Do nothing else
 		if state != "Last Stand" and _process_fleeing():
@@ -180,30 +184,42 @@ func _get_dangerous_threat() -> Node2D:
 	return highest_threat
 
 # Handles taking final stands when being hunted down
-func _adj_last_stand() -> void:
+func _last_stand() -> void:
 	var active_melee: MeleeWeaponComponent = npc.get("melee_w_component")
-	if active_melee != null and threat in kill_zone.get_overlapping_bodies():
-		state = "Last Stand"
-
-
-# Handles whether to keep fleeing, is far enough away 
-func _process_fleeing() -> bool:
+	var active_ranged: RangedWeaponComponent = npc.get("ranged_w_component")
 	
-	if is_instance_valid(threat): # If there is a threat, flee
+	if threat in kill_zone.get_overlapping_bodies():
+		state = "Last Stand"
+		
+		if is_instance_valid(active_ranged):
+			_action_ranged(active_ranged, threat)
+			
+		if active_melee != null and active_melee.can_attack:
+			active_melee.request_melee_attack(threat.global_position)
+
+
+# Handles whether to keep fleeing, is far enough away - stop
+func _process_fleeing() -> bool:
+
+	if is_instance_valid(threat):
 		last_threat_pos = threat.global_position
 		flee_timer = 3.0
-		if curr_class == "Shadow_Knight" and _action_stealth(): # Try and stealth, if sucessful return > Do nothing else
+		
+		var active_ranged: RangedWeaponComponent = npc.get("ranged_w_component")
+		if is_instance_valid(active_ranged):
+			_action_ranged(active_ranged, threat)
+			
+		if curr_class == "Shadow_Knight" and _action_stealth():
 			return true
 		elif (curr_class == "Jester" or curr_class == "Holy_Queen") and _action_illusion():
 			return true
 		_action_flee(last_threat_pos)
 		return true
 	
-	if flee_timer > 0.0: # No threat but still fleeing
-		#print("Fleeing after away from threat")
+	if flee_timer > 0.0:
 		flee_timer -= get_physics_process_delta_time()
 		_action_flee(last_threat_pos)
-		if flee_timer <= 0.0: # Fleeing finishes
+		if flee_timer <= 0.0:
 			is_fleeing = false
 		return true
 		
@@ -285,52 +301,44 @@ func _process_targeting(best_visible_target: Node2D) -> bool:
 func _process_combat_state(target: Node2D, delta: float) -> bool:
 	var dist: float = npc.global_position.distance_to(target.global_position)
 	
-	# If the target has escaped, return 
-	if _process_chasing(delta, dist):
-		return true
+	_update_chase_timers(delta, dist)
 	
 	var active_melee: MeleeWeaponComponent = npc.get("melee_w_component")
 	var active_ranged: RangedWeaponComponent = npc.get("ranged_w_component")
 	
-	if is_instance_valid(active_melee) and is_instance_valid(active_ranged): # Melee and Ranged does both (Tries ranged first)
-		if dist <= attack_range: # In Range, fire
-			_action_ranged(active_ranged, target)
-
-			if dist <= melee_range: # In Melee Range, attack
-				#print("In melee range")
-				_action_melee(active_melee, target)
-				return true
-			else: # Out of Melee Range
-				if _move_towards(npc.global_position, target.global_position):
-					return true
-
-		else: # Out of range
-			if _move_towards(npc.global_position, target.global_position):
-				return true
-
-	elif is_instance_valid(active_melee): # Has Melee 
-		if dist <= melee_range: # In Melee Range, attack
-			#print("In melee range")
-			_action_melee(active_melee, target)
+	if is_instance_valid(active_melee) and dist <= melee_range:
+		_action_melee(active_melee, target)
+		if not is_instance_valid(active_ranged):
+			_move_towards(npc.global_position, target.global_position)
 			return true
-		else: # Out of Melee Range
-			if _move_towards(npc.global_position, target.global_position):
-				return true
-	elif is_instance_valid(active_ranged): # Has ranged
-		if dist <= attack_range: # In Range, fire
+
+	if is_instance_valid(active_ranged):
+		if dist <= max_shoot_range:
 			_action_ranged(active_ranged, target)
+		
+		if dist < min_shoot_range and not target.is_in_group("food"):
+			state = "Repositioning"
+			_action_flee(target.global_position)
 			return true
-		else: # Out of range
-			if _move_towards(npc.global_position, target.global_position):
-				return true
+		elif dist > max_shoot_range:
+			state = "Chasing"
+			return _move_towards(npc.global_position, target.global_position)
+		else:
+			state = "Ranged_Attack"
+			move_comp.set_movement_direction(Vector2.ZERO)
+			return true
+
+	if is_instance_valid(active_melee):
+		state = "Chasing"
+		return _move_towards(npc.global_position, target.global_position)
+			
 	return false
 
-# Handles chasing (True if the target escapes > No longer there)
-func _process_chasing(delta: float, dist: float) -> bool:
+# Handles chasing 
+func _update_chase_timers(delta: float, dist: float) -> void:
 	state = "Chasing"
 	
-	
-	# Reset the timer if the AI is getting closer to the target, otherwise decrement towards abandonment.
+	# Reset the timer if the AI is getting closer, otherwise decrement
 	if dist < last_dist_to_target:
 		target_out_of_range_timer = give_up_chase_time
 	elif not current_target.is_in_group("food"):
@@ -338,32 +346,24 @@ func _process_chasing(delta: float, dist: float) -> bool:
 
 	last_dist_to_target = dist
 
-	if target_out_of_range_timer <= 0.0: # The target has escaped, reset chase stats
-		#print("Giving up")
-		blacklisted_target = current_target # Blacklist the target to avoid chasing them again for a while
+	if target_out_of_range_timer <= 0.0: # Blacklist the target if it gets away
+		blacklisted_target = current_target
 		blacklist_timer = 5.0
 		current_target = null 
 		target_out_of_range_timer = give_up_chase_time
 		last_dist_to_target = INF
-		return true
-	return false
 
 # ACTION
 # Stops moving and tries to request melee attacks
 func _action_melee(active_melee: MeleeWeaponComponent, target: Node2D) -> void:
 	state = "Melee_Attack"
-	move_comp.set_movement_direction(Vector2.ZERO) # TODO change this to strafing or something
 	if active_melee.can_attack:
-		#print("Can Melee attack, Requesting attack")
 		active_melee.request_melee_attack(target.global_position)
 
 # ACTION
 # Stops moving and tries to request ranged attacks
 func _action_ranged(active_ranged: RangedWeaponComponent, target: Node2D) -> void:
-	state = "Ranged_Attack"
-	move_comp.set_movement_direction(Vector2.ZERO) # TODO change this to strafing or something
 	if active_ranged.shot_cooldown <= 0.0:
-		#print("Can Ranged attack, Requesting attack")
 		active_ranged.shoot(target.global_position)
 
 # Wanders to a random position
@@ -406,8 +406,6 @@ func _move_towards(pos: Vector2, t_pos: Vector2) -> bool:
 		
 	return true
 
-
-
 # Provides the raw heading toward the current target for the context steering system.
 func get_desired_direction() -> Vector2:
 	if is_instance_valid(current_target):
@@ -417,3 +415,9 @@ func get_desired_direction() -> Vector2:
 	elif state == "Fleeing":
 		return last_threat_pos.direction_to(npc.global_position)
 	return Vector2.ZERO
+
+func _draw() -> void:
+	var active_ranged: Node = npc.get("ranged_w_component")
+	if is_instance_valid(active_ranged):
+		draw_circle(Vector2.ZERO, max_shoot_range, Color(1.0, 0.0, 0.0, 0.1), false, 10.0)
+		draw_circle(Vector2.ZERO, max_shoot_range, Color(1.0, 0.0, 0.0, 0.1), false, 10.0)

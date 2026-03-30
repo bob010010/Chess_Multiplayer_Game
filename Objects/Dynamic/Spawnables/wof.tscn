@@ -1,0 +1,11 @@
+[gd_scene format=3 uid="uid://c37ctg36bht0r"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_bfxow"]
+size = Vector2(100, 3)
+
+[node name="WOF" type="StaticBody2D" unique_id=1503241422]
+collision_layer = 8
+collision_mask = 8
+
+[node name="WOFHitbox" type="CollisionShape2D" parent="." unique_id=1735555457]
+shape = SubResource("RectangleShape2D_bfxow")

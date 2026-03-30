@@ -8,7 +8,7 @@
 [ext_resource type="Texture2D" uid="uid://bq8sr0olo0k5r" path="res://images/HowToPlay/r-key.png" id="4_f6fdm"]
 [ext_resource type="Script" uid="uid://cx4o8l16ouh2j" path="res://Spawning/spawning_projectiles.gd" id="4_lquwl"]
 [ext_resource type="Texture2D" uid="uid://csmhnva76ej5y" path="res://images/HowToPlay/mouse.png" id="4_rj11h"]
-[ext_resource type="Script" uid="uid://c4gpkfscoiv78" path="res://Spawning/spawning_towers.gd" id="6_liyct"]
+[ext_resource type="Script" uid="uid://c4gpkfscoiv78" path="res://Spawning/spawning_traps.gd" id="6_liyct"]
 [ext_resource type="Script" uid="uid://cyhwkk735ps0q" path="res://Spawning/spawning_npcs.gd" id="10_qac2q"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_7mycd"]
@@ -258,12 +258,12 @@ script = ExtResource("4_lquwl")
 _spawnable_scenes = PackedStringArray("uid://d24rjpu5nvya5", "uid://2owofpdyy6p8", "uid://dmnhywv7oxjqf")
 spawn_path = NodePath("../SpawnedProjectiles")
 
-[node name="SpawnedTowers" type="Node2D" parent="." unique_id=1384798803]
+[node name="SpawnedTraps" type="Node2D" parent="." unique_id=1384798803]
 script = ExtResource("6_liyct")
 
-[node name="TowerSpawner" type="MultiplayerSpawner" parent="." unique_id=1691883587]
+[node name="TrapSpawner" type="MultiplayerSpawner" parent="." unique_id=1691883587]
 _spawnable_scenes = PackedStringArray("uid://b2rtodncqul3h")
-spawn_path = NodePath("../SpawnedTowers")
+spawn_path = NodePath("../SpawnedTraps")
 
 [node name="SpawnedNPCs" type="Node2D" parent="." unique_id=328143973]
 script = ExtResource("10_qac2q")

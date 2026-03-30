@@ -122,7 +122,8 @@ func change_first_ability(ability_type: String) -> void:
 		"Illusion": components_container.get_node_or_null("IllusionComponent"),
 		"Stealth": components_container.get_node_or_null("StealthComponent"),
 		"Spawner": components_container.get_node_or_null("SpawnerComponent"),
-		"Teleport_Crush": components_container.get_node_or_null("TeleportCrushComponent")
+		"Teleport_Crush": components_container.get_node_or_null("TeleportCrushComponent"),
+		"WOF": components_container.get_node_or_null("WOFComponent")
 	}
 	
 	for key: String in abilities:

@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://y8thnyvir87p"]
+
+[ext_resource type="Script" uid="uid://gm7hsty05xj8" path="res://Components/Ability Components/Wall Of Fire Components/wof_component.gd" id="1_dpgnw"]
+
+[node name="WOFComponent" type="Node2D" unique_id=131953459]
+script = ExtResource("1_dpgnw")

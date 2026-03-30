@@ -511,7 +511,7 @@ func change_weapon(class_choice: String) -> void:
 		"Super_Queen": 
 			new_m = "Sword"; new_r = "Bow"; new_a = "Teleport_Crush"; new_s = "Wooden"
 		"Holy_Queen": 
-			new_m = "Spear"; new_r = "Fireball_Shooter"; new_a = "Illusion"; new_s = "Magic"
+			new_m = "Spear"; new_r = "Fireball_Shooter"; new_a = "WOF"; new_s = "Magic"
 			
 	entity.set("current_melee_weapon", new_m)
 	entity.set("current_ranged_weapon", new_r)

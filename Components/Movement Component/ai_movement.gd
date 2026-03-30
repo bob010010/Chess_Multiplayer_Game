@@ -68,9 +68,9 @@ func _compute_context_steering(delta: float) -> void:
 	
 	# Determines the stopping distance based on whether the AI is engaging in melee or ranged combat.
 	if is_instance_valid(entity.get("melee_w_component")):
-		stop_threshold = ai_controller.melee_range
+		stop_threshold = ai_controller.melee_range * 0.85
 	elif is_instance_valid(entity.get("ranged_w_component")):
-		stop_threshold = ai_controller.attack_range
+		stop_threshold = ai_controller.max_shoot_range * 0.85
 	else:
 		stop_threshold = 60.0 # Default fallback for body damage/contact
 	

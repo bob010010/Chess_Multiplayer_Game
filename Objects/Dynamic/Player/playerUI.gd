@@ -290,6 +290,11 @@ func show_debug_info() -> void:
 				var tpc_duration_text: String = "Til next: " + str(snapped(first_ability_component.current_cooldown, 0.1)) + "\n"
 				var tpc_range_text: String = "Teleport Range: " + str(first_ability_component.max_range) + "\n\n"
 				stats_label_two.text = tpc_damage_text + tpc_kb_text + tpc_radius_text + tpc_area_duration_text + tpc_cooldown_text + tpc_duration_text + tpc_range_text
+			"WOF":
+				var wof_cd_text = "WOF Cooldown: " + str(first_ability_component.max_cooldown) + "\n"
+				var wof_time_text: String = "Til next: " + str(snapped(first_ability_component.current_cooldown, 0.1)) + "\n"
+				var wof_start_text = "WOF Start: " + str(first_ability_component.start_pos) + "\n\n"
+				stats_label_two.text = wof_cd_text + wof_time_text + wof_start_text
 	else:
 		var no_ability_text: String = "No First Ability" + "\n" + "\n"
 		stats_label_two.text = no_ability_text

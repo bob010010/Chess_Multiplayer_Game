@@ -19,12 +19,13 @@ var shielding: bool = false
 var knockback: Vector2 = Vector2.ZERO
 var knockback_force: int = 200
 var body_damage: int
+var input_needed: bool = false # An input is needed, block everything until then
 
 #Physics layers TODO use these
 const LAYER_AI_PLAYER_AND_FOOD: int = 1
 const LAYER_WORLD_BOUNDARIES: int = 2
 
-@export var current_class: String = "Pawn_II":
+@export var current_class: String = "Holy_Queen":
 	set(value):
 		current_class = value
 		if is_node_ready():
@@ -105,6 +106,10 @@ func apply_team_color() -> void:
 # Processes server-side physics and calls local client input gathering.
 func _physics_process(delta: float) -> void:
 	if name == str(multiplayer.get_unique_id()):
+		if input_needed:
+			check_second_input_wof()
+			return
+
 		#if not shielding: # TODO Add this back in
 		check_player_input()
 		check_ranged_input()
@@ -158,9 +163,16 @@ func check_first_ability_input() -> void:
 			"Stealth":
 				first_ability_component.request_stealth.rpc_id(1)
 			"Spawner":
-				first_ability_component.request_spawn.rpc_id(1, position)
+				first_ability_component.request_spawn.rpc_id(1, get_global_mouse_position())
 			"Teleport_Crush":
 				first_ability_component.request_teleport_area.rpc_id(1, get_global_mouse_position())
+			"WOF":
+				first_ability_component.request_wof.rpc_id(1, get_global_mouse_position())
+
+# Gets the second input for the wall of fire
+func check_second_input_wof() -> void:
+	if first_ability_component and current_first_ability == "WOF" and Input.is_action_just_pressed("first_ability"):
+		first_ability_component.request_second_pos.rpc_id(1, get_global_mouse_position())
 
 # Evaluates continuous input to request shield activation and deactivation from the server.
 func check_shield_input() -> void:

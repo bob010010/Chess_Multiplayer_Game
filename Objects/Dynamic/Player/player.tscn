@@ -15,6 +15,7 @@
 [ext_resource type="Script" uid="uid://drtotaaepbr3t" path="res://Components/Promotion Component/promotion_component.gd" id="19_j1n4j"]
 [ext_resource type="Script" uid="uid://dk0pqntam1qlr" path="res://Objects/Dynamic/Player/playerUI.gd" id="22_d3u3q"]
 [ext_resource type="PackedScene" uid="uid://d4bosy3p363kl" path="res://UI/Bars/Ability Bar/ability_bar.tscn" id="26_xyotm"]
+[ext_resource type="PackedScene" uid="uid://y8thnyvir87p" path="res://Components/Ability Components/Wall Of Fire Components/wof_component.tscn" id="28_4ge2x"]
 [ext_resource type="Script" uid="uid://dd6mlpw8tkkbb" path="res://Components/Ability Components/Teleport Components/teleport_component.gd" id="35_x2bxi"]
 [ext_resource type="PackedScene" uid="uid://3y2gt1rbgeo3" path="res://Components/Shield Components/Directional Shield Components/wooden_shield_component.tscn" id="36_xyotm"]
 [ext_resource type="PackedScene" uid="uid://drldjkjxrdrg" path="res://Components/Weapon Components/Ranged Weapon Components/Bow Component/bow_component.tscn" id="37_46ev8"]
@@ -521,6 +522,8 @@ script = ExtResource("35_x2bxi")
 
 [node name="ComponentManager" type="Node2D" parent="Components" unique_id=1388107634]
 script = ExtResource("46_ohodf")
+
+[node name="WOFComponent" parent="Components" unique_id=131953459 instance=ExtResource("28_4ge2x")]
 
 [node name="TestingComponent" type="Node2D" parent="." unique_id=1977352903]
 script = ExtResource("49_8ikvy")

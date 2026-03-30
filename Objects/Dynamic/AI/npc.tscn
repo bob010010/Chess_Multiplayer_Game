@@ -23,13 +23,13 @@
 size = Vector2(72, 95)
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_p2f8y"]
-radius = 50.0
+radius = 1250.0
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_q7cir"]
-radius = 50.0
+radius = 350.0
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_l1orh"]
-radius = 50.0
+radius = 600.0
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_c7qqn"]
 properties/0/path = NodePath(".:position")
@@ -92,21 +92,19 @@ shape = SubResource("RectangleShape2D_t2tx2")
 debug_color = Color(0.125988, 0.4824381, 0.5932888, 0.41960785)
 
 [node name="DetectionArea" type="Area2D" parent="." unique_id=1304377030]
-scale = Vector2(25, 25)
 
 [node name="DetectionHitbox" type="CollisionShape2D" parent="DetectionArea" unique_id=2122327938]
 shape = SubResource("CircleShape2D_p2f8y")
 debug_color = Color(0, 0.6, 0.69803923, 0.05882353)
 
 [node name="KillArea" type="Area2D" parent="." unique_id=133820070]
-scale = Vector2(10, 10)
+position = Vector2(0, -4)
 
 [node name="KillHitbox" type="CollisionShape2D" parent="KillArea" unique_id=1852263935]
 shape = SubResource("CircleShape2D_q7cir")
 debug_color = Color(0.7764706, 0.42352942, 0.35686275, 0.1764706)
 
 [node name="LookingArea" type="Area2D" parent="." unique_id=275248731]
-scale = Vector2(12, 12)
 
 [node name="LookingHitbox" type="CollisionShape2D" parent="LookingArea" unique_id=1897812908]
 shape = SubResource("CircleShape2D_l1orh")

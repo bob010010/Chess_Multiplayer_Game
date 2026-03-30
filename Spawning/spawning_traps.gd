@@ -22,7 +22,7 @@ func spawn_tower(spawn_pos: Vector2, owner_id: String, team: int) -> Node2D:
 	
 	add_child(tower, true)
 	
-	if tower.has_method("initialize"):
+	if tower.has_method("initialise"):
 		tower.initialize(owner_id, team)
 		
 	return tower
@@ -34,12 +34,6 @@ func spawn_wof(start_pos: Vector2, end_pos: Vector2, owner_id: String, team: int
 		
 	var wall: StaticBody2D = wof_scence.instantiate() as StaticBody2D
 	
-	# Ensures the node name is unique so the MultiplayerSpawner can track it across peers
-	wall.name = "WOF_" + owner_id + "_" + str(Time.get_ticks_msec())
-	wall.global_position = (start_pos + end_pos)/2
-	wall.rotation = start_pos.angle_to_point(end_pos)
-	wall.get_node("WOFHitbox").shape.size.x = start_pos.distance_to(end_pos)
-	
 	# Assign the team_id property directly to the script before adding to tree
 	# This helps server-side AI logic immediately recognize it as a teammate
 	if "team_id" in wall:
@@ -47,7 +41,8 @@ func spawn_wof(start_pos: Vector2, end_pos: Vector2, owner_id: String, team: int
 	
 	add_child(wall, true)
 	
-	if wall.has_method("initialize"):
-		wall.initialize(owner_id, team)
+	if wall.has_method("initialise"):
+		print("Init wall")
+		wall.initialise(owner_id, team, start_pos, end_pos)
 		
 	return wall

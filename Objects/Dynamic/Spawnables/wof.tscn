@@ -1,11 +1,15 @@
 [gd_scene format=3 uid="uid://c37ctg36bht0r"]
 
+[ext_resource type="Script" uid="uid://dwxitxp71qnlu" path="res://Objects/Dynamic/Spawnables/wof.gd" id="1_jlign"]
+
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_bfxow"]
 size = Vector2(100, 3)
 
 [node name="WOF" type="StaticBody2D" unique_id=1503241422]
-collision_layer = 8
-collision_mask = 8
+collision_layer = 3
+collision_mask = 3
+script = ExtResource("1_jlign")
 
 [node name="WOFHitbox" type="CollisionShape2D" parent="." unique_id=1735555457]
 shape = SubResource("RectangleShape2D_bfxow")
+debug_color = Color(1, 0, 0, 0.13725491)

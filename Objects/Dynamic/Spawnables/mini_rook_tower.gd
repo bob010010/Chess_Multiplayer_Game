@@ -9,7 +9,7 @@ var team_id: int = -1
 @onready var health_component: Node = $Components/HealthComponent
 
 # Sets the initial identity and team data
-func initialize(creator_id: String, creator_team: int) -> void:
+func initialise(creator_id: String, creator_team: int) -> void:
 	owner_peer_id = creator_id
 	team_id = creator_team
 	$TeamLabel.text = str(team_id)
@@ -52,7 +52,7 @@ func apply_team_color() -> void:
 	var local_player: Node2D = get_tree().current_scene.find_child(local_id, true, false) as Node2D
 	
 	if local_player and "team_id" in local_player:
-		if self.team_id == local_player.get("team_id"):
+		if team_id == local_player.get("team_id"):
 			$Sprite2D.modulate = Color(0.0, 1.0, 0.0)
 		else:
 			$Sprite2D.modulate = Color(1.0, 0.0, 0.0)

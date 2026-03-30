@@ -5,11 +5,11 @@
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_bfxow"]
 size = Vector2(100, 3)
 
-[node name="WOF" type="StaticBody2D" unique_id=1503241422]
-collision_layer = 3
-collision_mask = 3
+[node name="WOF" type="Area2D" unique_id=1950984905]
 script = ExtResource("1_jlign")
 
 [node name="WOFHitbox" type="CollisionShape2D" parent="." unique_id=1735555457]
 shape = SubResource("RectangleShape2D_bfxow")
 debug_color = Color(1, 0, 0, 0.13725491)
+
+[node name="FireParticles" type="GPUParticles2D" parent="." unique_id=538272036]

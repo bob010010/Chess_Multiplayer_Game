@@ -12,7 +12,7 @@ func spawn_tower(spawn_pos: Vector2, owner_id: String, team: int) -> Node2D:
 	var tower: StaticBody2D = tower_scene.instantiate() as StaticBody2D
 	
 	# Ensures the node name is unique so the MultiplayerSpawner can track it across peers
-	tower.name = "Tower_" + owner_id + "_" + str(Time.get_ticks_msec())
+	tower.name = "Tower_" + str(owner_id) + "_" + str(Time.get_ticks_msec())
 	tower.global_position = spawn_pos
 	
 	# Assign the team_id property directly to the script before adding to tree
@@ -32,7 +32,8 @@ func spawn_wof(start_pos: Vector2, end_pos: Vector2, owner_id: String, team: int
 	if not multiplayer.is_server():
 		return null
 		
-	var wall: StaticBody2D = wof_scence.instantiate() as StaticBody2D
+	var wall: Area2D = wof_scence.instantiate() as Area2D
+	wall.name = "WOF_" + str(owner_id) + "_" + str(Time.get_ticks_msec()) # Unique name assigned
 	
 	# Assign the team_id property directly to the script before adding to tree
 	# This helps server-side AI logic immediately recognize it as a teammate

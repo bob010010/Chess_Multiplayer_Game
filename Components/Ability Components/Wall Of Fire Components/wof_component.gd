@@ -23,7 +23,7 @@ func _process(delta: float) -> void:
 # Starts the ability and requests the wall of fire
 @rpc("any_peer", "call_local", "reliable")
 func request_wof(input_pos: Vector2) -> void:
-	if multiplayer.is_server() and current_cooldown <= 0.0 and AbilityUtils.is_position_within_map(get_tree().current_scene, start_pos):
+	if multiplayer.is_server() and current_cooldown <= 0.0 and AbilityUtils.is_position_within_map(get_tree().current_scene, input_pos):
 		start_pos = input_pos
 		waiting_for_end = true
 		entity.input_needed = true

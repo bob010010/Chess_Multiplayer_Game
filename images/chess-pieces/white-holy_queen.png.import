@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://5eubu4uhawbi"
-path="res://.godot/imported/white-grassh.png-4781ddd8a512d09e0eb178e08ff54b9b.ctex"
+uid="uid://dobde2a3751e6"
+path="res://.godot/imported/white-holy_queen.png-e5c9978c18a8cb728dd46442854c4847.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://images/chess-pieces/white-grassh.png"
-dest_files=["res://.godot/imported/white-grassh.png-4781ddd8a512d09e0eb178e08ff54b9b.ctex"]
+source_file="res://images/chess-pieces/white-holy_queen.png"
+dest_files=["res://.godot/imported/white-holy_queen.png-e5c9978c18a8cb728dd46442854c4847.ctex"]
 
 [params]
 

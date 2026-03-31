@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cprl6jr11gq2y"
-path="res://.godot/imported/white-centaur.png-b5e77d420df8eda3581bcaad85ab8456.ctex"
+uid="uid://cwgelun1dajm3"
+path="res://.godot/imported/white-pawn_I.png-3274c3b41a0dff19e1483969bfa6dac9.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://images/chess-pieces/white-centaur.png"
-dest_files=["res://.godot/imported/white-centaur.png-b5e77d420df8eda3581bcaad85ab8456.ctex"]
+source_file="res://images/chess-pieces/white-pawn_I.png"
+dest_files=["res://.godot/imported/white-pawn_I.png-3274c3b41a0dff19e1483969bfa6dac9.ctex"]
 
 [params]
 

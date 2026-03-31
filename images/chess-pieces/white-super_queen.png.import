@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://237fsxjn0wkh"
-path="res://.godot/imported/white-archbis.png-e39bf77ba231ee84b311e5cef8c95935.ctex"
+uid="uid://bxbrjc37sox1c"
+path="res://.godot/imported/white-super_queen.png-d8f8ec64832d40854f8e8fa56131c361.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://images/chess-pieces/white-archbis.png"
-dest_files=["res://.godot/imported/white-archbis.png-e39bf77ba231ee84b311e5cef8c95935.ctex"]
+source_file="res://images/chess-pieces/white-super_queen.png"
+dest_files=["res://.godot/imported/white-super_queen.png-d8f8ec64832d40854f8e8fa56131c361.ctex"]
 
 [params]
 

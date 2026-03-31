@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bkti6qkbmljk0"
-path="res://.godot/imported/white-rknight.png-12d72c2222aeb412f52d37e4bb33792a.ctex"
+uid="uid://cprl6jr11gq2y"
+path="res://.godot/imported/white-sultans_knight.png-9c5a23b2e2cb045e6333d52af5551d48.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://images/chess-pieces/white-rknight.png"
-dest_files=["res://.godot/imported/white-rknight.png-12d72c2222aeb412f52d37e4bb33792a.ctex"]
+source_file="res://images/chess-pieces/white-sultans_knight.png"
+dest_files=["res://.godot/imported/white-sultans_knight.png-9c5a23b2e2cb045e6333d52af5551d48.ctex"]
 
 [params]
 

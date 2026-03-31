@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cwgelun1dajm3"
-path="res://.godot/imported/white-bpawn.png-6d5cb3e37d891ad387f72dc46126788b.ctex"
+uid="uid://da1t6men8pybg"
+path="res://.godot/imported/white-sultan.png-a35540118cf78ded66b18a70c773bef7.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://images/chess-pieces/white-bpawn.png"
-dest_files=["res://.godot/imported/white-bpawn.png-6d5cb3e37d891ad387f72dc46126788b.ctex"]
+source_file="res://images/chess-pieces/white-sultan.png"
+dest_files=["res://.godot/imported/white-sultan.png-a35540118cf78ded66b18a70c773bef7.ctex"]
 
 [params]
 

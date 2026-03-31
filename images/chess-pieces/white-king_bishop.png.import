@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ckf555syla3gf"
-path="res://.godot/imported/white-nrking.png-a866cb089589a559ee1eec57a88152c4.ctex"
+uid="uid://cy336i8i0u3vs"
+path="res://.godot/imported/white-king_bishop.png-ac86d833030ec87a5bef7c47774d291d.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://images/chess-pieces/white-nrking.png"
-dest_files=["res://.godot/imported/white-nrking.png-a866cb089589a559ee1eec57a88152c4.ctex"]
+source_file="res://images/chess-pieces/white-king_bishop.png"
+dest_files=["res://.godot/imported/white-king_bishop.png-ac86d833030ec87a5bef7c47774d291d.ctex"]
 
 [params]
 

@@ -246,8 +246,8 @@ func _on_player_died(attacker_id: String) -> void:
 @rpc("authority", "call_local", "reliable")
 func trigger_death_screen(attacker_id: String) -> void:
 	var main_scene = get_tree().current_scene
-	if main_scene and main_scene.has_method("start_spectating"):
-		main_scene.start_spectating(attacker_id)
+	if main_scene and main_scene.has_method("player_died"):
+		main_scene.player_died(name, leveling_component.total_score, attacker_id)
 
 func _update_points(new_points: int):
 	$HUD/LevelBar.queue_points(new_points)

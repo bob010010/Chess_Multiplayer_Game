@@ -5,12 +5,12 @@ const PORT: int = 8910
 
 @export var is_hosting: bool = false # Remove this?
 
-# --- New Spectator Variables ---
 var spectate_target: Node2D = null
 var respawn_timer: float = 0.0
 @onready var spectator_camera: Camera2D = $SpectatorCamera
 @onready var respawn_button: Button = $RespawnLayer/RespawnPanel/RespawnButton
 @onready var respawn_label: Label = $RespawnLayer/RespawnPanel/RespawnTimerLabel
+var dead_scores_dict: Dictionary
 
 @onready var ip_label: Label = $CanvasLayer/SharingIPLabel
 
@@ -243,6 +243,10 @@ func _on_join_pressed() -> void:
 	
 	$TitleScreen.hide()
 
+func player_died(player_id: String, player_score: int, killer_id: String) -> void:
+	start_spectating(killer_id)
+	dead_scores_dict[player_id] = player_score
+
 # Sets up the local client's UI and camera for the spectate phase.
 func start_spectating(killer_id: String) -> void:
 	$RespawnLayer.show()
@@ -290,5 +294,11 @@ func request_respawn() -> void:
 	if old_player:
 		old_player.name = str(sender_id) + "_dying_" + str(Time.get_ticks_msec())
 		old_player.queue_free()
-		
-	$SpawnedPlayers.add_player(sender_id)
+	
+	var previous_score: int = dead_scores_dict.get(str(sender_id))
+	if previous_score:
+		$SpawnedPlayers.add_player(sender_id, previous_score)
+		dead_scores_dict.erase(sender_id)
+	else:
+		$SpawnedPlayers.add_player(sender_id)
+	

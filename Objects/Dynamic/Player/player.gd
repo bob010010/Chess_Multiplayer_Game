@@ -6,7 +6,6 @@ extends CharacterBody2D
 @onready var promotion_component: Node = $Components/PromotionComponent
 @onready var manager_component: ComponentManager = $Components/ComponentManager
 @onready var sprite_component: Sprite2D = $SpriteComponent
-@onready var UIComponent: Node = $UIComponent
 
 var ranged_w_component: Node
 var melee_w_component: Node
@@ -25,7 +24,7 @@ var input_needed: bool = false # An input is needed, block everything until then
 const LAYER_NPC_PLAYER_AND_FOOD: int = 1
 const LAYER_WORLD_BOUNDARIES: int = 2
 
-@export var current_class: String = "Mini_Rook":
+@export var current_class: String = "Pawn":
 	set(value):
 		current_class = value
 		if is_node_ready():
@@ -81,9 +80,6 @@ func _ready() -> void:
 	if name == str(multiplayer.get_unique_id()):
 		$SpriteComponent.modulate = Color(0, 1, 0)
 		$Camera2D.make_current()
-		$HUD.show()
-		$AbilityBar.show()
-		$HUD/UpgradeUI.hide()
 		for button: Node in $HUD/UpgradeUI.get_children():
 			if button is Button:
 				button.stat_chosen.connect(_on_stat_chosen)
@@ -93,8 +89,6 @@ func _ready() -> void:
 				button.type_chosen.connect(_on_type_chosen)
 	else:
 		$SpriteComponent.modulate = Color(1, 0, 0)
-		$HUD.hide()
-		$AbilityBar.hide()
 
 func apply_team_color() -> void:
 	var sprite: Sprite2D = get_node_or_null("SpriteComponent") as Sprite2D

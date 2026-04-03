@@ -29,7 +29,7 @@ var promotion_tree: Dictionary = {
 	"Holy_Queen": ["Super_Queen", "Pawn_II"]
 }
 
-
+# Base stats for each of the current classes
 var class_base_stats: Dictionary = {
 	
 	# Rank 1
@@ -92,9 +92,11 @@ var class_base_stats: Dictionary = {
 		"regen_amount": 2.0,
 		"body_damage": 15.0,
 		"projectile_damage": 8.0,
-		"projectile_speed": 300.0,
+		"projectile_speed": 150.0,
 		"reload_speed": 2.0,
 		"accuracy": 60.0,
+		"mass_heal_amount": 20,
+		"mass_heal_cooldown": 20.0,
 		"shield_health": 80.0
 	},
 
@@ -133,7 +135,7 @@ var class_base_stats: Dictionary = {
 		"regen_amount": 4.0,
 		"body_damage": 25.0,
 		"projectile_damage": 10.0,
-		"projectile_speed": 500.0,
+		"projectile_speed": 250.0,
 		"reload_speed": 1.5,
 		"accuracy": 60.0,
 		"spawner_cooldown": 12.0,
@@ -147,7 +149,7 @@ var class_base_stats: Dictionary = {
 		"regen_amount": 3.0,
 		"body_damage": 4.0,
 		"projectile_damage": 15.0,
-		"projectile_speed": 400.0,
+		"projectile_speed": 200.0,
 		"reload_speed": 1.2,
 		"accuracy": 70.0,
 		"area_damage": 30.0,
@@ -181,7 +183,7 @@ var class_base_stats: Dictionary = {
 		"regen_amount": 3.0,
 		"body_damage": 18.0,
 		"projectile_damage": 20.0,
-		"projectile_speed": 550.0,
+		"projectile_speed": 275.0,
 		"reload_speed": 1.0,
 		"accuracy": 80.0,
 		"teleport_range": 350.0,
@@ -197,7 +199,7 @@ var class_base_stats: Dictionary = {
 		"regen_amount": 4.0,
 		"body_damage": 6.0,
 		"projectile_damage": 25.0,
-		"projectile_speed": 500.0,
+		"projectile_speed": 250.0,
 		"reload_speed": 0.9,
 		"accuracy": 85.0,
 		"area_damage": 45.0,
@@ -230,7 +232,7 @@ var class_base_stats: Dictionary = {
 		"regen_amount": 10.0,
 		"body_damage": 20.0,
 		"projectile_damage": 40.0,
-		"projectile_speed": 650.0,
+		"projectile_speed": 325.0,
 		"reload_speed": 0.3,
 		"accuracy": 100.0, 
 		"area_damage": 75.0,
@@ -245,7 +247,7 @@ var class_base_stats: Dictionary = {
 		"regen_amount": 10.0,
 		"body_damage": 20.0,
 		"projectile_damage": 40.0,
-		"projectile_speed": 600.0,
+		"projectile_speed": 300.0,
 		"reload_speed": 0.3,
 		"accuracy": 100.0, 
 		"spawner_cooldown": 12.0,
@@ -276,7 +278,7 @@ var class_base_stats: Dictionary = {
 		"regen_amount": 10.0,
 		"body_damage": 20.0,
 		"projectile_damage": 40.0,
-		"projectile_speed": 700.0,
+		"projectile_speed": 350.0,
 		"reload_speed": 0.3,
 		"accuracy": 100.0, 
 		"area_damage": 75.0,
@@ -298,6 +300,8 @@ var class_base_stats: Dictionary = {
 		"melee_cooldown": 0.2, 
 		"spawner_cooldown": 12.0,
 		"max_spawns": 7.0,
+		"mass_heal_amount": 50,
+		"mass_heal_cooldown": 10.0,
 		"shield_health": 200.0
 	},
 
@@ -308,7 +312,7 @@ var class_base_stats: Dictionary = {
 		"regen_amount": 5.0,
 		"body_damage": 12.0,
 		"projectile_damage": 60.0,
-		"projectile_speed": 650.0,
+		"projectile_speed": 325.0,
 		"reload_speed": 0.8,
 		"accuracy": 95.0,
 		"illusion_cooldown": 12.0,
@@ -328,7 +332,7 @@ var class_base_stats: Dictionary = {
 		"melee_knockback": 800.0,
 		"melee_cooldown": 0.2, 
 		"projectile_damage": 40.0,
-		"projectile_speed": 750.0,
+		"projectile_speed": 375.0,
 		"reload_speed": 0.3,
 		"accuracy": 100.0, 
 		"area_damage": 75.0,
@@ -349,61 +353,16 @@ var class_base_stats: Dictionary = {
 		"melee_knockback": 800.0,
 		"melee_cooldown": 0.2, 
 		"projectile_damage": 40.0,
-		"projectile_speed": 750.0,
+		"projectile_speed": 375.0,
 		"reload_speed": 0.3,
 		"accuracy": 100.0, 
-		"illusion_cooldown": 12.0,
-		"illusion_duration": 5.0,
-		"illusions_count": 6.0,
+		"wof_cooldown": 10.0,
+		"wof_length": 500,
+		"wof_damage": 10,
+		"mass_heal_amount": 100,
+		"mass_heal_cooldown": 80.0,
 		"shield_health": 200.0
 	},
-}
-
-var max_stats: Dictionary = {
-	"move_speed": 400.0,
-	"body_damage": 40.0,
-	
-	#Health & Regen
-	"max_health": 400.0,
-	"regen_speed": 0.5,
-	"regen_amount": 20.0,
-
-	#Ranged
-	"projectile_damage": 80.0,
-	"projectile_speed": 850.0,
-	"reload_speed": 0.15,
-	"accuracy": 100.0,
-
-	#Melee
-	"melee_damage": 120.0,
-	"melee_knockback": 1600.0,
-	"melee_cooldown": 0.1,
-
-	#Area
-	"area_damage": 150.0,
-	"area_knockback": 2000.0,
-	"area_radius": 1000.0,
-	"area_cooldown": 1.0,
-
-	#Teleport
-	"teleport_cooldown": 1.0,
-	"teleport_range": 2000.0,
-
-	#Illusion
-	"illusion_cooldown": 4.0,
-	"illusion_duration": 10.0,
-	"illusions_count": 12.0,
-
-	#Stealth
-	"stealth_cooldown": 6.0,
-	"stealth_duration": 6.0,
-
-	#Spawning
-	"spawner_cooldown": 6.0,
-	"max_spawns": 10.0,
-
-	#Shield
-	"shield_health": 400.0
 }
 
 @onready var entity: CharacterBody2D = get_parent().get_parent() as CharacterBody2D
@@ -512,23 +471,25 @@ func change_weapon(class_choice: String) -> void:
 		"Super_Queen": 
 			new_m = "Sword"; new_r = "Bow"; new_a = "Teleport_Crush"; new_s = "Wooden"
 		"Holy_Queen": 
-			new_m = "Spear"; new_r = "Fireball_Shooter"; new_a = "WOF"; new_s = "Magic"
-			
-	entity.set("current_melee_weapon", new_m)
+			new_m = "Spear"; new_r = "Fireball_Shooter"; new_a = "Mass_Heal"; new_a_2 = "WOF"; new_s = "Magic"
+
+	#Sets these to a string, their setters then call the logic to switch the component	
+	entity.set("current_melee_weapon", new_m) 
 	entity.set("current_ranged_weapon", new_r)
 	entity.set("current_first_ability", new_a)
 	entity.set("current_second_ability", new_a_2)
 	entity.set("current_shield", new_s)
 
 
-# Calculates and applies capped stat values to the entity's active components.
+# Calculates and applies stat values to the entity's active components using additive level scaling.
 func apply_promotion_stats(class_choice: String) -> void:
 	if not class_base_stats.has(class_choice):
 		return
 	
 	var base: Dictionary = class_base_stats[class_choice]
-	var level: LevelingComponent = entity.get_node("Components/LevelingComponent") as LevelingComponent
-	var mults: Dictionary = level.stat_levels
+	var level_comp: LevelingComponent = entity.get_node("Components/LevelingComponent") as LevelingComponent
+	var levels: Dictionary = level_comp.stat_levels
+	var increments: Dictionary = level_comp.upgrade_increments
 	
 	var comps: Node = entity.get_node("Components")
 	var h_comp: Node = comps.get_node("HealthComponent")
@@ -539,69 +500,88 @@ func apply_promotion_stats(class_choice: String) -> void:
 	var a_2_comp: Node = entity.get("second_ability_component")
 	var s_comp: Node = entity.get("shield_component")
 
+	# Helper lambda to calculate the boosted value: Base + (Increment * Level)
+	var calc = func(s_name: String) -> float:
+		var base_val: float = float(base.get(s_name, 0.0))
+		var step: float = float(increments.get(s_name, 0.0))
+		var current_lvl: int = int(levels.get(s_name, 0))
+		return base_val + (step * float(current_lvl))
+
 	if m_comp and base.has("move_speed"):
-		m_comp.move_speed = _get_capped_value("move_speed", base["move_speed"] * mults["move_speed"], max_stats["move_speed"], m_comp.move_speed)
+		m_comp.move_speed = int(calc.call("move_speed"))
 	if h_comp:
 		if base.has("max_health"):
-			h_comp.max_health = int(_get_capped_value("max_health", base["max_health"] * mults["max_health"], max_stats["max_health"], h_comp.max_health))
-			h_comp.health = h_comp.max_health
+			var old_max: int = h_comp.max_health
+			h_comp.max_health = int(calc.call("max_health"))
+			
+			# Heals the player up when they increase max health
+			var health_boost: int = h_comp.max_health - old_max
+			h_comp.health += health_boost
+			if h_comp.health > h_comp.max_health: 
+				h_comp.health = h_comp.max_health
 		if base.has("regen_speed"):
-			h_comp.regen_speed = _get_capped_value("regen_speed", base["regen_speed"] * mults["regen_speed"], max_stats["regen_speed"], h_comp.regen_speed, true)
+			h_comp.regen_speed = calc.call("regen_speed")
 		if base.has("regen_amount"):
-			h_comp.regen_amount = _get_capped_value("regen_amount", base["regen_amount"] * mults["regen_amount"], max_stats["regen_amount"], h_comp.regen_amount)
+			h_comp.regen_amount = calc.call("regen_amount")
+	
 	if base.has("body_damage"):
-		entity.set("body_damage", int(_get_capped_value("body_damage", base["body_damage"] * mults["body_damage"], max_stats["body_damage"], entity.get("body_damage"))))
+		entity.set("body_damage", int(calc.call("body_damage")))
+	
 	if s_comp and base.has("shield_health"):
-		s_comp.max_shield_health = int(_get_capped_value("shield_health", base["shield_health"] * mults["shield_health"], max_stats["shield_health"], s_comp.max_shield_health))
+		s_comp.max_shield_health = int(calc.call("shield_health"))
+	
 	if m_w_comp:
-		if base.has("melee_damage"): m_w_comp.melee_damage = int(_get_capped_value("melee_damage", base["melee_damage"] * mults["melee_damage"], max_stats["melee_damage"], m_w_comp.melee_damage))
-		if base.has("melee_knockback"): m_w_comp.knockback_force = _get_capped_value("melee_knockback", base["melee_knockback"] * mults["melee_knockback"], max_stats["melee_knockback"], m_w_comp.knockback_force)
-		if base.has("melee_cooldown"): m_w_comp.attack_cooldown = _get_capped_value("melee_cooldown", base["melee_cooldown"] * mults["melee_cooldown"], max_stats["melee_cooldown"], m_w_comp.attack_cooldown, true)
+		if base.has("melee_damage"): m_w_comp.melee_damage = int(calc.call("melee_damage"))
+		if base.has("melee_knockback"): m_w_comp.knockback_force = calc.call("melee_knockback")
+		if base.has("melee_cooldown"): m_w_comp.attack_cooldown = calc.call("melee_cooldown")
+	
 	if r_w_comp:
-		if base.has("projectile_damage"): r_w_comp.projectile_damage = int(_get_capped_value("projectile_damage", base["projectile_damage"] * mults["projectile_damage"], max_stats["projectile_damage"], r_w_comp.projectile_damage))
-		if base.has("projectile_speed"): r_w_comp.projectile_speed = _get_capped_value("projectile_speed", base["projectile_speed"] * mults["projectile_speed"], max_stats["projectile_speed"], r_w_comp.projectile_speed)
-		if base.has("reload_speed"): r_w_comp.reload_speed = _get_capped_value("reload_speed", base["reload_speed"] * mults["reload_speed"], max_stats["reload_speed"], r_w_comp.reload_speed, true)
-		if base.has("accuracy"): r_w_comp.accuracy = _get_capped_value("accuracy", base["accuracy"] * mults["accuracy"], max_stats["accuracy"], r_w_comp.accuracy)
+		if base.has("projectile_damage"): r_w_comp.projectile_damage = int(calc.call("projectile_damage"))
+		if base.has("projectile_speed"): r_w_comp.projectile_speed = int(calc.call("projectile_speed"))
+		if base.has("reload_speed"): r_w_comp.reload_speed = calc.call("reload_speed")
+		if base.has("accuracy"): r_w_comp.accuracy = calc.call("accuracy")
+	
 	if a_comp:
-		_apply_ability_stats("current_first_ability", a_comp, base, mults)
+		_apply_ability_stats("current_first_ability", a_comp, base, levels, increments)
 	if a_2_comp:
-		_apply_ability_stats("current_second_ability", a_2_comp, base, mults)
+		_apply_ability_stats("current_second_ability", a_2_comp, base, levels, increments)
 
-# Applies ability upgrades
-func _apply_ability_stats(first_second: String, a: Node, b: Dictionary, m: Dictionary) -> void:
-	match entity.get(first_second):
+# Calculates and applies ability-specific stat values using additive scaling based on current stat levels.
+func _apply_ability_stats(slot_key: String, a_node: Node, b_dict: Dictionary, lvls: Dictionary, incs: Dictionary) -> void:
+	var calc = func(s_name: String) -> float:
+		var base_val: float = float(b_dict.get(s_name, 0.0))
+		var step: float = float(incs.get(s_name, 0.0))
+		var current_lvl: int = int(lvls.get(s_name, 0))
+		return base_val + (step * float(current_lvl))
+
+	match entity.get(slot_key):
 		"Magic":
-			if b.has("area_damage"): a.area_damage = int(_get_capped_value("area_damage", b["area_damage"] * m["area_damage"], max_stats["area_damage"], a.area_damage))
-			if b.has("area_radius"): a.max_radius = _get_capped_value("area_radius", b["area_radius"] * m["area_radius"], max_stats["area_radius"], a.max_radius)
-			if b.has("area_cooldown"): a.max_cooldown = _get_capped_value("area_cooldown", b["area_cooldown"] * m["area_cooldown"], max_stats["area_cooldown"], a.max_cooldown, true)
+			if b_dict.has("area_damage"): a_node.area_damage = int(calc.call("area_damage"))
+			if b_dict.has("area_knockback"): a_node.knockback_force = int(calc.call("area_knockback"))
+			if b_dict.has("area_radius"): a_node.max_radius = calc.call("area_radius")
+			if b_dict.has("area_cooldown"): a_node.max_cooldown = calc.call("area_cooldown")
 		"Teleport":
-			if b.has("teleport_range"): a.max_range = _get_capped_value("teleport_range", b["teleport_range"] * m["teleport_range"], max_stats["teleport_range"], a.max_range)
-			if b.has("teleport_cooldown"): a.max_cooldown = _get_capped_value("teleport_cooldown", b["teleport_cooldown"] * m["teleport_cooldown"], max_stats["teleport_cooldown"], a.max_cooldown, true)
+			if b_dict.has("teleport_range"): a_node.max_range = calc.call("teleport_range")
+			if b_dict.has("teleport_cooldown"): a_node.max_cooldown = calc.call("teleport_cooldown")
 		"Teleport_Crush":
-			if b.has("area_damage"): a.area_damage = int(_get_capped_value("area_damage", b["area_damage"] * m["area_damage"], max_stats["area_damage"], a.area_damage))
-			if b.has("teleport_range"): a.max_range = _get_capped_value("teleport_range", b["teleport_range"] * m["teleport_range"], max_stats["teleport_range"], a.max_range)
-			if b.has("teleport_cooldown"): a.max_cooldown = _get_capped_value("teleport_cooldown", b["teleport_cooldown"] * m["teleport_cooldown"], max_stats["teleport_cooldown"], a.max_cooldown, true)
+			if b_dict.has("area_damage"): a_node.area_damage = int(calc.call("area_damage"))
+			if b_dict.has("area_knockback"): a_node.knockback_force = int(calc.call("area_knockback"))
+			if b_dict.has("area_radius"): a_node.max_radius = calc.call("area_radius")
+			if b_dict.has("teleport_range"): a_node.max_range = calc.call("teleport_range")
+			if b_dict.has("teleport_cooldown"): a_node.max_cooldown = calc.call("teleport_cooldown")
 		"Illusion":
-			if b.has("illusion_cooldown"): a.max_cooldown = _get_capped_value("illusion_cooldown", b["illusion_cooldown"] * m["illusion_cooldown"], max_stats["illusion_cooldown"], a.max_cooldown, true)
-			if b.has("illusions_count"): a.illusions_count = int(_get_capped_value("illusions_count", b["illusions_count"] * m["illusions_count"], max_stats["illusions_count"], a.illusions_count))
+			if b_dict.has("illusion_cooldown"): a_node.max_cooldown = calc.call("illusion_cooldown")
+			if b_dict.has("illusions_count"): a_node.illusions_count = int(calc.call("illusions_count"))
 		"Stealth":
-			if b.has("stealth_cooldown"): a.max_cooldown = _get_capped_value("stealth_cooldown", b["stealth_cooldown"] * m["stealth_cooldown"], max_stats["stealth_cooldown"], a.max_cooldown, true)
-			print("Current: " + str(a.stealth_duration), " M: " + str(m["stealth_duration"]) + " B: " + str(b["stealth_duration"]))
-			if b.has("stealth_duration"): a.stealth_duration = _get_capped_value("stealth_duration", b["stealth_duration"] * m["stealth_duration"], max_stats["stealth_duration"], a.stealth_duration, false)
+			if b_dict.has("stealth_cooldown"): a_node.max_cooldown = calc.call("stealth_cooldown")
+			if b_dict.has("stealth_duration"): a_node.stealth_duration = calc.call("stealth_duration")
 		"Spawner":
-			if b.has("spawner_cooldown"): a.max_cooldown = _get_capped_value("spawner_cooldown", b["spawner_cooldown"] * m["spawner_cooldown"], max_stats["spawner_cooldown"], a.max_cooldown, true)
-			if b.has("max_spawns"): a.max_spawns = int(_get_capped_value("max_spawns", b["max_spawns"] * m["max_spawns"], max_stats["max_spawns"], a.max_spawns))
-		"Spawner":
-			printerr("Add this")
-
-func is_stat_maxed(stat_name: String) -> bool:
-	var level_comp: LevelingComponent = entity.get_node("Components/LevelingComponent")
-	return level_comp.maxed_stats_list.contains(stat_name)
-
-# Calculates and logs stat changes, returning the clamped result.
-func _get_capped_value(s_name: String, n_val: float, c_val: float, o_val: float, is_cd: bool = false) -> float:
-	var reached: bool = n_val <= c_val if is_cd else n_val >= c_val
-	var final: float = c_val if reached else n_val
-	if snapped(final, 0.001) != snapped(o_val, 0.001) and entity.is_in_group("player"):
-		print("Stat Log: " + s_name + (" reached MAX CAP: " if reached else " changed to ") + str(snapped(final, 0.01)))
-	return final
+			if b_dict.has("spawner_cooldown"): a_node.max_cooldown = calc.call("spawner_cooldown")
+			if b_dict.has("max_spawns"): a_node.max_spawns = int(calc.call("max_spawns"))
+		"WOF":
+			if b_dict.has("wof_cooldown"): a_node.max_cooldown = calc.call("wof_cooldown")
+			if b_dict.has("wof_length"): a_node.max_length = calc.call("wof_length")
+			if b_dict.has("wof_damage"): a_node.max_damage = calc.call("wof_damage")
+		"Mass_Heal":
+			if b_dict.has("mass_heal_amount"): a_node.mass_heal_amount = int(calc.call("mass_heal_amount"))
+			if b_dict.has("mass_heal_cooldown"): a_node.max_cooldown = int(calc.call("mass_heal_cooldown"))

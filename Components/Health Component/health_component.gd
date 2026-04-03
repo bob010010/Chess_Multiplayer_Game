@@ -16,7 +16,7 @@ var decay_speed: float = 10.0
 var decay_cooldown: float = decay_speed
 
 @onready var entity: Node = get_parent().get_parent()
-var health_bar: ProgressBar
+@onready var health_bar: ProgressBar = entity.get_node("UI/HealthBar")
 
 var active_dmg_label: Label = null
 var active_heal_label: Label = null
@@ -33,7 +33,6 @@ var mass_heal_time: float = 0.0
 
 # Sets initial health to max health.
 func _ready() -> void:
-	health_bar = entity.get_node("HealthBar") as ProgressBar
 	if not health_bar:
 		printerr("No health bar")
 

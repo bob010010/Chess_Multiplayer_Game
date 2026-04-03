@@ -1,6 +1,8 @@
 extends Node2D
 
 @onready var entity: CharacterBody2D = get_parent()
+@onready var hud: CanvasLayer = $"../HUD"
+@onready var ui_container = $"../UI"
 
 @onready var movement_component: Node = $"../Components/MovementComponent"
 @onready var health_component: Node = $"../Components/HealthComponent"
@@ -23,9 +25,9 @@ var shield_component: Node
 var current_first_ability: String
 var current_second_ability: String
 
-@onready var health_bar: ProgressBar = $"../HealthBar"
+@onready var health_bar: ProgressBar = $"../UI/HealthBar"
 
-@onready var name_label: Label = $"../Name"
+@onready var name_label: Label = $"../UI/Name"
 @onready var stats_label_one: Label = $"../HUD/StatsLabel"
 @onready var stats_label_two: Label = $"../HUD/StatsLabel2"
 @onready var level_label: Label = $"../HUD/LevelBar/LevelLabel"
@@ -36,13 +38,29 @@ var current_second_ability: String
 @onready var leaderboard_container: VBoxContainer = $"../HUD/LBContainer/Leaderboard"
 @export var lb_entry_scene: PackedScene
 
+@onready var first_ability_bar: EntityBar = $"../UI/FirstAbilityBar"
+@onready var second_ability_bar: EntityBar = $"../UI/SecondAbilityBar"
+
+var abil_1_last_cd: float = 0.0
+var abil_2_last_cd: float = 0.0
+
 func _ready() -> void:
-	name_label.text = "Player " + entity.name.substr(0, 4)
+	name_label.text = entity.name
 	if entity.name == str(multiplayer.get_unique_id()):
 		leveling_component.show_upgrade_menu.connect(_show_upgrade_menu)
 		promotion_component.show_promotion_menu.connect(_show_promotion_menu)
-		if not health_component:
-			printerr("No health component")
+		hud.show() 
+		ui_container.show()
+		upgrade_UI.hide()
+		promotion_UI.hide()
+
+	else: # Hides all UI for other players
+		hud.hide()
+		ui_container.hide()
+		upgrade_UI.hide()
+		promotion_UI.hide()
+
+	toggle_external_ui(false) # Shows external UIs (Health, name) for other players
 
 # Toggles the visibility of identifying UI elements specifically for other players
 func toggle_external_ui(is_hidden: bool) -> void:
@@ -61,31 +79,29 @@ func _show_upgrade_menu(upgrade_count: int) -> void:
 		child.hide()
 	
 	var curr_class: String = entity.current_class
-	var valid_stats_dict: Dictionary = promotion_component.class_base_stats[curr_class] # The base stats
+	var valid_stats_dict: Dictionary = promotion_component.class_base_stats[curr_class]
 	var valid_stats: Array = valid_stats_dict.keys()
-	valid_stats = valid_stats.filter(func(stat: String) -> bool: return not promotion_component.is_stat_maxed(stat)) # Stats that arent maxed
+	valid_stats = valid_stats.filter(func(stat: String) -> bool: return not leveling_component.is_stat_maxed(stat))
 
 	if valid_stats.size() <= 0:
 		upgrade_UI.hide()
 		return
 	
 	var buttons: Array[Node] = ui_children.filter(func(b: Node) -> bool: return b is Button)
-
 	valid_stats.shuffle()
 
 	var button_w_valid_count: int = min(buttons.size(), valid_stats.size())
 
 	for i: int in button_w_valid_count:
 		var stat: String = valid_stats[i]
-		buttons[i].stat_id = stat + " X" + str(snapped(leveling_component.stat_levels.get(stat), 0.01))
+		var current_lvl: int = leveling_component.stat_levels.get(stat, 1)
+		
+		buttons[i].stat_id = stat + " Lvl " + str(current_lvl)
 		buttons[i].refresh_text()
 		
-		if not valid_stats_dict.keys().has(stat):
-			printerr("Not found " + stat + " In " + curr_class )
-		
-		var curr_class_stat_base: float = valid_stats_dict[stat]
-		
-		buttons[i].update_progress_bar((curr_class_stat_base / 10))
+		# Update progress bar: (current_level / 10.0) * 100
+		var progress_percent: float = (float(current_lvl) / 10.0) * 100.0
+		buttons[i].update_progress_bar(progress_percent)
 		buttons[i].show()
 	
 	ui_children[0].show()
@@ -149,12 +165,13 @@ func update_leaderboard_ui(entries: Array) -> void:
 				
 				
 			leaderboard_container.add_child(entry)
-		
-@rpc("any_peer", "call_local", "reliable")
-func display_message(message: String) -> void:
-	var label = Label.new()
-	add_child(label)
 
+# Displays a message above the player
+@rpc("any_peer", "call_local", "reliable")
+func display_message(message: String, pos_offset: Vector2 = Vector2(-100.0, -200.0), font_size: int = 70, override_color: Color = Color(0, 0, 0, 0), duration: float = 1.0) -> void:
+	var label: Label = Label.new()
+	add_child(label)
+	print("Message: " + message)
 	var text: String = ""
 	var colour: Color
 	
@@ -166,7 +183,7 @@ func display_message(message: String) -> void:
 		colour = Color(0.0, 1.0, 0.0, 1.0)
 	else:
 		text = message
-		colour = Color(0.965, 0.0, 0.0, 0.788)
+		colour = override_color if override_color.a > 0.0 else Color(0.965, 0.0, 0.0, 1.0)
 
 	label.text = text
 	label.modulate = colour
@@ -174,13 +191,13 @@ func display_message(message: String) -> void:
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
 	
-	label.add_theme_font_size_override("font_size", 70)
+	label.add_theme_font_size_override("font_size", font_size)
 	
-	var vertical_offset: float = -200.0 * entity.scale.y
+	var vertical_offset: float = pos_offset.y * entity.scale.y
 	
-	label.global_position = entity.global_position + Vector2(-100, vertical_offset)
+	label.global_position = entity.global_position + Vector2(pos_offset.x, vertical_offset)
 	
-	var tween = create_tween()
+	var tween: Tween = create_tween()
 	tween.set_parallel(true)
 
 	tween.tween_property(label, "global_position:y", label.global_position.y - 50.0, 1.0).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
@@ -189,8 +206,8 @@ func display_message(message: String) -> void:
 	tween.tween_property(label, "scale", Vector2(1.2, 1.2), 0.1)
 	tween.chain().tween_property(label, "scale", Vector2(1.0, 1.0), 0.2)
 	
-	var fade_tween = create_tween()
-	fade_tween.tween_interval(1.0)
+	var fade_tween: Tween = create_tween()
+	fade_tween.tween_interval(duration)
 	fade_tween.tween_property(label, "modulate:a", 0.0, 2.0)
 
 	tween.chain().tween_callback(label.queue_free)
@@ -199,6 +216,30 @@ func display_message(message: String) -> void:
 func _process(_delta: float) -> void:
 	if entity.name == str(multiplayer.get_unique_id()): 
 		show_debug_info()
+		ability_cooldown_bars()
+
+# Handles the ability cooldown bars
+func ability_cooldown_bars():
+	if first_ability_component != null and current_first_ability != "None":
+		handle_ability_bar(first_ability_component, first_ability_bar, abil_1_last_cd)
+	
+	if second_ability_component != null and current_second_ability != "None":
+		handle_ability_bar(second_ability_component, second_ability_bar, abil_2_last_cd)
+	
+func handle_ability_bar(ability_comp: Node2D, ability_bar: EntityBar, last_cd: float):
+	var current_cd: float = float(ability_comp.current_cooldown)
+	var max_cd: float = float(ability_comp.max_cooldown)
+	
+	if current_cd > 0.0 and current_cd > last_cd:
+		show()
+		ability_bar.value = current_cd
+		ability_bar.animate_value(0.0, max_cd, current_cd)
+	elif current_cd <= 0.0:
+		hide()
+		
+	last_cd = current_cd
+
+
 
 # Compiles and displays internal entity variables to the local HUD.
 func show_debug_info() -> void:
@@ -224,11 +265,10 @@ func show_debug_info() -> void:
 	if ranged_w_component:
 		var projectile_dmg_text: String = "Projectile Damage: " + str(ranged_w_component.projectile_damage) + "\n"
 		var projectile_speed_text: String = "Projectile Speed: " + str(ranged_w_component.projectile_speed) + "\n\n"
-		var shoot_text: String = "Shooting: " + str(ranged_w_component.shooting) + "\n"
 		var reload_time_text: String = "Reload Time: " + str(ranged_w_component.reload_speed)+ "\n"
 		var cooldown_text: String = "Cooldown: " + str(snapped(ranged_w_component.shot_cooldown, 0.01)) + "\n"
 		var accuracy_text: String = "Accuracy: " + str(snapped(ranged_w_component.accuracy, 0.01)) + "\n\n"
-		stats_label_one.text += projectile_dmg_text + projectile_speed_text + shoot_text + reload_time_text + cooldown_text + accuracy_text
+		stats_label_one.text += projectile_dmg_text + projectile_speed_text + reload_time_text + cooldown_text + accuracy_text
 	else:
 		var no_ranged_text: String = "No Ranged Weapon" + "\n" + "\n"
 		stats_label_one.text += no_ranged_text
@@ -309,8 +349,19 @@ func show_debug_info() -> void:
 				var spawner_spawns_text: String = "Current spawns: " + str(second_ability_component.current_spawns) + "\n"
 				var spawner_max_spawns_text: String = "Max spawns: " + str(second_ability_component.max_spawns) + "\n\n"
 				stats_label_two.text += spawner_cd_text + spawner_time_text + spawner_spawns_text + spawner_max_spawns_text
+			"Mass_Heal":
+				var heal_cd_text = "Heal Cooldown: " + str(second_ability_component.max_cooldown) + "\n"
+				var heal_time_text: String = "Til next: " + str(snapped(second_ability_component.current_cooldown, 0.1)) + "\n"
+				var heal_amount_text = "Heal Amount: " + str(second_ability_component.mass_heal_amount) + "\n\n"
+				stats_label_two.text += heal_cd_text + heal_time_text + heal_amount_text
+			"WOF":
+				var wof_cd_text = "WOF Cooldown: " + str(second_ability_component.max_cooldown) + "\n"
+				var wof_time_text: String = "Til next: " + str(snapped(second_ability_component.current_cooldown, 0.1)) + "\n"
+				var wof_length_text: String = "Max Length: " + str(snapped(second_ability_component.max_length, 0.1)) + "\n"
+				var wof_damage_text = "WOF Max Damage: " + str(second_ability_component.max_damage) + "\n\n"
+				stats_label_two.text += wof_cd_text + wof_time_text + wof_length_text + wof_damage_text
 	else:
-		var no_ability_text: String = "No First Ability" + "\n" + "\n"
+		var no_ability_text: String = "No Second Ability" + "\n" + "\n"
 		stats_label_two.text += no_ability_text
 		
 	# SHIELD

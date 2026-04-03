@@ -178,7 +178,7 @@ func change_first_ability(ability_type: String) -> void:
 func change_second_ability(ability_type: String) -> void:
 	var abilities: Dictionary = _get_ability_node_map()
 	var msg: String = ""
-	
+	#print("Trying to change to: " + ability_type)
 	if abilities.has(ability_type) and is_instance_valid(abilities[ability_type]):
 		entity.set("second_ability_component", abilities[ability_type])
 		if is_player_and_UI_valid: 

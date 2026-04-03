@@ -14,6 +14,7 @@ properties/1/spawn = true
 properties/1/replication_mode = 2
 
 [node name="Fireball" type="Area2D" unique_id=1842032804]
+scale = Vector2(2, 2)
 script = ExtResource("1_883jx")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1170523347]
@@ -23,7 +24,7 @@ debug_color = Color(0.6627451, 0.23921569, 0, 0.8392157)
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=998692623]
 modulate = Color(1, 0.44705883, 1, 1)
-rotation = -1.5707964
+rotation = -3.1415927
 scale = Vector2(0.005, 0.005)
 texture = ExtResource("2_85771")
 

@@ -1,6 +1,6 @@
 extends EntityBar
 
-@onready var entity: Node = get_parent()
+@onready var entity: Node = get_parent().get_parent()
 var health_component: Node = null
 var last_health: float = -1.0
 var fill_style: StyleBoxFlat

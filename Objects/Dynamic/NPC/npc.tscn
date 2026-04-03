@@ -151,21 +151,29 @@ script = ExtResource("10_bl8rq")
 
 [node name="IllusionComponent" parent="Components" unique_id=1196718733 instance=ExtResource("18_q7cir")]
 
-[node name="HealthBar" parent="." unique_id=1748738400 instance=ExtResource("6_bl8rq")]
+[node name="UI" type="Control" parent="." unique_id=1660187117]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="HealthBar" parent="UI" unique_id=1748738400 instance=ExtResource("6_bl8rq")]
+layout_mode = 0
 offset_left = -60.0
 offset_top = 100.0
 offset_bottom = 115.0
 
-[node name="Name" type="Label" parent="." unique_id=865800907]
+[node name="Name" type="Label" parent="UI" unique_id=865800907]
+layout_mode = 1
 anchors_preset = 7
 anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = -35.0
-offset_top = 189.0
-offset_right = 35.0
-offset_bottom = 223.0
+offset_left = -55.0
+offset_top = 87.0
+offset_right = 15.0
+offset_bottom = 183.0
 grow_horizontal = 2
 grow_vertical = 0
 theme_override_colors/font_color = Color(0, 0, 0, 1)
@@ -174,7 +182,8 @@ theme_override_styles/normal = SubResource("StyleBoxFlat_xfw1d")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="InfoLabel" type="Label" parent="." unique_id=1894124550]
+[node name="InfoLabel" type="Label" parent="UI" unique_id=1894124550]
+layout_mode = 0
 offset_left = -400.0
 offset_top = -360.0
 offset_right = -360.0

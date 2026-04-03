@@ -21,110 +21,98 @@ var total_score: int = 0
 var pending_upgrades: int = 0
 
 @onready var npc_gains_points: bool = get_tree().current_scene.npc_gains_points
+var maxed_stats_list: Array[String] = []
 
-# The static increments applied to the multiplier pool upon upgrade selection.
+# The static additive values applied per level to each stat category.
 var upgrade_increments: Dictionary = {
-	"move_speed": 1.1,
-	"body_damage": 1.2,
+	"move_speed": 15.0,
+	"body_damage": 2.0,
 	
 	#Health & Regen
-	"max_health": 1.1,
-	"regen_speed": 0.9,
-	"regen_amount": 1.1,
+	"max_health": 20.0,
+	"regen_speed": -0.05,
+	"regen_amount": 1.0,
 	
 	#Ranged
-	"projectile_damage": 1.1,
-	"projectile_speed": 1.1,
-	"reload_speed": 0.9,
-	"accuracy": 1.1,
+	"projectile_damage": 4.0,
+	"projectile_speed": 10.0,
+	"reload_speed": -0.015,
+	"accuracy": 5.0,
 	
 	#Melee
-	"melee_damage": 1.1,
-	"melee_knockback": 1.1,
-	"melee_cooldown": 0.9,
+	"melee_damage": 6.0,
+	"melee_knockback": 80.0,
+	"melee_cooldown": -0.01,
 	
 	#Area
-	"area_damage": 1.1,
-	"area_knockback": 1.1,
-	"area_radius": 1.1,
-	"area_cooldown": 0.9,
+	"area_damage": 7.5,
+	"area_knockback": 120.0,
+	"area_radius": 50.0,
+	"area_cooldown": -0.1,
 	
 	#Teleport
-	"teleport_cooldown": 0.9,
-	"teleport_range": 1.1,
+	"teleport_range": 100.0,
+	"teleport_cooldown": -0.1,
 
 	#Illusion
-	"illusion_cooldown": 0.9,
-	"illusion_duration": 1.2,
-	"illusion_amount": 1.2,
+	"illusion_cooldown": -0.8,
+	"illusion_duration": 0.5,
+	"illusions_count": 1.0,
 
 	#Stealth
-	"stealth_cooldown": 0.9,
-	"stealth_duration": 1.2,
+	"stealth_cooldown": -0.6,
+	"stealth_duration": 0.4,
 	
 	#Spawning
-	"spawner_cooldown": 0.9,
-	"max_spawns": 1.4,
+	"spawner_cooldown": -0.6,
+	"max_spawns": 1.0,
 	
 	#Shield
-	"shield_health": 1.2
-}
-
-# How levelled a stat is
-var stat_levels: Dictionary = {
-	"move_speed": 1,
-	"body_damage": 1,
+	"shield_health": 20.0,
 	
-	#Health & Regen
-	"max_health": 1,
-	"regen_speed": 1,
-	"regen_amount": 1,
-	
-	#Ranged
-	"projectile_damage": 1,
-	"projectile_speed": 1,
-	"reload_speed": 1,
-	"accuracy": 1,
-	
-	#Melee
-	"melee_damage": 1,
-	"melee_knockback": 1,
-	"melee_cooldown": 1,
-	
-	#Area
-	"area_damage": 1,
-	"area_knockback": 1,
-	"area_radius": 1,
-	"area_cooldown": 1,
-	
-	#Teleport
-	"teleport_cooldown": 1,
-	"teleport_range": 1,
-	
-	#Illusion
-	"illusion_cooldown": 1,
-	"illusion_duration": 1,
-	"illusions_count": 1,
-
-	#Stealth
-	"stealth_cooldown": 1,
-	"stealth_duration": 1,
-	
-	#Spawning
-	"spawner_cooldown": 1,
-	"max_spawns": 1,
-
 	#Healing
-	"mass_heal_amount": 1,
-	"healing_cooldown": 1,
+	"mass_heal_amount": 15.0,
+	"mass_heal_cooldown": -0.2,
 
 	#WOF
-	"max_cooldown": 1,
-	"max_length": 1,
-	"max_damage": 1,
+	"wof_cooldown": -0.5,
+	"wof_length": 40.0,
+	"wof_damage": 5.0
+}
 
-	#Shield
-	"shield_health": 1
+# Tracks the current upgrade level for every entity attribute.
+var stat_levels: Dictionary = {
+	"move_speed": 0,
+	"body_damage": 0,
+	"max_health": 0,
+	"regen_speed": 0,
+	"regen_amount": 0,
+	"projectile_damage": 0,
+	"projectile_speed": 0,
+	"reload_speed": 0,
+	"accuracy": 0,
+	"melee_damage": 0,
+	"melee_knockback": 0,
+	"melee_cooldown": 0,
+	"area_damage": 0,
+	"area_knockback": 0,
+	"area_radius": 0,
+	"area_cooldown": 0,
+	"teleport_cooldown": 0,
+	"teleport_range": 0,
+	"illusion_cooldown": 0,
+	"illusion_duration": 0,
+	"illusions_count": 0,
+	"stealth_cooldown": 0,
+	"stealth_duration": 0,
+	"spawner_cooldown": 0,
+	"max_spawns": 0,
+	"mass_heal_amount": 0,
+	"mass_heal_cooldown": 0,
+	"wof_cooldown": 0,
+	"wof_length": 0,
+	"wof_damage": 0,
+	"shield_health": 0
 }
 
 # Grants score and initiates level up verification.
@@ -203,34 +191,41 @@ func request_upgrade(stat_name: String) -> void:
 # Updates stat multipliers and refreshes the entity's base attributes.
 func apply_upgrade(button_info: String) -> void:
 	if pending_upgrades > 0:
-		pending_upgrades -= 1
 		
 		var stat_name: String = button_info.split(" ")[0]
 		
 		print("Stat b4: " + str(stat_levels[stat_name]))
+
+		if stat_levels[stat_name] >= 10:
+			printerr("Stat is maxed")
+			return
+
+		pending_upgrades -= 1
 		stat_levels[stat_name] += 1
+
 		print("Stat after: " + str(stat_levels[stat_name]))
+
+		if stat_levels[stat_name] == 10:
+			if not maxed_stats_list.has(stat_name):
+				maxed_stats_list.append(stat_name)
+				print("Added to max stats")
 
 		var promo: PromotionComponent = entity.get_node("Components/PromotionComponent") as PromotionComponent
 		promo.apply_promotion_stats(entity.get("current_class"))
 		
 		var ui_comp = entity.get_node_or_null("UIComponent")
 
-		if promo.is_stat_maxed(stat_name):
-			printerr("Trying to upgrade manual but maxed: " + stat_name)
-			pending_upgrades += 1
-			trigger_upgrade_ui.rpc_id(multiplayer.get_remote_sender_id(), pending_upgrades) # Re show the stat - this shouldnt happen
-			
-			if entity.is_in_group("player") and ui_comp:
-				ui_comp.display_message.rpc_id(entity.name.to_int(), "ERROR MAX: " + stat_name)
-			
 		if entity.is_in_group("player"):
 			if pending_upgrades > 0: 
 				trigger_upgrade_ui.rpc_id(multiplayer.get_remote_sender_id(), pending_upgrades)
 
 			if ui_comp:
 				ui_comp.display_message.rpc_id(entity.name.to_int(), "Upgraded: " + stat_name)
-			
+
+# If a stat is maxed out
+func is_stat_maxed(stat_name: String) -> bool:
+	return stat_name in maxed_stats_list
+
 # Spawns or updates a floating, vanishing label on all clients to stack level changes dynamically from the base position.
 @rpc("authority", "call_local", "unreliable")
 func spawn_floating_text(amount: int) -> void:

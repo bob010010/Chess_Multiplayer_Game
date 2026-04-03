@@ -248,9 +248,17 @@ corner_radius_bottom_left = 12
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xyotm"]
 bg_color = Color(0.12156863, 0.12156863, 0.12156863, 0.5529412)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ootfv"]
 bg_color = Color(0.9490196, 0.3647059, 0.8901961, 0.5529412)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4ge2x"]
 bg_color = Color(0.12156863, 0.12156863, 0.12156863, 0.5529412)
@@ -435,6 +443,41 @@ offset_bottom = 45.0
 layout_mode = 2
 alignment = 1
 
+[node name="FirstAbilityBar" type="ProgressBar" parent="HUD" unique_id=980408302]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -99.0
+offset_top = -70.0
+offset_right = 101.0
+offset_bottom = -40.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_styles/background = SubResource("StyleBoxFlat_xyotm")
+theme_override_styles/fill = SubResource("StyleBoxFlat_ootfv")
+show_percentage = false
+script = ExtResource("10_ktvaa")
+metadata/_custom_type_script = "uid://2lr61aueyl58"
+
+[node name="SecondAbilityBar" type="ProgressBar" parent="HUD" unique_id=875392124]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -100.0
+offset_top = -30.0
+offset_right = 100.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_styles/background = SubResource("StyleBoxFlat_4ge2x")
+theme_override_styles/fill = SubResource("StyleBoxFlat_ktvaa")
+show_percentage = false
+script = ExtResource("10_ktvaa")
+metadata/_custom_type_script = "uid://2lr61aueyl58"
+
 [node name="UI" type="Control" parent="." unique_id=72954873]
 layout_mode = 3
 anchors_preset = 0
@@ -446,38 +489,6 @@ layout_mode = 0
 offset_left = -60.0
 offset_top = 108.0
 offset_bottom = 123.0
-
-[node name="FirstAbilityBar" type="ProgressBar" parent="UI" unique_id=980408302]
-layout_mode = 1
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -120.0
-offset_top = -250.0
-offset_right = 80.0
-offset_bottom = -220.0
-grow_horizontal = 2
-theme_override_styles/background = SubResource("StyleBoxFlat_xyotm")
-theme_override_styles/fill = SubResource("StyleBoxFlat_ootfv")
-show_percentage = false
-script = ExtResource("10_ktvaa")
-metadata/_custom_type_script = "uid://2lr61aueyl58"
-
-[node name="SecondAbilityBar" type="ProgressBar" parent="UI" unique_id=875392124]
-layout_mode = 1
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -120.0
-offset_top = -300.0
-offset_right = 80.0
-offset_bottom = -270.0
-grow_horizontal = 2
-theme_override_styles/background = SubResource("StyleBoxFlat_4ge2x")
-theme_override_styles/fill = SubResource("StyleBoxFlat_ktvaa")
-show_percentage = false
-script = ExtResource("10_ktvaa")
-metadata/_custom_type_script = "uid://2lr61aueyl58"
 
 [node name="ReloadBar" type="ProgressBar" parent="UI" unique_id=894808094]
 layout_mode = 0

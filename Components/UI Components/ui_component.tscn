@@ -1,0 +1,7 @@
+[gd_scene format=3 uid="uid://c6y00jabt5ta6"]
+
+[ext_resource type="Script" uid="uid://cahv5ok88vqx6" path="res://Components/UI Components/ui_component.gd" id="1_85wb6"]
+
+[node name="UIComponent" type="Node2D" unique_id=1301694338]
+visible = false
+script = ExtResource("1_85wb6")

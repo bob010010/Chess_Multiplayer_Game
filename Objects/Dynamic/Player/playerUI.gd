@@ -1,6 +1,5 @@
-extends Node2D
+extends UIComponent
 
-@onready var entity: CharacterBody2D = get_parent()
 @onready var hud: CanvasLayer = $"../HUD"
 @onready var ui_container = $"../UI"
 
@@ -38,9 +37,8 @@ var current_second_ability: String
 @onready var leaderboard_container: VBoxContainer = $"../HUD/LBContainer/Leaderboard"
 @export var lb_entry_scene: PackedScene
 
-@onready var first_ability_bar: EntityBar = $"../UI/FirstAbilityBar"
-@onready var second_ability_bar: EntityBar = $"../UI/SecondAbilityBar"
-
+@onready var first_ability_bar: EntityBar = $"../HUD/FirstAbilityBar"
+@onready var second_ability_bar: EntityBar = $"../HUD/SecondAbilityBar"
 var abil_1_last_cd: float = 0.0
 var abil_2_last_cd: float = 0.0
 
@@ -166,52 +164,6 @@ func update_leaderboard_ui(entries: Array) -> void:
 				
 			leaderboard_container.add_child(entry)
 
-# Displays a message above the player
-@rpc("any_peer", "call_local", "reliable")
-func display_message(message: String, pos_offset: Vector2 = Vector2(-100.0, -200.0), font_size: int = 70, override_color: Color = Color(0, 0, 0, 0), duration: float = 1.0) -> void:
-	var label: Label = Label.new()
-	add_child(label)
-	print("Message: " + message)
-	var text: String = ""
-	var colour: Color
-	
-	if message.contains("Upgraded"):
-		text = NameUtils.format_stat_name(message)
-		colour = ColourUtils.get_colour_based_on_type(message.split(" ")[1])
-	elif message.contains("Promoted"):
-		text = message
-		colour = Color(0.0, 1.0, 0.0, 1.0)
-	else:
-		text = message
-		colour = override_color if override_color.a > 0.0 else Color(0.965, 0.0, 0.0, 1.0)
-
-	label.text = text
-	label.modulate = colour
-
-	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	label.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
-	
-	label.add_theme_font_size_override("font_size", font_size)
-	
-	var vertical_offset: float = pos_offset.y * entity.scale.y
-	
-	label.global_position = entity.global_position + Vector2(pos_offset.x, vertical_offset)
-	
-	var tween: Tween = create_tween()
-	tween.set_parallel(true)
-
-	tween.tween_property(label, "global_position:y", label.global_position.y - 50.0, 1.0).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-	
-	label.scale = Vector2(0.5, 0.5)
-	tween.tween_property(label, "scale", Vector2(1.2, 1.2), 0.1)
-	tween.chain().tween_property(label, "scale", Vector2(1.0, 1.0), 0.2)
-	
-	var fade_tween: Tween = create_tween()
-	fade_tween.tween_interval(duration)
-	fade_tween.tween_property(label, "modulate:a", 0.0, 2.0)
-
-	tween.chain().tween_callback(label.queue_free)
-
 # Updates the debug info display.
 func _process(_delta: float) -> void:
 	if entity.name == str(multiplayer.get_unique_id()): 
@@ -222,24 +174,27 @@ func _process(_delta: float) -> void:
 func ability_cooldown_bars():
 	if first_ability_component != null and current_first_ability != "None":
 		handle_ability_bar(first_ability_component, first_ability_bar, abil_1_last_cd)
-	
+	else:
+		first_ability_bar.hide()
+		
 	if second_ability_component != null and current_second_ability != "None":
 		handle_ability_bar(second_ability_component, second_ability_bar, abil_2_last_cd)
-	
+	else:
+		second_ability_bar.hide()
+
+
 func handle_ability_bar(ability_comp: Node2D, ability_bar: EntityBar, last_cd: float):
 	var current_cd: float = float(ability_comp.current_cooldown)
 	var max_cd: float = float(ability_comp.max_cooldown)
 	
 	if current_cd > 0.0 and current_cd > last_cd:
-		show()
+		ability_bar.show()
 		ability_bar.value = current_cd
 		ability_bar.animate_value(0.0, max_cd, current_cd)
 	elif current_cd <= 0.0:
-		hide()
+		ability_bar.hide()
 		
 	last_cd = current_cd
-
-
 
 # Compiles and displays internal entity variables to the local HUD.
 func show_debug_info() -> void:

@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://da682bbtqwx87" path="res://Objects/Static/Food/food.gd" id="1_8txok"]
 [ext_resource type="PackedScene" uid="uid://b0tv68ilswjsh" path="res://UI/Bars/Health Bar/health_bar.tscn" id="2_pohk7"]
 [ext_resource type="PackedScene" uid="uid://bah68f313cuc3" path="res://Components/Health Component/health_component.tscn" id="3_ksbt4"]
+[ext_resource type="PackedScene" uid="uid://c6y00jabt5ta6" path="res://Components/UI Components/ui_component.tscn" id="4_g2ilh"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_4x0hx"]
 radius = 15.0
@@ -33,6 +34,8 @@ replication_config = SubResource("SceneReplicationConfig_8txok")
 [node name="Components" type="Node2D" parent="." unique_id=1416323552]
 
 [node name="HealthComponent" parent="Components" unique_id=421527654 instance=ExtResource("3_ksbt4")]
+
+[node name="UIComponent" parent="." unique_id=1301694338 instance=ExtResource("4_g2ilh")]
 
 [node name="UI" type="Control" parent="." unique_id=843464970]
 layout_mode = 3

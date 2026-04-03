@@ -137,7 +137,9 @@ func request_level_up_math() -> void:
 	
 	while points >= next_level_points:
 		entity_level += 1
-		spawn_floating_text.rpc(1)
+		var ui_comp: Node2D = entity.get_node_or_null("UIComponent")
+		if is_instance_valid(ui_comp):
+			ui_comp.spawn_floating_number.rpc(1, "level")
 		
 		var leftover: int = points - next_level_points
 		
@@ -172,8 +174,7 @@ func _npc_auto_upgrade() -> void:
 	var curr_class: String = entity.current_class
 	var valid_stats_dict: Dictionary = promo_comp.class_base_stats[curr_class] # The base stats
 	var available_choices: Array = valid_stats_dict.keys() # The stats the class has
-	#print(str(available_choices))
-	available_choices = available_choices.filter(func(stat): return not promo_comp.is_stat_maxed(stat)) # Remove any stats that are already maxed
+	available_choices = available_choices.filter(func(stat): return not is_stat_maxed(stat)) # Remove any stats that are already maxed
 			
 	if not available_choices.is_empty():
 		var chosen: String = available_choices.pick_random()
@@ -225,32 +226,6 @@ func apply_upgrade(button_info: String) -> void:
 # If a stat is maxed out
 func is_stat_maxed(stat_name: String) -> bool:
 	return stat_name in maxed_stats_list
-
-# Spawns or updates a floating, vanishing label on all clients to stack level changes dynamically from the base position.
-@rpc("authority", "call_local", "unreliable")
-func spawn_floating_text(amount: int) -> void:
-	if not entity:
-		return
-
-	var vertical_offset: float = -20.0 * entity.scale.y
-	var random_offset_x: float = randf_range(-15.0, 15.0) - 18.0 
-	var label: Label = Label.new()
-	
-	label.top_level = true
-	label.text = "+" + str(amount)
-	label.add_theme_font_size_override("font_size", 30)
-	label.modulate = Color(0.0, 0.0, 1.0, 1.0)
-	
-	label.global_position = entity.global_position + Vector2(random_offset_x, vertical_offset)
-	
-	entity.add_child(label)
-	
-	var tween: Tween = create_tween()
-	tween.set_parallel(true)
-	tween.tween_property(label, "global_position:y", label.global_position.y - 50.0, 1.0).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-	tween.tween_property(label, "scale", Vector2(0.5, 0.5), 1.0).from(Vector2(1.5, 1.5)).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-	tween.tween_property(label, "modulate:a", 0.0, 1.0).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
-	tween.chain().tween_callback(label.queue_free)
 
 # Commands the local client to open the upgrade selection interface via signal.
 @rpc("authority", "call_local", "reliable")

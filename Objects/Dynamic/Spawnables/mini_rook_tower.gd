@@ -12,8 +12,8 @@ var team_id: int = -1
 func initialise(creator_id: String, creator_team: int) -> void:
 	owner_peer_id = creator_id
 	team_id = creator_team
-	$TeamLabel.text = str(team_id)
-	$TeamLabel.add_theme_font_size_override("font_size", 40)
+	$UI/TeamLabel.text = str(team_id)
+	$UI/TeamLabel.add_theme_font_size_override("font_size", 40)
 	add_to_group("tower")
 	
 	if not health_component.died.is_connected(on_tower_died):

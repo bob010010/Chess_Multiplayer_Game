@@ -1,6 +1,5 @@
-extends Node2D
+extends UIComponent
 
-@onready var entity: CharacterBody2D = get_parent()
 
 @onready var name_label: Label = $"../UI/Name"
 @onready var health_bar: ProgressBar = $"../UI/HealthBar"

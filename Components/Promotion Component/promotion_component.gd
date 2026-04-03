@@ -572,6 +572,7 @@ func _apply_ability_stats(slot_key: String, a_node: Node, b_dict: Dictionary, lv
 		"Illusion":
 			if b_dict.has("illusion_cooldown"): a_node.max_cooldown = calc.call("illusion_cooldown")
 			if b_dict.has("illusions_count"): a_node.illusions_count = int(calc.call("illusions_count"))
+			if b_dict.has("illusion_duration"): a_node.illusion_duration = calc.call("illusion_duration")
 		"Stealth":
 			if b_dict.has("stealth_cooldown"): a_node.max_cooldown = calc.call("stealth_cooldown")
 			if b_dict.has("stealth_duration"): a_node.stealth_duration = calc.call("stealth_duration")

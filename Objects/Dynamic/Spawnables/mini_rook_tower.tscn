@@ -5,6 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://bah68f313cuc3" path="res://Components/Health Component/health_component.tscn" id="1_jxjvf"]
 [ext_resource type="PackedScene" uid="uid://b0tv68ilswjsh" path="res://UI/Bars/Health Bar/health_bar.tscn" id="3_41amo"]
 [ext_resource type="PackedScene" uid="uid://drldjkjxrdrg" path="res://Components/Weapon Components/Ranged Weapon Components/Bow Component/bow_component.tscn" id="3_2373d"]
+[ext_resource type="PackedScene" uid="uid://c6y00jabt5ta6" path="res://Components/UI Components/ui_component.tscn" id="5_dssrb"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_j1h6l"]
 size = Vector2(82, 75)
@@ -55,6 +56,9 @@ position = Vector2(0, 4.9999995)
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=168763180]
 replication_config = SubResource("SceneReplicationConfig_2373d")
+
+[node name="UIComponent" parent="." unique_id=1301694338 instance=ExtResource("5_dssrb")]
+scale = Vector2(0.99999994, 0.99999994)
 
 [node name="UI" type="Control" parent="." unique_id=1382521903]
 layout_mode = 3

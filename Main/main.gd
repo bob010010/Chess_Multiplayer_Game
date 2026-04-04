@@ -300,10 +300,11 @@ func request_respawn() -> void:
 		old_player.name = str(sender_id) + "_dying_" + str(Time.get_ticks_msec())
 		old_player.queue_free()
 	
-	var previous_score: int = dead_scores_dict.get(str(sender_id))
-	if previous_score:
+	var previous_score = dead_scores_dict.get(str(sender_id))
+	if previous_score != null:
 		$SpawnedPlayers.add_player(sender_id, previous_score)
 		dead_scores_dict.erase(sender_id)
 	else:
+		print(str(sender_id) + " Had no score on death")
 		$SpawnedPlayers.add_player(sender_id)
 	

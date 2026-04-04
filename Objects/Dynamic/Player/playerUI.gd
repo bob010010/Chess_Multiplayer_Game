@@ -45,25 +45,22 @@ var current_second_ability: String
 
 func _ready() -> void:
 	name_label.text = entity.name
+	ui_container.show()
+	reload_bar.hide()
+	melee_bar.hide()
+	first_ability_bar.hide()
+	second_ability_bar.hide()
+	
 	if entity.name == str(multiplayer.get_unique_id()):
 		leveling_component.show_upgrade_menu.connect(_show_upgrade_menu)
 		promotion_component.show_promotion_menu.connect(_show_promotion_menu)
 		hud.show() 
-		first_ability_bar.hide()
-		second_ability_bar.hide()
-		reload_bar.hide()
-		melee_bar.hide()
-		ui_container.show()
 		upgrade_UI.hide()
 		promotion_UI.hide()
-
-	else: # Hides all UI for other players
+	else: # Hides these for other players
 		hud.hide()
-		ui_container.hide()
 		upgrade_UI.hide()
 		promotion_UI.hide()
-
-	toggle_external_ui(false) # Shows external UIs (Health, name) for other players
 
 # Toggles the visibility of identifying UI elements specifically for other players
 func toggle_external_ui(is_hidden: bool) -> void:
@@ -231,153 +228,114 @@ func trigger_ability_ui(ability_name: String, max_cooldown: float, is_secondary:
 		if bar.bar_tween:
 			bar.bar_tween.finished.connect(func() -> void: if is_instance_valid(bar): bar.hide())
 
-# Updates the debug info display.
+# Processes server-side debug compilation and transmits formatted strings to the owner client.
 func _process(_delta: float) -> void:
-	if entity.name == str(multiplayer.get_unique_id()): 
-		show_debug_info()
+	if multiplayer.is_server():
+		_server_compile_debug_info()
 
-# Compiles and displays internal entity variables to the local HUD.
-func show_debug_info() -> void:
-	
-	#POSITION AND SPEED
-	var pos_text: String = "Position: " + str(Vector2(int(entity.position.x), int(entity.position.y))) + "\n"
-	var speed_text: String = "Speed: " + str(movement_component.move_speed) + "\n\n"
-
-	#HEALTH
-	var max_health_text: String = "Max Health: " + str(health_component.max_health) + "\n"
-	var health_text: String = "Health: " + str(health_component.health) + "\n"
-	var regen_amount_text: String = "Regen Amount: " + str(health_component.regen_amount) + "\n"
-	var regen_speed_text: String = "Regen Speed: " + str(health_component.regen_speed) + "\n"
-	var regen_cooldown_text: String = "Regen Cooldown: " + str(snapped(health_component.regen_cooldown, 0.1)) + "\n\n"
-	
-	#KNOCKBACK AND BODY DAMAGE
-	var kb_text: String = "Knockback: " + str(Vector2(int(entity.knockback.x), int(entity.knockback.y))) + "\n"
-	var body_dmg_text: String = "Body Damage: " + str(entity.body_damage) + "\n\n"
-	
-	stats_label_one.text = max_health_text + health_text + regen_amount_text + regen_speed_text + regen_cooldown_text + pos_text + speed_text + kb_text + body_dmg_text
-	
-	#RANGED COMBAT
-	if ranged_w_component:
-		var projectile_dmg_text: String = "Projectile Damage: " + str(ranged_w_component.projectile_damage) + "\n"
-		var projectile_speed_text: String = "Projectile Speed: " + str(ranged_w_component.projectile_speed) + "\n\n"
-		var reload_time_text: String = "Reload Time: " + str(ranged_w_component.reload_speed)+ "\n"
-		var cooldown_text: String = "Cooldown: " + str(snapped(ranged_w_component.shot_cooldown, 0.01)) + "\n"
-		var accuracy_text: String = "Accuracy: " + str(snapped(ranged_w_component.accuracy, 0.01)) + "\n\n"
-		stats_label_one.text += projectile_dmg_text + projectile_speed_text + reload_time_text + cooldown_text + accuracy_text
-	else:
-		var no_ranged_text: String = "No Ranged Weapon" + "\n" + "\n"
-		stats_label_one.text += no_ranged_text
-	
-	#MELEE COMBAT
-	if melee_w_component:
-		var melee_dmg_text: String = "Melee Damage: " + str(melee_w_component.melee_damage) + "\n"
-		var melee_kb_text: String = "Melee Knockback: " + str(melee_w_component.knockback_force) + "\n"
-		var melee_cooldown_text: String = "Melee Cooldown: " + str(melee_w_component.attack_cooldown) + "\n"
-		var melee_duration_text: String = "Melee Attack Duration: " + str(melee_w_component.attack_duration) + "\n"
-		var melee_has_hit_text: String = "Melee Has Hit: " + str(melee_w_component.has_hit) + "\n\n"
-		stats_label_one.text += melee_dmg_text + melee_kb_text + melee_cooldown_text + melee_duration_text + melee_has_hit_text
-	else:
-		var no_melee_text: String = "No Melee Weapon"  + "\n" + "\n"
-		stats_label_one.text += no_melee_text
-
-	# FIRST ABILITY
-	if first_ability_component:
-		match current_first_ability:
-			"Magic":
-				var area_damage_text: String = "Area Damage: " + str(first_ability_component.area_damage) + "\n"
-				var area_kb_text: String = "Area Knockback: " + str(first_ability_component.knockback_force) + "\n"
-				var area_radius_text: String = "Area Radius: " + str(first_ability_component.max_radius) + "\n"
-				var area_cooldown_text: String = "Area Cooldown: " + str(first_ability_component.area_cooldown) + "\n\n"
-				stats_label_two.text = area_damage_text + area_kb_text + area_radius_text + area_cooldown_text
-			"Teleport":
-				var tele_cooldown_text: String = "Teleport Cooldown: " + str(first_ability_component.teleport_cooldown) + "\n"
-				var tele_duration_text: String = "Til next: " + str(snapped(first_ability_component.current_cooldown, 0.1)) + "\n"
-				var tele_range_text: String = "Teleport Range: " + str(first_ability_component.max_range) + "\n\n"
-				stats_label_two.text = tele_cooldown_text + tele_duration_text + tele_range_text
-			"Illusion":
-				var illu_cooldown_text: String = "Illusion Cooldown: " + str(first_ability_component.illusion_cooldown) + "\n"
-				var illu_duration_text: String = "Illusion Duration: " + str(first_ability_component.illusion_duration) + "\n"
-				var illu_time_text: String = "Til next: " + str(snapped(first_ability_component.current_cooldown, 0.1)) + "\n"
-				var illu_amount_text: String = "Illusion Amount: " + str(first_ability_component.illusions_count) + "\n\n"
-				stats_label_two.text = illu_cooldown_text + illu_time_text + illu_duration_text + illu_amount_text
-			"Stealth":
-				var stealth_cd_text: String = "Stealth Cooldown: " + str(first_ability_component.stealth_cooldown) + "\n"
-				var stealth_dur_text: String = "Stealth Duration: " + str(first_ability_component.stealth_duration) + "\n"
-				var stealth_time_text: String = "Til next: " + str(snapped(first_ability_component.current_cooldown, 0.1)) + "\n\n"
-				stats_label_two.text = stealth_cd_text + stealth_dur_text + stealth_time_text
-			"Spawner":
-				var spawner_cd_text: String = "Spawner Cooldown: " + str(first_ability_component.spawner_cooldown) + "\n"
-				var spawner_time_text: String = "Til next: " + str(snapped(first_ability_component.current_cooldown, 0.1)) + "\n"
-				var spawner_spawns_text: String = "Current spawns: " + str(first_ability_component.current_spawns) + "\n"
-				var spawner_max_spawns_text: String = "Max spawns: " + str(first_ability_component.max_spawns) + "\n\n"
-				stats_label_two.text = spawner_cd_text + spawner_time_text + spawner_spawns_text + spawner_max_spawns_text
-			"Teleport_Crush":
-				var tpc_damage_text: String = "Teleport Damage: " + str(first_ability_component.area_damage) + "\n"
-				var tpc_kb_text: String = "Teleport Knockback: " + str(first_ability_component.knockback_force) + "\n"
-				var tpc_radius_text: String = "Teleport AoE Radius: " + str(first_ability_component.max_radius) + "\n"
-				var tpc_cooldown_text: String = "Teleport Cooldown: " + str(first_ability_component.tp_crush_cooldown) + "\n"
-				var tpc_time_text: String = "Til next: " + str(snapped(first_ability_component.current_cooldown, 0.1)) + "\n"
-				var tpc_range_text: String = "Teleport Range: " + str(first_ability_component.max_range) + "\n\n"
-				stats_label_two.text = tpc_damage_text + tpc_kb_text + tpc_radius_text + tpc_cooldown_text + tpc_time_text + tpc_range_text
-			"WOF":
-				var wof_cd_text = "WOF Cooldown: " + str(first_ability_component.wof_cooldown) + "\n"
-				var wof_time_text: String = "Til next: " + str(snapped(first_ability_component.current_cooldown, 0.1)) + "\n"
-				var wof_length_text: String = "Max Length: " + str(snapped(first_ability_component.max_length, 0.1)) + "\n"
-				var wof_damage_text = "WOF Max Damage: " + str(first_ability_component.max_damage) + "\n\n"
-				stats_label_two.text = wof_cd_text + wof_time_text + wof_length_text + wof_damage_text
-			"Mass_Heal":
-				var heal_cd_text = "Heal Cooldown: " + str(first_ability_component.mass_heal_cooldown) + "\n"
-				var heal_time_text: String = "Til next: " + str(snapped(first_ability_component.current_cooldown, 0.1)) + "\n"
-				var heal_amount_text = "Heal Amount: " + str(first_ability_component.mass_heal_amount) + "\n\n"
-				stats_label_two.text = heal_cd_text + heal_time_text + heal_amount_text
-	else:
-		var no_ability_text: String = "No First Ability" + "\n" + "\n"
-		stats_label_two.text = no_ability_text
-	
-	if second_ability_component:
-		match current_second_ability:
-			"Spawner":
-				var spawner_cd_text: String = "Spawner Cooldown: " + str(second_ability_component.spawner_cooldown) + "\n"
-				var spawner_time_text: String = "Til next: " + str(snapped(second_ability_component.current_cooldown, 0.1)) + "\n"
-				var spawner_spawns_text: String = "Current spawns: " + str(second_ability_component.current_spawns) + "\n"
-				var spawner_max_spawns_text: String = "Max spawns: " + str(second_ability_component.max_spawns) + "\n\n"
-				stats_label_two.text += spawner_cd_text + spawner_time_text + spawner_spawns_text + spawner_max_spawns_text
-			"Mass_Heal":
-				var heal_cd_text = "Heal Cooldown: " + str(second_ability_component.mass_heal_cooldown) + "\n"
-				var heal_time_text: String = "Til next: " + str(snapped(second_ability_component.current_cooldown, 0.1)) + "\n"
-				var heal_amount_text = "Heal Amount: " + str(second_ability_component.mass_heal_amount) + "\n\n"
-				stats_label_two.text += heal_cd_text + heal_time_text + heal_amount_text
-			"WOF":
-				var wof_cd_text = "WOF Cooldown: " + str(second_ability_component.wof_cooldown) + "\n"
-				var wof_time_text: String = "Til next: " + str(snapped(second_ability_component.current_cooldown, 0.1)) + "\n"
-				var wof_length_text: String = "Max Length: " + str(snapped(second_ability_component.max_length, 0.1)) + "\n"
-				var wof_damage_text = "WOF Max Damage: " + str(second_ability_component.max_damage) + "\n\n"
-				stats_label_two.text += wof_cd_text + wof_time_text + wof_length_text + wof_damage_text
-	else:
-		var no_ability_text: String = "No Second Ability" + "\n" + "\n"
-		stats_label_two.text += no_ability_text
+# Gathers all internal entity and component variables on the server to format the HUD strings.
+func _server_compile_debug_info() -> void:
+	if not entity.is_in_group("player"):
+		return
 		
-	# SHIELD
-	if shield_component:
-		var max_shield_health_text = "Max Shield Health: " + str(shield_component.max_shield_health) + "\n"
-		var shield_health_text = "Shield Health: " + str(shield_component.shield_health) + "\n"
-		var duration_text = "Total Shield Duration: " + str(shield_component.active_duration) + "\n\n"
-		stats_label_two.text += max_shield_health_text + shield_health_text + duration_text
-	else:
-		var no_shield_text: String = "No Shield" + "\n" + "\n"
-		stats_label_two.text += no_shield_text
+	var peer_id: int = entity.name.to_int()
 	
-	#PROMOTIONS AND UPGRADES
-	var pending_upgrades_text: String = "Pending upgrades: " + str(leveling_component.pending_upgrades) + "\n"
-	var pending_promotions_text: String = "Pending Promotions: " + str(promotion_component.pending_promotions) + "\n"
-	# Down the right side
-	stats_label_two.text += pending_upgrades_text + pending_promotions_text
+	var stats_1: String = "Position: " + str(Vector2(int(entity.position.x), int(entity.position.y))) + "\n"
+	stats_1 += "Speed: " + str(movement_component.get("move_speed")) + "\n\n"
 
-	#POINTS AND LEVELLING
-	var entity_level_text: String = "Level: " + str(leveling_component.entity_level)
-	var next_level_points_text: String = "    Points for next: " + str(leveling_component.next_level_points)
-	var points_text: String = "    Points: " + str(leveling_component.points) 
-	var score_text: String = "    Score: " + str(leveling_component.total_score)
+	stats_1 += "Max Health: " + str(health_component.max_health) + "\n"
+	stats_1 += "Health: " + str(int(health_component.health)) + "\n"
+	stats_1 += "Regen Amount: " + str(health_component.regen_amount) + "\n"
+	stats_1 += "Regen Speed: " + str(health_component.regen_speed) + "\n"
+	stats_1 += "Regen Cooldown: " + str(snapped(health_component.regen_cooldown, 0.1)) + "\n\n"
+	
+	stats_1 += "Knockback: " + str(Vector2(int(entity.knockback.x), int(entity.knockback.y))) + "\n"
+	stats_1 += "Body Damage: " + str(entity.body_damage) + "\n\n"
+	
+	if is_instance_valid(ranged_w_component):
+		stats_1 += "Proj Dmg: " + str(ranged_w_component.projectile_damage) + "\n"
+		stats_1 += "Proj Spd: " + str(ranged_w_component.projectile_speed) + "\n"
+		stats_1 += "Reload: " + str(ranged_w_component.reload_speed) + "\n"
+		stats_1 += "Cooldown: " + str(snapped(ranged_w_component.shot_cooldown, 0.01)) + "\n"
+		stats_1 += "Acc: " + str(snapped(ranged_w_component.accuracy, 0.01)) + "\n\n"
+	else:
+		stats_1 += "No Ranged Weapon\n\n"
+	
+	if is_instance_valid(melee_w_component):
+		stats_1 += "Melee Dmg: " + str(melee_w_component.melee_damage) + "\n"
+		stats_1 += "Melee KB: " + str(melee_w_component.knockback_force) + "\n"
+		stats_1 += "Melee CD: " + str(melee_w_component.attack_cooldown) + "\n"
+		stats_1 += "Melee Dur: " + str(melee_w_component.attack_duration) + "\n"
+		stats_1 += "Has Hit: " + str(melee_w_component.has_hit) + "\n\n"
+	else:
+		stats_1 += "No Melee Weapon\n\n"
 
-	# Below the level bar
-	level_label.text = entity_level_text + next_level_points_text + points_text + score_text
+	var stats_2: String = _get_ability_debug_text(first_ability_component, current_first_ability, "Ability 1")
+	stats_2 += _get_ability_debug_text(second_ability_component, current_second_ability, "Ability 2")
+		
+	if is_instance_valid(shield_component):
+		stats_2 += "Max Shield HP: " + str(shield_component.get("max_shield_health")) + "\n"
+		stats_2 += "Shield HP: " + str(shield_component.get("shield_health")) + "\n"
+		stats_2 += "Shield Duration: " + str(shield_component.get("active_duration")) + "\n\n"
+	else:
+		stats_2 += "No Shield\n\n"
+	
+	stats_2 += "Pending Upgrades: " + str(leveling_component.pending_upgrades) + "\n"
+	stats_2 += "Pending Promos: " + str(promotion_component.pending_promotions) + "\n"
+
+	var level_text: String = "Lvl: " + str(leveling_component.entity_level)
+	level_text += "  Next: " + str(leveling_component.next_level_points)
+	level_text += "  Pts: " + str(leveling_component.points) 
+	level_text += "  Score: " + str(leveling_component.total_score)
+
+	update_debug_labels.rpc_id(peer_id, stats_1, stats_2, level_text)
+
+# Returns a formatted string containing all specific stat variables for a given ability component.
+func _get_ability_debug_text(comp: Node2D, type_name: String, slot_label: String) -> String:
+	if not is_instance_valid(comp) or type_name == "None":
+		return slot_label + ": None\n\n"
+		
+	var text: String = slot_label + ": " + type_name + "\n"
+	text += "Til Next: " + str(snapped(comp.get("current_cooldown"), 0.1)) + "\n"
+	
+	match type_name:
+		"Magic":
+			text += "Area Dmg: " + str(comp.get("area_damage")) + "\n"
+			text += "Area KB: " + str(comp.get("knockback_force")) + "\n"
+			text += "Area Radius: " + str(comp.get("max_radius")) + "\n"
+			text += "Area CD: " + str(comp.get("area_cooldown")) + "\n"
+		"Teleport":
+			text += "Tele CD: " + str(comp.get("teleport_cooldown")) + "\n"
+			text += "Tele Range: " + str(comp.get("max_range")) + "\n"
+		"Illusion":
+			text += "Illu CD: " + str(comp.get("illusion_cooldown")) + "\n"
+			text += "Illu Dur: " + str(comp.get("illusion_duration")) + "\n"
+			text += "Illu Count: " + str(comp.get("illusions_count")) + "\n"
+		"Stealth":
+			text += "Stealth CD: " + str(comp.get("stealth_cooldown")) + "\n"
+			text += "Stealth Dur: " + str(comp.get("stealth_duration")) + "\n"
+		"Spawner":
+			text += "Spawn CD: " + str(comp.get("spawner_cooldown")) + "\n"
+			text += "Max Spawns: " + str(comp.get("max_spawns")) + "\n"
+		"Teleport_Crush":
+			text += "TPC Dmg: " + str(comp.get("area_damage")) + "\n"
+			text += "TPC KB: " + str(comp.get("knockback_force")) + "\n"
+			text += "TPC Radius: " + str(comp.get("max_radius")) + "\n"
+			text += "TPC CD: " + str(comp.get("tp_crush_cooldown")) + "\n"
+			text += "TPC Range: " + str(comp.get("max_range")) + "\n"
+		"WOF":
+			text += "WOF CD: " + str(comp.get("wof_cooldown")) + "\n"
+			text += "WOF Length: " + str(comp.get("wof_length")) + "\n"
+			text += "WOF Dmg: " + str(comp.get("wof_damage")) + "\n"
+		"Mass_Heal":
+			text += "Heal CD: " + str(comp.get("mass_heal_cooldown")) + "\n"
+			text += "Heal Amt: " + str(comp.get("mass_heal_amount")) + "\n"
+			
+	return text + "\n"
+
+# Updates the text content of the local HUD labels based on server-received data.
+@rpc("authority", "call_local", "unreliable")
+func update_debug_labels(s1: String, s2: String, l_text: String) -> void:
+	stats_label_one.text = s1
+	stats_label_two.text = s2
+	level_label.text = l_text

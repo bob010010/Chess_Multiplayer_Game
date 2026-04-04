@@ -16,7 +16,6 @@ static func create_label(text: String, color: Color, size: int, offset: Vector2,
 
 # Animates the local position and transparency of a label to create a floating effect.
 static func animate_label(parent: Node, label: Label, start_offset: Vector2, duration: float, entity_scale: Vector2) -> Tween:
-	var inv_scale: Vector2 = Vector2.ONE / entity_scale
 	label.position = start_offset / entity_scale
 	label.modulate.a = 1.0
 	var tween: Tween = parent.create_tween()

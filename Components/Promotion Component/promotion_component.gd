@@ -173,7 +173,7 @@ var class_base_stats: Dictionary = {
 		"teleport_cooldown": 4.0,
 		"area_damage": 25.0,
 		"area_knockback": 500.0,
-		"area_radius": 300.0,
+		"area_radius": 150.0,
 		"shield_health": 50.0
 	},
 	"Rook_Knight": {
@@ -237,7 +237,7 @@ var class_base_stats: Dictionary = {
 		"accuracy": 100.0, 
 		"area_damage": 75.0,
 		"area_knockback": 1000.0,
-		"area_radius": 500.0,
+		"area_radius": 200.0,
 		"area_cooldown": 2.0,
 	},
 	"King_Rook": {
@@ -337,7 +337,7 @@ var class_base_stats: Dictionary = {
 		"accuracy": 100.0, 
 		"area_damage": 75.0,
 		"area_knockback": 1000.0,
-		"area_radius": 500.0,
+		"area_radius": 350.0,
 		"area_cooldown": 2.0,
 		"teleport_range": 1000.0,
 		"teleport_cooldown": 2.0,

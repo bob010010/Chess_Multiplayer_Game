@@ -3,8 +3,28 @@ class_name TestingComponent
 
 @export var commands_enabled: bool = true
 
+@onready var main: Node2D = get_tree().current_scene
 @onready var player: CharacterBody2D = get_parent() as CharacterBody2D
 var c_s: String = "1"
+
+# Initializes the component and schedules automated initialization commands on the server.
+func _ready() -> void:
+	if multiplayer.is_server():
+		if main.player_levels_at_start != 0:
+			get_tree().create_timer(1.0).timeout.connect(_execute_initial_boost)
+		if main.player_starts_as != "Pawn":
+			get_tree().create_timer(1.5).timeout.connect(_execute_intital_promote)
+		
+# Grants the player an additional 200 levels by calculating required points and invoking the level handler.
+func _execute_initial_boost() -> void:
+	var level_comp: LevelingComponent = player.get_node_or_null("Components/LevelingComponent") as LevelingComponent
+	if is_instance_valid(level_comp):
+		var target_string: String = str(level_comp.entity_level + main.player_levels_at_start)
+		_handle_levels(PackedStringArray(["initial_boost", target_string]))
+
+# Promotes the player to the class of choice.
+func _execute_intital_promote() -> void:
+	_handle_promote(PackedStringArray(["initial_promote", main.player_starts_as]))
 
 # Monitors input to toggle the visibility of the global command console UI.
 func _input(event: InputEvent) -> void:

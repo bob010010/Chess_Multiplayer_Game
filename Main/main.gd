@@ -15,19 +15,19 @@ var dead_scores_dict: Dictionary
 @onready var ip_label: Label = $CanvasLayer/SharingIPLabel
 
 const PRESETS: Dictionary = {
-	"Alone": { "game_type": "FFA", "arena_size": 2500.0, "food_per_player": 1500, "bots_per_player": 0, "bot_classes": ["Bishop"], "npc_points": false}, # Alone for testing
+	"Alone": { "game_type": "FFA", "arena_size": 2500.0, "food_per_player": 1500, "bots_per_player": 0, "bot_classes": ["Bishop"], "npc_points": false, "start_lvls": 200, "player_class": "Knight"}, # Alone for testing
 	
-	"1-Bot": { "game_type": "FFA", "arena_size": 2500.0, "food_per_player": 1500, "bots_per_player": 1, "bot_classes": ["Jester"], "npc_points": false}, # 1 Bot for testing
+	"1-Bot": { "game_type": "FFA", "arena_size": 2500.0, "food_per_player": 1500, "bots_per_player": 1, "bot_classes": ["Jester"], "npc_points": false, "start_lvls": 200, "player_class": "Pawn_II"}, # 1 Bot for testing
 	
-	"1 Bot": { "game_type": "FFA", "arena_size": 2500.0, "food_per_player": 1500, "bots_per_player": 1, "bot_classes": ["Jester"], "npc_points": false}, # 1 Bot for testing
+	"1 Bot": { "game_type": "FFA", "arena_size": 2500.0, "food_per_player": 1500, "bots_per_player": 1, "bot_classes": ["Jester"], "npc_points": false, "start_lvls": 200, "player_class": "Pawn_II"}, # 1 Bot for testing
 	
-	"2-Bot": { "game_type": "FFA", "arena_size": 2500.0, "food_per_player": 1500, "bots_per_player": 2, "bot_classes": ["Pawn"], "npc_points": false}, # 2 Bots for testing
+	"2-Bot": { "game_type": "FFA", "arena_size": 2500.0, "food_per_player": 1500, "bots_per_player": 2, "bot_classes": ["Pawn"], "npc_points": false, "start_lvls": 200, "player_class": "Pawn_II"}, # 2 Bots for testing
 	
-	"FFA": { "game_type": "FFA", "arena_size": 6000.0, "food_per_player": 7500, "bots_per_player": 20, "bot_classes": ["Pawn"], "npc_points": true}, # Large game FFA
-	"2T": { "game_type": "2_Teams", "arena_size": 6000.0, "food_per_player": 2500, "bots_per_player": 20, "bot_classes": ["Pawn"], "npc_points": true}, # Large game 2 teams
+	"FFA": { "game_type": "FFA", "arena_size": 6000.0, "food_per_player": 7500, "bots_per_player": 20, "bot_classes": ["Pawn"], "npc_points": true, "start_lvls": 0, "player_class": "Pawn"}, # Large game FFA
+	"2T": { "game_type": "2_Teams", "arena_size": 6000.0, "food_per_player": 2500, "bots_per_player": 20, "bot_classes": ["Pawn"], "npc_points": true, "start_lvls": 0, "player_class": "Pawn"}, # Large game 2 teams
 	
-	"FFA-L": { "game_type": "FFA", "arena_size": 12000.0, "food_per_player": 12000, "bots_per_player": 40, "bot_classes": ["Pawn"], "npc_points": true}, # Large game FFA
-	"2T-L": { "game_type": "2_Teams", "arena_size": 12000.0, "food_per_player": 12000, "bots_per_player": 40, "bot_classes": ["Pawn"], "npc_points": true} # Large game 2 teams
+	"FFA-L": { "game_type": "FFA", "arena_size": 12000.0, "food_per_player": 12000, "bots_per_player": 40, "bot_classes": ["Pawn"], "npc_points": true, "start_lvls": 0, "player_class": "Pawn"}, # Large game FFA
+	"2T-L": { "game_type": "2_Teams", "arena_size": 12000.0, "food_per_player": 12000, "bots_per_player": 40, "bot_classes": ["Pawn"], "npc_points": true, "start_lvls": 0, "player_class": "Pawn"} # Large game 2 teams
 }
 
 var leaderboard_timer: float = 0.0
@@ -43,9 +43,12 @@ var max_food: int = 0
 var bots_per_player: int = 2
 var max_bots: int = 0
 var npc_gains_points: bool = true
-var bot_spawn_classes: Array = ["Pawn", "Pawn_I"]
+var bot_spawn_classes: Array = ["Pawn"]
 
-var game_type = "2_Teams"
+var player_levels_at_start: int = 0
+var player_starts_as: String = "Pawn"
+
+var game_type: String = "2_Teams"
 
 # Connects buttons and initializes the game boundary
 func _ready() -> void:
@@ -73,7 +76,9 @@ func _apply_preset_or_custom() -> void:
 		bots_per_player  = preset["bots_per_player"]
 		bot_spawn_classes = preset["bot_classes"]
 		npc_gains_points = preset["npc_points"]
-		print(str(food_per_player))
+		player_levels_at_start = preset["start_lvls"]
+		player_starts_as = preset["player_class"]
+		print("Setting player to: " + str(player_starts_as))
 		return
 
 	# Otherwise expect: game_type, arena_size, food_per_player, bots_per_player

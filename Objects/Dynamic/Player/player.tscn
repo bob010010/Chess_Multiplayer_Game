@@ -546,7 +546,6 @@ knockback_force = 400.0
 attack_cooldown = 2.0
 
 [node name="MagicAreaWeaponComponent" parent="Components" unique_id=1293441058 instance=ExtResource("17_ws0sy")]
-visible = false
 
 [node name="PromotionComponent" type="Node2D" parent="Components" unique_id=768163417]
 script = ExtResource("19_j1n4j")

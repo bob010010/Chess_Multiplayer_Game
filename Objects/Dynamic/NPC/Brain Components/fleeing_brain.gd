@@ -8,6 +8,10 @@ var current_threat: Node2D
 var last_threat_pos: Vector2 = Vector2.ZERO
 var flee_timer: float = 0.0
 var flee_distance: float = 100.0
+var super_scared_threshold: float = 0.2
+
+func _ready() -> void:
+	super_scared_threshold = randf_range(0.05, 0.4)
 
 # Finds the most imminent threat among nearby enemies, weighted by distance and score.
 func _get_dangerous_threat() -> Node2D:
@@ -20,6 +24,10 @@ func _get_dangerous_threat() -> Node2D:
 			continue
 		var enemy_score: int = TargetingUtils.get_entity_score(body)
 		var weighted_boldness_threshold: float = main_brain.my_score * main_brain.boldness_factor * main_brain.health_scale
+		
+		if main_brain.health_scale <= super_scared_threshold: # Super scared if less than 20% health
+			weighted_boldness_threshold *= 0.025
+		#print("Weighted boldness: " + str(weighted_boldness_threshold))
 		if enemy_score <= weighted_boldness_threshold:
 			continue
 		var score_difference: float = float(enemy_score - main_brain.my_score)

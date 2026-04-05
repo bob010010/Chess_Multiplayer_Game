@@ -10,6 +10,7 @@ extends CharacterBody2D
 var team_id: int = 500
 var knockback: Vector2 = Vector2.ZERO
 var body_damage: int = 10
+var kill_value: int = 50
 
 var ranged_w_component: Node
 var melee_w_component: Node
@@ -112,7 +113,7 @@ func _handle_collisions() -> void:
 
 # Grants points to the attacker and removes the NPC from the scene tree.
 func _on_npc_died(attacker_id: String) -> void:
-	KillingUtils.route_kill_credits_and_points(get_tree().current_scene, attacker_id, leveling_component.total_score, name)
+	KillingUtils.route_kill_credits_and_points(get_tree().current_scene, attacker_id, leveling_component.total_score + kill_value, name)
 	manager_component.cleanup_all_abilities() # Triggers the component manager to remove lingering ability visuals
 	process_mode = Node.PROCESS_MODE_DISABLED# Disable collisions and processing so the dead body doesn't interact with the world
 	hide()

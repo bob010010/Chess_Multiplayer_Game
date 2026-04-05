@@ -29,7 +29,7 @@ size = Vector2(140, 180)
 radius = 300.0
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_q7cir"]
-radius = 100.0
+radius = 110.0
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_l1orh"]
 radius = 160.0
@@ -81,6 +81,9 @@ corner_radius_top_left = 5
 corner_radius_top_right = 5
 corner_radius_bottom_right = 5
 corner_radius_bottom_left = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pbrkc"]
+bg_color = Color(0.627451, 0.63529414, 1, 0.3254902)
 
 [node name="NPC" type="CharacterBody2D" unique_id=1312732274]
 script = ExtResource("1_5yobt")
@@ -172,14 +175,15 @@ layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
-offset_left = -20.0
+offset_left = -16.0
 offset_top = -50.0
-offset_right = 24.0
+offset_right = 28.0
 offset_bottom = -27.0
 grow_horizontal = 2
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 1, 1)
 theme_override_font_sizes/font_size = 14
+theme_override_styles/normal = SubResource("StyleBoxFlat_pbrkc")
 horizontal_alignment = 1
 
 [node name="Components" type="Node2D" parent="." unique_id=1926972529]

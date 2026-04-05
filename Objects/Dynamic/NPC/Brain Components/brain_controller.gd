@@ -5,7 +5,6 @@ class_name MainBrain
 @onready var move_comp: Node2D = npc.get_node("Components/MovementComponent") as Node2D
 @onready var detection_area: Area2D = npc.get_node("DetectionArea") as Area2D
 @onready var health_comp: Node2D = npc.get_node("Components/HealthComponent") as Node2D
-@onready var kill_zone: Area2D = npc.get_node("KillArea") as Area2D
 
 @onready var fleeing_brain: FleeingBrain = get_parent().get_node("FleeingBrain") as FleeingBrain
 @onready var combat_brain: CombatBrain = get_parent().get_node("CombatBrain") as CombatBrain
@@ -17,6 +16,8 @@ var my_score: int = 0
 var health_scale: float = 1.0
 var boldness_factor: float = 1.0 
 var kindness_factor: float = 1.0
+
+var all_visible_entities: Dictionary
 
 var wander_target: Vector2 = Vector2.ZERO 
 var wander_radius: float = 1000.0
@@ -71,13 +72,13 @@ func _physics_process(delta: float) -> void:
 			if not has_target_whilst_fleeing:
 				combat_brain.current_target = null
 			return
-
-	# Only takes on the new target if it doesnt have a combat target already
-	if combat_brain.current_target == null:
-		var best_visible_target: Node2D = TargetingUtils.get_closest_enemy(npc.global_position, detection_area, npc.team_id, false, my_score, combat_brain.blacklisted_target)
-		if best_visible_target != null and combat_brain._process_targeting(best_visible_target):
-			state = combat_brain.combat_state
-			return
+	
+	var new_all_visible_entities: Dictionary = TargetingUtils.get_all_potential_targets(npc.global_position, detection_area, npc.team_id, combat_brain.blacklisted_target)
+	if all_visible_entities != null:
+		if new_all_visible_entities != all_visible_entities: # Only considers re targeting if the visible entities map changes
+			all_visible_entities = new_all_visible_entities
+			if combat_brain._process_targeting(all_visible_entities): # If a new target is taken
+				return
 
 	var in_combat: bool = false
 	if is_instance_valid(combat_brain.current_target) and not combat_brain.current_target.is_queued_for_deletion():
@@ -111,14 +112,8 @@ func _get_valid_wander_pos() -> Vector2:
 
 # ACTION
 # Updates the NPC's movement direction based on the high-level NPC state and context-aware steering.
-func _move_towards(pos: Vector2, t_pos: Vector2) -> bool:
-	var dist: float = pos.distance_to(t_pos)
-	var arrival_threshold: float = 120.0
-	var min_speed_ratio: float = 0.2
-	if state == "Chasing" or state == "Melee_Attack":
-		move_comp.set("speed_limit_multiplier", clamp(dist / arrival_threshold, min_speed_ratio, 1.0))
-	else:
-		move_comp.set("speed_limit_multiplier", 1.0)
+func _move_towards(_pos: Vector2, _t_pos: Vector2) -> bool:
+	move_comp.set("speed_limit_multiplier", 1.0)
 	return true
 
 # Provides the raw heading toward the current target for the context steering system.
@@ -127,8 +122,10 @@ func get_desired_direction() -> Vector2:
 		return fleeing_brain.last_threat_pos.direction_to(npc.global_position)
 	if state == "Repositioning" and is_instance_valid(combat_brain.current_target):
 		return combat_brain.current_target.global_position.direction_to(npc.global_position)
-	if state in ["Ranged_Attack", "Ranged_Attack_TC", "Melee_Attack"]:
+	if state in ["Ranged_Attack", "Melee_Attack"] or state.contains("Last_Stand"):
 		return Vector2.ZERO
+	if state.contains("Ranged_Attack_TC") and is_instance_valid(combat_brain.current_target):
+		return combat_brain.target.global_position.direction_to(npc.global_position)
 	if is_instance_valid(combat_brain.current_target):
 		return npc.global_position.direction_to(combat_brain.current_target.global_position)
 	if state == "Wandering" and wander_target != Vector2.ZERO:

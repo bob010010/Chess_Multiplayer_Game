@@ -15,33 +15,123 @@ var min_shoot_range: float = 150.0
 
 # Factors that affect whether to take a fight
 var kindness_factor: float = 1.0 
+var hits_to_kill_to_target: int = 5
 
 var current_target: Node2D = null
+var current_targets_priority: int = 0
 var combat_state: String = ""
 var blacklisted_target: Node2D = null 
 var blacklist_timer: float = 0.0
 var last_dist_to_target: float = INF 
 
-
 var target_out_of_range_timer: float = 5.0 # TODO
 
 var give_up_attack_time: float = 30.0 # TODO
 
+var nearby_food_count: int = 0
+
 func _ready() -> void:
-	kindness_factor = randf_range(0.01, 0.2) 
+	kindness_factor = randf_range(0.01, 0.2)
+	hits_to_kill_to_target = randi_range(1, 10)
 
 # Re target to higher priority targets, or get new target from the best visible ones
-func _process_targeting(best_visible_target: Node2D) -> bool:
-	var target_points: int = TargetingUtils.get_entity_score(best_visible_target)
-	print("Best visible target: " + str(best_visible_target.get_groups()[0]))
-	print("Target is worth: " + str(target_points))
-	if main_brain.my_score * main_brain.kindness_factor > target_points:
+func _process_targeting(all_targets: Dictionary) -> bool:
+	var players: Dictionary = {}
+	var npcs: Dictionary = {}
+	var food: Dictionary = {}
+	var towers: Dictionary = {}
+	
+	# Sorts potential targets by type
+	for target_name: String in all_targets:
+		var target_info: Dictionary = all_targets[target_name]
+		var type: String = target_info.get("type", "unknown")
+		
+		# Sets the default priority based on type
+		target_info.set("priority", TargetingUtils.get_priority(target_info.get("entity")))
+		
+		match type:
+			"player":
+				players[target_name] = target_info
+			"npc":
+				npcs[target_name] = target_info
+			"food":
+				food[target_name] = target_info
+			"tower":
+				towers[target_name] = target_info
+	
+	nearby_food_count = food.size()
+		
+	#print("Players: " + str(players))
+	#print("NPCs: " + str(npcs))
+	#print("Food: " + str(food))
+	
+	_update_weapons()
+	
+	#Filters for players/NPCs with too low a score
+	for dict in [players, npcs]:
+		for key in dict:
+			var potential_target: Dictionary = dict.get(key)
+			
+			if main_brain.my_score * main_brain.kindness_factor > potential_target.get("score"): # Skips players or nps with a much lower score
+				potential_target.set("priority", -1)
+				continue
+			
+			if potential_target.get("entity") in kill_zone.get_overlapping_bodies(): # Always goes for ones in the kill zone
+				potential_target.set("priority", 100)
+				continue
+			
+			if TargetingUtils.less_than_x_hits_to_kill(hits_to_kill_to_target, potential_target.get("health"), active_melee, active_ranged): # If it is low health increase the priority
+				potential_target.set("priority", potential_target.get("priority") + 30)
+	
+	#Filters to not go for food too big for it
+	for f in food:
+		var food_to_check: Dictionary = food.get(f)
+		if not TargetingUtils._is_food_accessible(food_to_check.get("entity"), 0):
+			if TargetingUtils.less_than_x_hits_to_kill(hits_to_kill_to_target, food_to_check.get("health"), active_melee, active_ranged): # If the thing is low health make an exception and increase the priority
+				food_to_check.set("priority", food_to_check.get("priority") + 19) 
+				#print("Low food found")
+			else:
+				food_to_check.set("priority", -1) 
+	
+	# Finds the highest priority potential target around
+	var best_potential_target: Dictionary
+	var highest_priority: int = 0
+	for dict in [players, npcs, food, towers]:
+		for key in dict:
+			var potential_target_info: Dictionary = dict.get(key)
+			var target_priority: int = potential_target_info.get("priority")
+			#print("Target: " + str(potential_target_info.get("entity")) + " Priority: " + str(target_priority))
+			if target_priority > highest_priority:
+				best_potential_target = potential_target_info
+				highest_priority = target_priority
+				
+			# If there is already a best potential target and another has the same priority
+			elif not best_potential_target.is_empty() and not potential_target_info.is_empty() and target_priority == highest_priority:
+				if potential_target_info.get("distance") < best_potential_target.get("distance"):
+					#print("Same priority, defaulting to closest")
+					best_potential_target = potential_target_info
+					highest_priority = target_priority
+				#print("NEW TARGET HAS BEST PRIORITY: " + str(target_priority))
+	
+	#print("Best pri: " + str(current_targets_priority) + " Curr pri: " + str(highest_priority))
+	# There is still a current target with better priority
+	if is_instance_valid(current_target):
+		if highest_priority <= current_targets_priority:
+			return false
+		
+	# If there is a new found highest priority potential target, make it the current target
+	if best_potential_target:
+		current_target = best_potential_target.get("entity")
+		current_targets_priority = highest_priority
+		#print("New curr pri: " + str(current_targets_priority))
+		target_out_of_range_timer = 3.0
+		last_dist_to_target = INF
+		return true
+	else:
 		return false
-	current_target = best_visible_target
-	target_out_of_range_timer = 3.0
-	last_dist_to_target = INF
-	return true
 
+	
+	
 # Handles taking final stands when being hunted down
 func _last_stand(threat: Node2D) -> bool:
 	if threat in kill_zone.get_overlapping_bodies():
@@ -68,8 +158,8 @@ func _process_combat_state(delta: float) -> bool:
 
 # Tries to do a melee attack
 func _melee_attack(target: Node2D, chase: bool = true) -> bool:
-	if is_instance_valid(active_melee):
-		print("Trying to melee")
+	if is_instance_valid(active_melee) and is_instance_valid(target):
+		#print("Trying to melee")
 		var dist: float = main_brain.npc.global_position.distance_to(target.global_position)
 		# If in range, stop moving, set state and request an attack
 		if dist <= melee_range:
@@ -90,7 +180,7 @@ func _melee_attack(target: Node2D, chase: bool = true) -> bool:
 
 # Trie to do a ranged attack
 func _ranged_attack(target: Node2D, chase: bool = true) -> bool:
-	if is_instance_valid(active_ranged):
+	if is_instance_valid(active_ranged) and is_instance_valid(target):
 		#print("Trying to ranged")
 		var dist: float = main_brain.npc.global_position.distance_to(target.global_position)
 		if dist <= max_shoot_range:
@@ -130,6 +220,10 @@ func _clear_blacklist(delta: float) -> void:
 
 func _update_weapons() -> void:
 	active_melee = main_brain.npc.get("melee_w_component")
+	if main_brain.npc.current_melee_weapon == "Spear":
+		melee_range = 110.0
+	elif main_brain.npc.current_melee_weapon == "Sword":
+		melee_range = 95.0
 	active_ranged = main_brain.npc.get("ranged_w_component")
 
 #func _draw() -> void:

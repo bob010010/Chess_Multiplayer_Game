@@ -15,19 +15,19 @@ var dead_scores_dict: Dictionary
 @onready var ip_label: Label = $CanvasLayer/SharingIPLabel
 
 const PRESETS: Dictionary = {
-	"Alone": { "game_type": "FFA", "arena_size": 2500.0, "food_per_player": 1500, "bots_per_player": 0, "bot_classes": ["Bishop"], "npc_points": false, "start_lvls": 0, "player_class": "Pawn_II"}, # Alone for testing
+	"Alone": { "game_type": "FFA", "arena_size": 2500.0, "food_per_player": 1500, "bots_per_player": 0, "bot_classes": ["Bishop"], "npc_points": false, "start_lvls": 0, "player_class": "Pawn_II", "player_levels_for_upgrade": 1, "player_levels_for_promotion": 2}, # Alone for testing
 	
-	"1-Bot": { "game_type": "FFA", "arena_size": 2500.0, "food_per_player": 1500, "bots_per_player": 1, "bot_classes": ["Jester"], "npc_points": false, "start_lvls": 200, "player_class": "Super_Queen"}, # 1 Bot for testing
+	"1-Bot": { "game_type": "FFA", "arena_size": 1500.0, "food_per_player": 50, "bots_per_player": 1, "bot_classes": ["Bishop"], "npc_points": false, "start_lvls": 1, "player_class": "Holy_Queen", "player_levels_for_upgrade": 1, "player_levels_for_promotion": 2}, # 1 Bot for testing
 	
-	"1 Bot": { "game_type": "FFA", "arena_size": 2500.0, "food_per_player": 1500, "bots_per_player": 1, "bot_classes": ["Jester"], "npc_points": false, "start_lvls": 200, "player_class": "Super_Queen"}, # 1 Bot for testing
+	"1-Bot-L": { "game_type": "FFA", "arena_size": 2500.0, "food_per_player": 1500, "bots_per_player": 1, "bot_classes": ["Pawn"], "npc_points": false, "start_lvls": 200, "player_class": "Super_Queen", "player_levels_for_upgrade": 1, "player_levels_for_promotion": 2}, # 1 Bot for testing
 	
-	"2-Bot": { "game_type": "FFA", "arena_size": 2500.0, "food_per_player": 1500, "bots_per_player": 2, "bot_classes": ["Pawn"], "npc_points": false, "start_lvls": 200, "player_class": "Pawn_II"}, # 2 Bots for testing
+	"2-Bot": { "game_type": "FFA", "arena_size": 2500.0, "food_per_player": 1500, "bots_per_player": 2, "bot_classes": ["Pawn"], "npc_points": false, "start_lvls": 200, "player_class": "Pawn_II", "player_levels_for_upgrade": 1, "player_levels_for_promotion": 2}, # 2 Bots for testing
 	
-	"FFA": { "game_type": "FFA", "arena_size": 6000.0, "food_per_player": 7500, "bots_per_player": 20, "bot_classes": ["Pawn"], "npc_points": true, "start_lvls": 0, "player_class": "Pawn"}, # Large game FFA
-	"2T": { "game_type": "2_Teams", "arena_size": 6000.0, "food_per_player": 2500, "bots_per_player": 20, "bot_classes": ["Pawn"], "npc_points": true, "start_lvls": 0, "player_class": "Pawn"}, # Large game 2 teams
+	"FFA": { "game_type": "FFA", "arena_size": 6000.0, "food_per_player": 7500, "bots_per_player": 20, "bot_classes": ["Pawn"], "npc_points": true, "start_lvls": 0, "player_class": "Pawn", "player_levels_for_upgrade": 2, "player_levels_for_promotion": 4}, # Large game FFA
+	"2T": { "game_type": "2_Teams", "arena_size": 6000.0, "food_per_player": 2500, "bots_per_player": 20, "bot_classes": ["Pawn"], "npc_points": true, "start_lvls": 0, "player_class": "Pawn", "player_levels_for_upgrade": 2, "player_levels_for_promotion": 4}, # Large game 2 teams
 	
-	"FFA-L": { "game_type": "FFA", "arena_size": 12000.0, "food_per_player": 12000, "bots_per_player": 40, "bot_classes": ["Pawn"], "npc_points": true, "start_lvls": 0, "player_class": "Pawn"}, # Large game FFA
-	"2T-L": { "game_type": "2_Teams", "arena_size": 12000.0, "food_per_player": 12000, "bots_per_player": 40, "bot_classes": ["Pawn"], "npc_points": true, "start_lvls": 0, "player_class": "Pawn"} # Large game 2 teams
+	"FFA-L": { "game_type": "FFA", "arena_size": 12000.0, "food_per_player": 12000, "bots_per_player": 40, "bot_classes": ["Pawn"], "npc_points": true, "start_lvls": 0, "player_class": "Pawn", "player_levels_for_upgrade": 2, "player_levels_for_promotion": 4}, # Large game FFA
+	"2T-L": { "game_type": "2_Teams", "arena_size": 12000.0, "food_per_player": 12000, "bots_per_player": 40, "bot_classes": ["Pawn"], "npc_points": true, "start_lvls": 0, "player_class": "Pawn", "player_levels_for_upgrade": 2, "player_levels_for_promotion": 4} # Large game 2 teams
 }
 
 var leaderboard_timer: float = 0.0
@@ -45,8 +45,15 @@ var max_bots: int = 0
 var npc_gains_points: bool = true
 var bot_spawn_classes: Array = ["Pawn"]
 
+#TODO add to presets
+var npc_levels_for_promotion = 3
+var npc_levels_for_upgrade = 1
+
+
 var player_levels_at_start: int = 0
 var player_starts_as: String = "Pawn"
+var player_levels_for_upgrade: int = 1
+var player_levels_for_promotion: int = 2
 
 var game_type: String = "2_Teams"
 
@@ -66,7 +73,7 @@ func _ready() -> void:
 func _apply_preset_or_custom() -> void:
 	var input: String = $TitleScreen/HostPanel/Preset.text.strip_edges()
 	if input == "":
-		input = "Alone"
+		input = "1-Bot"
 	var parts: Array = input.split(",")
 	print("GAME PRESETS: " + str(parts))
 	# If a single token matches a preset key, apply it directly
@@ -81,7 +88,8 @@ func _apply_preset_or_custom() -> void:
 		npc_gains_points = preset["npc_points"]
 		player_levels_at_start = preset["start_lvls"]
 		player_starts_as = preset["player_class"]
-		print("Setting player to: " + str(player_starts_as))
+		player_levels_for_upgrade = preset["player_levels_for_upgrade"]
+		player_levels_for_promotion = preset["player_levels_for_promotion"]
 		return
 
 	# Otherwise expect: game_type, arena_size, food_per_player, bots_per_player

@@ -70,4 +70,6 @@ static func get_entity_score(entity: Node2D) -> int:
 	var level_comp: Node = entity.get_node_or_null("Components/LevelingComponent")
 	if is_instance_valid(level_comp) and "total_score" in level_comp:
 		return level_comp.total_score as int
+	elif entity.is_in_group("food"):
+		return entity.points_value
 	return 0 # Gives things without a score 0 (Towers)

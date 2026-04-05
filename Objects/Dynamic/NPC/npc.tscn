@@ -7,7 +7,7 @@
 [ext_resource type="Script" uid="uid://bihqjl51yapha" path="res://Components/Movement Component/npc_movement.gd" id="4_l1orh"]
 [ext_resource type="PackedScene" uid="uid://drldjkjxrdrg" path="res://Components/Weapon Components/Ranged Weapon Components/Bow Component/bow_component.tscn" id="5_0gikb"]
 [ext_resource type="PackedScene" uid="uid://b0tv68ilswjsh" path="res://UI/Bars/Health Bar/health_bar.tscn" id="6_bl8rq"]
-[ext_resource type="Script" uid="uid://mcmoxtd5u8rq" path="res://Objects/Dynamic/NPC/npc_controller_component.gd" id="6_eflwn"]
+[ext_resource type="Script" uid="uid://mcmoxtd5u8rq" path="res://Objects/Dynamic/NPC/Brain Components/brain_controller.gd" id="6_eflwn"]
 [ext_resource type="PackedScene" uid="uid://bcpvgo3r5i7b3" path="res://Components/Weapon Components/Meele Weapon Component/Spear Component/spear_component.tscn" id="7_ijq6w"]
 [ext_resource type="Script" uid="uid://drtotaaepbr3t" path="res://Components/Promotion Component/promotion_component.gd" id="8_7k8bs"]
 [ext_resource type="Script" uid="uid://bcp4tn61yaump" path="res://Components/Leveling Component/leveling_component.gd" id="9_0gikb"]
@@ -18,18 +18,21 @@
 [ext_resource type="PackedScene" uid="uid://bktkawpolxble" path="res://Components/Ability Components/Stealth Components/stealth_component.tscn" id="16_snteq"]
 [ext_resource type="PackedScene" uid="uid://qsi0va4ssotc" path="res://Components/Ability Components/Spawner Component/spawner_component.tscn" id="17_l1orh"]
 [ext_resource type="PackedScene" uid="uid://dn8boj5kwnei2" path="res://Components/Ability Components/Stealth Components/Illusion Component/illusion_component.tscn" id="18_q7cir"]
+[ext_resource type="Script" uid="uid://mv2v07rw8s26" path="res://Objects/Dynamic/NPC/Brain Components/fleeing_brain.gd" id="19_x612b"]
+[ext_resource type="Script" uid="uid://dvicgrdqq6jit" path="res://Objects/Dynamic/NPC/Brain Components/combat_brain.gd" id="20_iljgk"]
+[ext_resource type="Script" uid="uid://c2qv8shos73lb" path="res://Objects/Dynamic/NPC/Brain Components/ability_brain.gd" id="21_pbrkc"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_t2tx2"]
 size = Vector2(140, 180)
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_p2f8y"]
-radius = 600.0
+radius = 300.0
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_q7cir"]
-radius = 150.0
+radius = 100.0
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_l1orh"]
-radius = 300.0
+radius = 160.0
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_c7qqn"]
 properties/0/path = NodePath(".:position")
@@ -59,15 +62,18 @@ properties/7/replication_mode = 2
 properties/8/path = NodePath("Components/HealthComponent:max_health")
 properties/8/spawn = true
 properties/8/replication_mode = 2
-properties/9/path = NodePath("Components/LevelingComponent:entity_level")
+properties/9/path = NodePath(".:knockback")
 properties/9/spawn = true
 properties/9/replication_mode = 2
-properties/10/path = NodePath(".:knockback")
+properties/10/path = NodePath("Components/HealthComponent:regen_amount")
 properties/10/spawn = true
 properties/10/replication_mode = 2
-properties/11/path = NodePath("Components/HealthComponent:regen_amount")
+properties/11/path = NodePath(".:current_second_ability")
 properties/11/spawn = true
 properties/11/replication_mode = 2
+properties/12/path = NodePath(".:rotation")
+properties/12/spawn = true
+properties/12/replication_mode = 2
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xfw1d"]
 bg_color = Color(0.6, 0.6, 0.9607843, 0.6)
@@ -183,9 +189,6 @@ script = ExtResource("4_l1orh")
 
 [node name="HealthComponent" parent="Components" unique_id=421527654 instance=ExtResource("4_7k8bs")]
 
-[node name="NPCControllerComponent" type="Node2D" parent="Components" unique_id=1295278930]
-script = ExtResource("6_eflwn")
-
 [node name="PromotionComponent" type="Node2D" parent="Components" unique_id=822742509]
 script = ExtResource("8_7k8bs")
 
@@ -210,3 +213,17 @@ script = ExtResource("10_bl8rq")
 [node name="SpawnerComponent" parent="Components" unique_id=1294504567 instance=ExtResource("17_l1orh")]
 
 [node name="IllusionComponent" parent="Components" unique_id=1196718733 instance=ExtResource("18_q7cir")]
+
+[node name="BrainComponents" type="Node2D" parent="." unique_id=1538700261]
+
+[node name="MainBrain" type="Node2D" parent="BrainComponents" unique_id=1295278930]
+script = ExtResource("6_eflwn")
+
+[node name="FleeingBrain" type="Node2D" parent="BrainComponents" unique_id=2115169034]
+script = ExtResource("19_x612b")
+
+[node name="CombatBrain" type="Node2D" parent="BrainComponents" unique_id=1632621367]
+script = ExtResource("20_iljgk")
+
+[node name="AbilityBrain" type="Node2D" parent="BrainComponents" unique_id=544635665]
+script = ExtResource("21_pbrkc")

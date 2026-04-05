@@ -7,7 +7,7 @@ extends CharacterBody2D
 @onready var leveling_component: Node = $Components/LevelingComponent
 @onready var promotion_component: Node = $Components/PromotionComponent
 
-@export var team_id: int = 500
+var team_id: int = 500
 var knockback: Vector2 = Vector2.ZERO
 var body_damage: int = 10
 
@@ -55,7 +55,7 @@ func _ready() -> void:
 	add_to_group("npc")
 	
 	if not has_node("MultiplayerSynchronizer"):
-		printerr("Peer ", multiplayer.get_unique_id(), " missing Synchronizer on ", name)
+		printerr("NPC ", multiplayer.get_unique_id(), " missing Synchronizer on ", name)
 		
 	if is_node_ready():
 		sprite_component._on_promotion_applied(current_class)

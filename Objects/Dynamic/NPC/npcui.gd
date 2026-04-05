@@ -1,29 +1,49 @@
 extends UIComponent
 
-
 @onready var name_label: Label = $"../UI/Name"
 @onready var health_bar: ProgressBar = $"../UI/HealthBar"
-
 @onready var info: Label = $"../UI/InfoLabel"
 
-@onready var npc: Node2D = $"../Components/NPCControllerComponent"
-@onready var move_comp = $"../Components/MovementComponent"
+@onready var main_brain: MainBrain = $"../BrainComponents/MainBrain"
+@onready var combat_brain: CombatBrain = $"../BrainComponents/CombatBrain"
+@onready var fleeing_brain: FleeingBrain = $"../BrainComponents/FleeingBrain"
+@onready var move_comp: Node2D = $"../Components/MovementComponent"
 
+# Sets the initial name label text based on a truncated version of the entity name.
 func _ready() -> void:
 	name_label.text = entity.name.substr(0, 8)
 
+# Processes the server-side debug string generation every frame.
 func _process(_delta: float) -> void:
-	show_debug_info()
+	if multiplayer.is_server():
+		show_debug_info()
 
-# TODO
-# This will not update client side currently 
+# Compiles internal brain variables into a formatted string on the server and broadcasts it to all clients.
 func show_debug_info() -> void:
-	info.text = npc.state + "  B:" + str(snapped(npc.boldness_factor,0.01)) + "  K:" + str(snapped(npc.kindness_factor,0.01)) + "  S:" + str(npc.my_score)
-	info.text += "  G_C:" + str(snapped(npc.give_up_chase_time,0.01)) + "  T:" + str(entity.team_id) + " H: " + str(snapped(npc.health_scale,0.01))
-	info.text += "  RT: " + str(snapped(npc.inp_delay,0.01)) + " ST: " + str(move_comp.context_dir)
+	# Accesses the split brain components to gather state and behavioral data.
+	var debug_text: String = main_brain.state + "  Bold: " + str(snapped(main_brain.boldness_factor, 0.01)) + "  Kind: " + str(snapped(main_brain.kindness_factor, 0.01)) + "  Score: " + str(main_brain.my_score)
+	debug_text += "  Give_Up_Chase: " + str(snapped(combat_brain.target_out_of_range_timer, 0.01)) + "  Team: " + str(entity.team_id) + "  Health: " + str(snapped(main_brain.health_scale, 0.01))
+	debug_text += "  Reaction_Time: " + str(snapped(main_brain.inp_delay, 0.01)) + "  ST: " + str(snapped(move_comp.get("context_dir"), Vector2(0.01, 0.01)))
 	
-# Toggles the visibility of identifying UI elements specifically for other players
+	if is_instance_valid(combat_brain.current_target):
+		debug_text += "  Target: " + str(combat_brain.current_target.name)
+	else:
+		debug_text += "  No Target "
+		
+	if is_instance_valid(fleeing_brain.current_threat):
+		debug_text += "  Threat: " + str(fleeing_brain.current_threat.name)
+	else:
+		debug_text += "  No Threat "
+	
+	update_info_label_rpc.rpc(debug_text)
+
+# Updates the local info label text with the authoritative string received from the server.
+@rpc("authority", "call_local", "unreliable")
+func update_info_label_rpc(text: String) -> void:
+	info.text = text
+	
+# Toggles the visibility of identifying UI elements specifically for other players.
 func toggle_external_ui(is_hidden: bool) -> void:
 	name_label.visible = not is_hidden
-	health_bar.hide_for_others = is_hidden
-	print("Health bar visible: " + str(health_bar.visible))
+	if is_instance_valid(health_bar):
+		health_bar.set("hide_for_others", is_hidden)

@@ -113,7 +113,6 @@ func _handle_promote(args: PackedStringArray) -> void:
 		
 	var promo_comp: Node = player.get_node_or_null("Components/PromotionComponent")
 	if is_instance_valid(promo_comp):
-		print("Requesting " + args[1])
 		promo_comp.request_promotion(args[1])
 
 # 1/points 100

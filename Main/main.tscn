@@ -563,5 +563,9 @@ spawn_path = NodePath("../SpawnedTraps")
 position = Vector2(0, -9)
 script = ExtResource("10_qac2q")
 
+[node name="NPCSpawner" type="MultiplayerSpawner" parent="." unique_id=1943154530]
+_spawnable_scenes = PackedStringArray("uid://c7cu6gk13wi33")
+spawn_path = NodePath("../SpawnedNPCs")
+
 [node name="SpectatorCamera" type="Camera2D" parent="." unique_id=1223713430]
 enabled = false

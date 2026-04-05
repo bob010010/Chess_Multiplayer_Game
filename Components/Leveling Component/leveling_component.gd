@@ -115,6 +115,8 @@ var stat_levels: Dictionary = {
 	"shield_health": 0
 }
 
+@onready var main: Node2D = get_tree().current_scene
+
 # Grants score and initiates level up verification.
 func get_points(amount: int) -> void:
 	if not multiplayer.is_server():
@@ -147,19 +149,27 @@ func request_level_up_math() -> void:
 			sync_points_to_client.rpc_id(peer_id, next_level_points)
 		
 		next_level_points = int(pow(float(entity_level), 1.5) * 10.0)
-		pending_upgrades += 1
+		
 		points = leftover
 		
-		# For entities
+		# For NPCs
 		if not is_player and entity_level % 3 == 0:
-			var promo: Node = entity.get_node("Components/PromotionComponent")
-			promo.add_pending_promotion(peer_id)
+			if entity_level % main.npc_levels_for_promotion == 0:
+				var promo: Node = entity.get_node("Components/PromotionComponent")
+				promo.add_pending_promotion(peer_id)
+			
+			if entity_level % main.npc_levels_for_upgrade == 0:
+				pending_upgrades += 1
 	
 		# For players
-		if is_player and entity_level % 2 == 0:
-			var promo: Node = entity.get_node("Components/PromotionComponent")
-			promo.add_pending_promotion(peer_id)
-		
+		if is_player:
+			if entity_level % main.player_levels_for_promotion == 0:
+				var promo: Node = entity.get_node("Components/PromotionComponent")
+				promo.add_pending_promotion(peer_id)
+			
+			if entity_level % main.player_levels_for_upgrade == 0:
+				pending_upgrades += 1
+
 		if is_player:
 			sync_points_to_client.rpc_id(peer_id, leftover)
 		

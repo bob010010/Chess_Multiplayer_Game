@@ -26,8 +26,8 @@ func add_player(id: int, start_score: int = 0) -> void:
 		"2_Teams":
 			player_instance.team_id = 1 if id == 1 else (get_child_count() % 2) + 1 #TODO change this to be fair
 	
-	printerr("REAL NAME: " + str(player_instance.name))
-	printerr("Username: " + player_instance.player_username)
+	#printerr("REAL NAME: " + str(player_instance.name))
+	#printerr("Username: " + player_instance.player_username)
 	add_child(player_instance, true)
 
 # Grants the previous score back

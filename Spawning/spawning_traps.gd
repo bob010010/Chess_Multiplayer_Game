@@ -43,7 +43,6 @@ func spawn_wof(start_pos: Vector2, end_pos: Vector2, owner_id: String, team: int
 	add_child(wall, true)
 	
 	if wall.has_method("initialise"):
-		print("Init wall")
 		wall.initialise(owner_id, team, start_pos, end_pos)
 		
 	return wall

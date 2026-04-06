@@ -31,13 +31,12 @@ func request_wof(input_pos: Vector2) -> void:
 		var peer_id: int = entity.name.to_int()
 		start_pos = input_pos
 		# Notifies the specific client to begin drawing the placement radius and lock movement.
-		trigger_placement_visuals.rpc_id(peer_id, true, input_pos)
-
+		trigger_waiting_for_end_lock.rpc_id(peer_id, true)
 		
 		if ui_comp and entity.is_in_group("player"):
 			ui_comp.display_message.rpc_id(peer_id, "Pick the second point!")
 
-# Rec
+# Gets the second position and spawns the wall
 @rpc("any_peer", "call_local", "reliable")
 func request_second_pos(input_pos: Vector2) -> void:
 	if not multiplayer.is_server():
@@ -53,7 +52,7 @@ func request_second_pos(input_pos: Vector2) -> void:
 		end_pos = input_pos
 		current_cooldown = wof_cooldown
 		# Notifies the client to stop drawing and release the movement lock.
-		trigger_placement_visuals.rpc_id(peer_id, false, Vector2.ZERO)
+		trigger_waiting_for_end_lock.rpc_id(peer_id, false)
 		
 		if is_instance_valid(ui_comp):
 			ui_comp.handle_ability_activated(self, "WOF", wof_cooldown)
@@ -65,12 +64,11 @@ func request_second_pos(input_pos: Vector2) -> void:
 				active_walls.append(new_wall)
 				new_wall.set("base_contact_damage", max_damage)
 
-# Synchronizes the placement state and boundary visuals to the owner client.
+# Synchronizes the waiting state (and entity lock that comes with) and boundary visuals to the owner client.
 @rpc("authority", "call_local", "reliable")
-func trigger_placement_visuals(is_active: bool, p_start_pos: Vector2) -> void:
+func trigger_waiting_for_end_lock(is_active: bool) -> void:
 	waiting_for_end = is_active
 	entity.input_needed = is_active
-	start_pos = p_start_pos
 	queue_redraw()
 
 # Removes all active walls of fire currently tracked by this component.
@@ -82,9 +80,5 @@ func cleanup() -> void:
 
 # Renders the placement boundary circle with scale-adjusted dimensions.
 func _draw() -> void:
-	if waiting_for_end:
-		var inv_scale: Vector2 = Vector2.ONE / entity.scale
-		var local_start: Vector2 = to_local(start_pos)
-		# Corrects the visual radius to match world-space length regardless of entity scale.
-		var draw_radius: float = max_length * inv_scale.x
-		draw_circle(local_start, draw_radius, Color(0.0, 0.0, 0.0, 0.173), false, 10.0 * inv_scale.x)
+	if waiting_for_end and entity.name == str(multiplayer.get_unique_id()):
+		draw_circle(to_local(start_pos), max_length, Color(0.608, 0.0, 0.0, 0.341), false, 6.0)

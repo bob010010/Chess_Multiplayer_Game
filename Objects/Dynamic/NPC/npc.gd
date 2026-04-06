@@ -10,7 +10,7 @@ extends CharacterBody2D
 var team_id: int = 500
 var knockback: Vector2 = Vector2.ZERO
 var body_damage: int = 10
-var kill_value: int = 50
+var kill_value: int = 200
 
 var ranged_w_component: Node
 var melee_w_component: Node

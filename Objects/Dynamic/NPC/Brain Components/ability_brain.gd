@@ -8,10 +8,13 @@ var min_food_to_spawn_tower: int = 2
 func _ready() -> void:
 	min_food_to_spawn_tower = randi_range(2, 4)
 
-# Spawn towers 
+# Spawn towers, TODO fix this, broken for unknown reasons, something to do with corners?
 func _spawn_towers() -> bool:
-	var spawn_comp: SpawnerComponent = main_brain.npc.get("first_ability_component")
-	if is_instance_valid(spawn_comp) and spawn_comp.get("current_cooldown") <= 0.0 and main_brain.combat_brain.nearby_food_count >= min_food_to_spawn_tower:
+	var spawn_comp: SpawnerComponent = main_brain.npc.get_node_or_null("Components/SpawnerComponent")
+	var near_enough_food: bool = main_brain.combat_brain.nearby_food_count >= min_food_to_spawn_tower
+	var threat_present: bool = is_instance_valid(main_brain.fleeing_brain.current_threat)
+	#print(str(threat_present) + str(spawn_comp.get("max_spawns")) + str(spawn_comp.get("current_spawns")) + str(spawn_comp.get("current_cooldown")))
+	if is_instance_valid(spawn_comp) and spawn_comp.get("current_cooldown") <= 0.0 and (threat_present or near_enough_food):
 		spawn_comp.request_spawn.rpc(main_brain.npc.global_position)
 		return true
 	return false

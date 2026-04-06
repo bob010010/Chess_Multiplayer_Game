@@ -13,7 +13,11 @@ var active_towers: Array[Node2D] = []
 func _process(delta: float) -> void:
 	if multiplayer.is_server() and current_cooldown > 0.0:
 		current_cooldown -= delta
+		
 		current_spawns = active_towers.size()
+		# Regularly cleans up references to destroyed towers to ensure the count is accurate.
+		_cleanup_dead_towers()
+
 
 @rpc("any_peer", "call_local", "reliable")
 func request_spawn(spawn_pos: Vector2) -> void:
@@ -23,7 +27,8 @@ func request_spawn(spawn_pos: Vector2) -> void:
 	if not AbilityUtils.is_position_within_map(get_tree().current_scene, spawn_pos):
 		if ui_comp and entity.is_in_group("player"):
 			ui_comp.display_message.rpc_id(entity.name.to_int(), "Naughty Naughty, Cant Spawn Towers outside the arena")
-		
+			return
+			
 	_cleanup_dead_towers()
 	
 	if current_cooldown <= 0.0 and active_towers.size() < max_spawns:

@@ -79,8 +79,6 @@ func player_promotion_UI_and_reroll(choice: String) -> void:
 func change_weapon(class_choice: String) -> void:
 	var comps: Dictionary = PromoUtils.get_components_for_class(class_choice)
 	
-	printerr(class_choice + str(comps))
-
 	# Defaults to none
 	var new_m: String = comps.get("melee", "None")
 	var new_r: String = comps.get("ranged", "None")

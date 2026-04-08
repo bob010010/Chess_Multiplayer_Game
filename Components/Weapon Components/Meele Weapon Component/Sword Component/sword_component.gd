@@ -1,7 +1,7 @@
 extends MeleeWeaponComponent
 class_name SwordComponent
 
-@onready var swing_audio: AudioStreamPlayer2D = entity.get_node("AudioComponent")
+@export var sword_audio: AudioStream = preload("res://Sound Effects/sword_slash.wav")
 
 @export var swing_angle: float = 120.0
 @export var lunge_distance: float = 20.0
@@ -9,10 +9,12 @@ class_name SwordComponent
 var swing_direction: int = 1
 var base_aim_rotation: float
 
-func _init() -> void:
+func _ready() -> void:
+	super._ready()
 	attack_cooldown = 0.4
 	attack_duration = 0.2
 	retractable = false
+
 
 # Commands all local clients to execute a directional lunging sweep animation.
 @rpc("authority", "call_local", "reliable")
@@ -37,10 +39,10 @@ func trigger_visual_attack(target_pos: Vector2) -> void:
 	active_tween = create_tween()
 	#active_tween.set_process_mode(Tween.TWEEN_PROCESS_PHYSICS) # Stops tunelling
 	active_tween.tween_property(self, "rotation", target_rot, attack_duration).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-	
-	play_swing_sound()
 
 	swing_direction *= -1
+
+	audio_comp.play_weapon_sound(sword_audio)
 
 # Commands all local clients to interrupt the sweep, bounce off the target, and retract position.
 @rpc("authority", "call_local", "reliable")
@@ -51,8 +53,3 @@ func trigger_visual_retract() -> void:
 	active_tween = create_tween()
 	active_tween.tween_property(self, "rotation", base_aim_rotation, attack_duration * 0.2).set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
 	active_tween.parallel().tween_property(self, "position", default_position, attack_duration * 0.2).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-
-func play_swing_sound() -> void:
-	# Randomize the pitch between 0.9 (slightly lower) and 1.1 (slightly higher)
-	swing_audio.pitch_scale = randf_range(0.9, 1.1)
-	swing_audio.play()

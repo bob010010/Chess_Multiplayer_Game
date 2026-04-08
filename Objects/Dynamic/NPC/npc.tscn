@@ -3,7 +3,9 @@
 [ext_resource type="Script" uid="uid://bt6nq7xaxu82r" path="res://Objects/Dynamic/NPC/npc.gd" id="1_5yobt"]
 [ext_resource type="PackedScene" uid="uid://5mf4ol8pweaw" path="res://Components/Sprite Component/sprite_component.tscn" id="1_ge44a"]
 [ext_resource type="Script" uid="uid://d04412dn2ik0y" path="res://Objects/Dynamic/NPC/npcui.gd" id="2_eflwn"]
+[ext_resource type="AudioStream" uid="uid://bioof6hkuy2vl" path="res://Sound Effects/sword_slash.wav" id="3_ovvwt"]
 [ext_resource type="PackedScene" uid="uid://bah68f313cuc3" path="res://Components/Health Component/health_component.tscn" id="4_7k8bs"]
+[ext_resource type="Script" uid="uid://be0de8m0h4ob5" path="res://Components/Audio Components/audio_component.gd" id="4_gbr31"]
 [ext_resource type="Script" uid="uid://bihqjl51yapha" path="res://Components/Movement Component/npc_movement.gd" id="4_l1orh"]
 [ext_resource type="PackedScene" uid="uid://drldjkjxrdrg" path="res://Components/Weapon Components/Ranged Weapon Components/Bow Component/bow_component.tscn" id="5_0gikb"]
 [ext_resource type="PackedScene" uid="uid://b0tv68ilswjsh" path="res://UI/Bars/Health Bar/health_bar.tscn" id="6_bl8rq"]
@@ -24,15 +26,6 @@
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_t2tx2"]
 size = Vector2(140, 180)
-
-[sub_resource type="CircleShape2D" id="CircleShape2D_p2f8y"]
-radius = 500.0
-
-[sub_resource type="CircleShape2D" id="CircleShape2D_q7cir"]
-radius = 110.0
-
-[sub_resource type="CircleShape2D" id="CircleShape2D_l1orh"]
-radius = 160.0
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_c7qqn"]
 properties/0/path = NodePath(".:position")
@@ -75,6 +68,15 @@ properties/12/path = NodePath(".:rotation")
 properties/12/spawn = true
 properties/12/replication_mode = 2
 
+[sub_resource type="CircleShape2D" id="CircleShape2D_p2f8y"]
+radius = 500.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_q7cir"]
+radius = 110.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_l1orh"]
+radius = 160.0
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xfw1d"]
 bg_color = Color(0.6, 0.6, 0.9607843, 0.6)
 corner_radius_top_left = 5
@@ -98,6 +100,17 @@ scale = Vector2(0.3, 0.3)
 shape = SubResource("RectangleShape2D_t2tx2")
 debug_color = Color(0.125988, 0.4824381, 0.5932888, 0.41960785)
 
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=1525879322]
+replication_config = SubResource("SceneReplicationConfig_c7qqn")
+
+[node name="AudioComponent" type="AudioStreamPlayer2D" parent="." unique_id=85077201]
+stream = ExtResource("3_ovvwt")
+max_distance = 848.0
+script = ExtResource("4_gbr31")
+
+[node name="UIComponent" type="Node2D" parent="." unique_id=32059567]
+script = ExtResource("2_eflwn")
+
 [node name="DetectionArea" type="Area2D" parent="." unique_id=1304377030]
 
 [node name="DetectionHitbox" type="CollisionShape2D" parent="DetectionArea" unique_id=2122327938]
@@ -116,12 +129,6 @@ debug_color = Color(0.7764706, 0.42352942, 0.35686275, 0.1764706)
 [node name="LookingHitbox" type="CollisionShape2D" parent="LookingArea" unique_id=1897812908]
 shape = SubResource("CircleShape2D_l1orh")
 debug_color = Color(0.5176471, 0.5764706, 0, 0.101960786)
-
-[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=1525879322]
-replication_config = SubResource("SceneReplicationConfig_c7qqn")
-
-[node name="UIComponent" type="Node2D" parent="." unique_id=32059567]
-script = ExtResource("2_eflwn")
 
 [node name="UI" type="Control" parent="." unique_id=1660187117]
 layout_mode = 3
@@ -204,10 +211,23 @@ script = ExtResource("9_0gikb")
 script = ExtResource("10_bl8rq")
 
 [node name="SpearComponent" parent="Components" unique_id=1242225676 instance=ExtResource("7_ijq6w")]
+spear_audio = null
+lunge_distance = null
+melee_damage = null
+knockback_force = null
+attack_cooldown = null
+attack_duration = null
 
 [node name="BowComponent" parent="Components" unique_id=73394275 instance=ExtResource("5_0gikb")]
 
 [node name="SwordComponent" parent="Components" unique_id=179149588 instance=ExtResource("12_uk261")]
+sword_audio = null
+swing_angle = null
+lunge_distance = null
+melee_damage = null
+knockback_force = null
+attack_cooldown = null
+attack_duration = null
 
 [node name="FireballShooterComponent" parent="Components" unique_id=269407601 instance=ExtResource("13_jjm0i")]
 

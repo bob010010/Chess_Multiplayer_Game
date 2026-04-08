@@ -1,6 +1,8 @@
 extends MeleeWeaponComponent
 class_name SpearComponent
 
+@export var spear_audio: AudioStream = preload("res://Sound Effects/spear_thrust.wav")
+
 @export var lunge_distance: float = 50 # In reality - 
 var pullback_distance: float = 25.0
 
@@ -25,6 +27,7 @@ func trigger_visual_attack(target_pos: Vector2) -> void:
 	active_tween.tween_property(self, "position", back_pos, attack_duration * 0.15).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	active_tween.tween_property(self, "position", forward_pos, attack_duration * 0.3).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	active_tween.tween_property(self, "position", default_position, attack_duration * 0.4).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	audio_comp.play_weapon_sound(spear_audio)
 	
 # Commands all local clients to cleanly interrupt the spear lunge and instantly retract.
 @rpc("authority", "call_local", "reliable")

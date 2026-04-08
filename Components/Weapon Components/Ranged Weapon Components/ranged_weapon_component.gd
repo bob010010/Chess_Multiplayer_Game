@@ -6,6 +6,7 @@ signal apply_recoil(recoil_force: Vector2)
 
 @onready var entity: Node = get_parent().get_parent()
 @onready var ui_comp: UIComponent = entity.get_node("UIComponent")
+@onready var audio_comp: AudioStreamPlayer2D = entity.get_node("AudioComponent")
 
 @export var projectile_type: String = "Default" # An identifier passed to the projectile so it knows what sprite to load
 
@@ -61,6 +62,8 @@ func _spawn_projectile_and_recoil(dir: Vector2) -> void:
 	get_tree().current_scene.get_node("SpawnedProjectiles").spawn_projectile(entity.global_position, dir, shooter_identity, projectile_speed, projectile_damage, projectile_type)
 	apply_recoil.emit(-dir * recoil_strength)
 	
+	play_audio()
+	
 	if is_instance_valid(ui_comp) and entity.is_in_group("player"):
 		ui_comp.handle_attack_activated("Ranged", reload_speed)
 
@@ -73,3 +76,6 @@ func request_shoot(dir: Vector2) -> void:
 			if shot_cooldown <= 0:
 				shot_cooldown = reload_speed
 				_spawn_projectile_and_recoil(dir)
+
+func play_audio() -> void:
+	pass

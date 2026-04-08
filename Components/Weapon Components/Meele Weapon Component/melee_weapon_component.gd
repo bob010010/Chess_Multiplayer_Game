@@ -16,6 +16,7 @@ var default_position: Vector2
 var active_tween: Tween
 
 @onready var entity: CharacterBody2D = get_parent().get_parent()
+@onready var audio_comp: AudioStreamPlayer2D = entity.get_node("AudioComponent")
 @onready var ui_comp: UIComponent = entity.get_node("UIComponent")
 @onready var hitbox: Area2D = $Hitbox
 @onready var hitbox_shape: CollisionShape2D = $Hitbox/Collision
@@ -69,6 +70,8 @@ func _on_target_entered(target: Node2D) -> void:
 
 func _on_cooldown_finished() -> void:
 	can_attack = true
+
+
 
 @rpc("authority", "call_local", "reliable")
 func trigger_visual_attack(_target_pos: Vector2) -> void:

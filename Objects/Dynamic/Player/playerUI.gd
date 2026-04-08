@@ -1,7 +1,7 @@
 extends UIComponent
 
 @onready var hud: CanvasLayer = $"../HUD"
-@onready var ui_container = $"../UI"
+@onready var ui_container: Control = $"../UI"
 
 @onready var movement_component: Node = $"../Components/MovementComponent"
 @onready var health_component: Node = $"../Components/HealthComponent"

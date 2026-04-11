@@ -7,6 +7,9 @@ static var fireball_shooter_image: Texture2D = preload("res://images/Projectiles
 static var pin_shooter_image: Texture2D = preload("res://images/Projectiles/pinRed.png")
 static var null_image: Texture2D = preload("res://images/upgrade.png")
 
+static var pin_image: Texture2D = preload("res://images/Projectiles/pinRed.png")
+static var fireball_image: Texture2D = preload("res://images/Projectiles/fireball.png")
+static var arrow_image: Texture2D = preload("res://images/Projectiles/arrow.png")
 
 static func get_image_by_component_name(comp_name: String) -> Texture2D:
 	var img: Texture2D = null_image
@@ -21,5 +24,15 @@ static func get_image_by_component_name(comp_name: String) -> Texture2D:
 			img = fireball_shooter_image
 		"Pin_Shooter":
 			img = pin_shooter_image
+	return img
 
+static func get_image_by_projectile_name(proj_name: String) -> Texture2D:
+	var img: Texture2D = null_image
+	match proj_name:
+		"Fireball":
+			img = fireball_image
+		"Pin":
+			img = pin_image
+		"Arrow":
+			img = arrow_image
 	return img

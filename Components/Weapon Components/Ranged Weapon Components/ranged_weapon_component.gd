@@ -1,9 +1,6 @@
 extends Node2D
 class_name RangedWeaponComponent
 
-# Tells the parent to apply knockback
-signal apply_recoil(recoil_force: Vector2)
-
 @onready var entity: Node = get_parent().get_parent()
 @onready var ui_comp: UIComponent = entity.get_node("UIComponent")
 @onready var audio_comp: AudioStreamPlayer2D = entity.get_node("AudioComponent")
@@ -14,7 +11,7 @@ signal apply_recoil(recoil_force: Vector2)
 var projectile_speed: int = 200
 var projectile_damage: int = 10
 var projectile_force: float = 2.0
-var recoil_strength: int = 30
+var recoil_strength: int = 300
 var accuracy: float = 100.0
 
 var is_charging: bool = false
@@ -98,7 +95,8 @@ func _spawn_projectile_and_recoil(dir: Vector2, final_speed: int, final_damage: 
 		
 	get_tree().current_scene.get_node("SpawnedProjectiles").spawn_projectile(entity.global_position, dir, shooter_identity, final_speed, final_damage, projectile_type)
 	
-	apply_recoil.emit(-dir * (recoil_strength * (final_speed / projectile_speed)))
+	# TODO Make this an rpc
+	entity.apply_recoil.rpc_id(1, -dir * (recoil_strength * (final_speed / projectile_speed)))
 
 	play_audio()
 
@@ -118,7 +116,7 @@ func trigger_visual_ghost(visible_state: bool) -> void:
 			
 		ghost_node = Sprite2D.new()
 		# Logic to determine texture based on projectile_type
-		ghost_node.texture = _get_projectile_texture()
+		ghost_node.texture = ImageUtils.get_image_by_projectile_name(projectile_type)
 		ghost_node.modulate = Color(1.0, 1.0, 1.0, 0.2)
 		ghost_node.scale = Vector2.ZERO
 		ghost_node.z_index = 2
@@ -150,14 +148,3 @@ func _update_ghost_visuals() -> void:
 			var dir: Vector2 = (entity.global_position - get_global_mouse_position()).normalized()
 			
 			ghost_node.rotation = dir.angle() - 55.0
-
-# Helper to retrieve the correct texture for the ghost from the spawner registry.
-func _get_projectile_texture() -> Texture2D:
-	var spawner: ProjectileSpawner = get_tree().current_scene.get_node("SpawnedProjectiles")
-	var proj_scene: PackedScene = spawner.projectile_scenes.get(projectile_type, null)
-	if proj_scene:
-		var temp_node: Projectile = proj_scene.instantiate()
-		var tex: Texture2D = temp_node.get_node("Sprite2D").texture
-		temp_node.free()
-		return tex
-	return null

@@ -3,8 +3,8 @@
 [ext_resource type="Script" uid="uid://bt6nq7xaxu82r" path="res://Objects/Dynamic/NPC/npc.gd" id="1_5yobt"]
 [ext_resource type="PackedScene" uid="uid://5mf4ol8pweaw" path="res://Components/Sprite Component/sprite_component.tscn" id="1_ge44a"]
 [ext_resource type="Script" uid="uid://d04412dn2ik0y" path="res://Objects/Dynamic/NPC/npcui.gd" id="2_eflwn"]
-[ext_resource type="AudioStream" uid="uid://bioof6hkuy2vl" path="res://Sound Effects/sword_slash.wav" id="3_ovvwt"]
-[ext_resource type="Texture2D" path="res://Images/chess-pieces/white-pawn.png" id="3_vmwl6"]
+[ext_resource type="AudioStream" uid="uid://cyk0hywipeti3" path="res://Sound Effects/sword_slash.wav" id="3_ovvwt"]
+[ext_resource type="Texture2D" uid="uid://dafivqsxp2upj" path="res://Images/chess-pieces/white-pawn.png" id="3_vmwl6"]
 [ext_resource type="PackedScene" uid="uid://bah68f313cuc3" path="res://Components/Health Component/health_component.tscn" id="4_7k8bs"]
 [ext_resource type="Script" uid="uid://be0de8m0h4ob5" path="res://Components/Audio Components/audio_component.gd" id="4_gbr31"]
 [ext_resource type="Script" uid="uid://bihqjl51yapha" path="res://Components/Movement Component/npc_movement.gd" id="4_l1orh"]
@@ -213,12 +213,6 @@ script = ExtResource("9_0gikb")
 script = ExtResource("10_bl8rq")
 
 [node name="SpearComponent" parent="Components" unique_id=1242225676 instance=ExtResource("7_ijq6w")]
-spear_audio = null
-lunge_distance = null
-melee_damage = null
-knockback_force = null
-attack_cooldown = null
-attack_duration = null
 
 [node name="BowComponent" parent="Components" unique_id=73394275 instance=ExtResource("5_0gikb")]
 

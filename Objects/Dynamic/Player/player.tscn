@@ -244,6 +244,7 @@ replication_config = SubResource("SceneReplicationConfig_sweqy")
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=436632609]
 position = Vector2(8, -8)
+zoom = Vector2(2, 2)
 position_smoothing_enabled = true
 
 [node name="UIComponent" type="Node2D" parent="." unique_id=308885794]

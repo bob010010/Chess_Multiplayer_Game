@@ -11,8 +11,9 @@ func _ready() -> void:
 	retractable = false
 
 func _physics_process(_delta: float) -> void:
-	if not active_tween:
-		look_at(get_global_mouse_position())
+	if entity.name == str(multiplayer.get_unique_id()):
+		if not active_tween:
+			look_at(get_global_mouse_position())
 
 # Commands all local clients to execute the physical spear lunge and reset animation.
 @rpc("authority", "call_local", "reliable")

@@ -280,8 +280,9 @@ func apply_bounce(force: Vector2) -> void:
 		knockback = force
 		
 # Adds recoil momentum from weapon firing.
-func _on_apply_recoil(force: Vector2) -> void:
-	print("Recoil applied")
+@rpc("authority", "call_local", "reliable")
+func apply_recoil(force: Vector2) -> void:
+	print("Recoil applied: " + str(force))
 	knockback += force
 
 # Awards points to the attacker, disables the player, and triggers the death UI.

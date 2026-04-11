@@ -55,7 +55,7 @@ debug_color = Color(0.5513601, 0.4082944, 0.9865976, 0.1764706)
 [node name="BowComponent" parent="Components" unique_id=73394275 instance=ExtResource("3_2373d")]
 position = Vector2(0, 4.9999995)
 
-[node name="AudioComponent" type="Node2D" parent="." unique_id=1939771261]
+[node name="AudioComponent" type="AudioStreamPlayer2D" parent="." unique_id=1474049208]
 scale = Vector2(0.99999994, 0.99999994)
 script = ExtResource("5_ceh55")
 

@@ -228,20 +228,19 @@ static var class_tooltips: Dictionary = {
 static var class_base_stats: Dictionary = {
 	# Rank 1
 	"Pawn": {
-		"move_speed": 150.0,
-		"max_health": 50.0,
-		"regen_speed": 25.0,
-		"regen_amount": 1.0,
-		"body_damage": 5.0,
-		"melee_damage": 10.0,
-		"melee_knockback": 200.0,
-		"melee_cooldown": 1.0,
-		"shield_health": 20.0
+	"move_speed": 240.0,
+	"max_health": 50.0,
+	"regen_speed": 25.0,
+	"regen_amount": 1.0,
+	"body_damage": 5.0,
+	"melee_damage": 10.0,
+	"melee_knockback": 200.0,
+	"melee_cooldown": 1.0,
+	"shield_health": 20.0
 	},
-	
 	# Rank 2
 	"Pawn_I": {
-		"move_speed": 160.0,
+		"move_speed": 230.0,
 		"max_health": 65.0,
 		"regen_speed": 22.5,
 		"regen_amount": 2.0,
@@ -251,10 +250,10 @@ static var class_base_stats: Dictionary = {
 		"melee_cooldown": 0.9,
 		"shield_health": 30.0
 	},
-	
+
 	# Rank 3
 	"Pawn_II": {
-		"move_speed": 170.0,
+		"move_speed": 220.0,
 		"max_health": 80.0,
 		"regen_speed": 20.0,
 		"regen_amount": 2.0,
@@ -267,7 +266,7 @@ static var class_base_stats: Dictionary = {
 
 	# Rank 4
 	"Knight": {
-		"move_speed": 150.0,
+		"move_speed": 230.0,
 		"max_health": 60.0,
 		"regen_speed": 17.5,
 		"regen_amount": 2.0,
@@ -280,7 +279,7 @@ static var class_base_stats: Dictionary = {
 		"shield_health": 40.0
 	},
 	"Mini_Rook": {
-		"move_speed": 150.0,
+		"move_speed": 180.0,
 		"max_health": 150.0,
 		"regen_speed": 15.0,
 		"regen_amount": 2.0,
@@ -294,10 +293,9 @@ static var class_base_stats: Dictionary = {
 		"shield_health": 80.0
 	},
 
-
 	# Rank 5
 	"Shadow_Knight": { 
-		"move_speed": 200.0,
+		"move_speed": 250.0,
 		"max_health": 45.0,
 		"regen_speed": 17.5,
 		"regen_amount": 1.0,
@@ -310,7 +308,7 @@ static var class_base_stats: Dictionary = {
 		"shield_health": 25.0
 	},
 	"Flowers_Knight": {
-		"move_speed": 175.0,
+		"move_speed": 220.0,
 		"max_health": 80.0,
 		"regen_speed": 15.0,
 		"regen_amount": 5.0,
@@ -337,7 +335,7 @@ static var class_base_stats: Dictionary = {
 		"shield_health": 120.0
 	},
 	"Bishop": {
-		"move_speed": 225.0,
+		"move_speed": 210.0,
 		"max_health": 45.0,
 		"regen_speed": 15.0,
 		"regen_amount": 3.0,
@@ -355,7 +353,7 @@ static var class_base_stats: Dictionary = {
 
 	# Rank 6
 	"Sultans_Knight": {
-		"move_speed": 250.0,
+		"move_speed": 200.0,
 		"max_health": 70.0,
 		"regen_speed": 14.0,
 		"regen_amount": 3.0,
@@ -371,7 +369,7 @@ static var class_base_stats: Dictionary = {
 		"shield_health": 50.0
 	},
 	"Rook_Knight": {
-		"move_speed": 150.0,
+		"move_speed": 140.0,
 		"max_health": 170.0,
 		"regen_speed": 12.5,
 		"regen_amount": 3.0,
@@ -387,7 +385,7 @@ static var class_base_stats: Dictionary = {
 		"shield_health": 100.0
 	},
 	"Bishop_Knight": {
-		"move_speed": 210.0,
+		"move_speed": 190.0,
 		"max_health": 60.0,
 		"regen_speed": 15.0,
 		"regen_amount": 4.0,
@@ -405,7 +403,7 @@ static var class_base_stats: Dictionary = {
 
 	# Rank 7
 	"King_Knight": {
-		"move_speed": 250.0,
+		"move_speed": 180.0,
 		"max_health": 200.0,
 		"regen_speed": 12.5,
 		"regen_amount": 10.0,
@@ -420,7 +418,7 @@ static var class_base_stats: Dictionary = {
 		"teleport_cooldown": 2.0,
 	},
 	"King_Bishop": {
-		"move_speed": 250.0,
+		"move_speed": 170.0,
 		"max_health": 200.0,
 		"regen_speed": 12.5,
 		"regen_amount": 10.0,
@@ -435,7 +433,7 @@ static var class_base_stats: Dictionary = {
 		"area_cooldown": 2.0,
 	},
 	"King_Rook": {
-		"move_speed": 250.0,
+		"move_speed": 130.0,
 		"max_health": 200.0,
 		"regen_speed": 10.0,
 		"regen_amount": 10.0,
@@ -451,7 +449,7 @@ static var class_base_stats: Dictionary = {
 
 	# Rank 8
 	"King": {
-		"move_speed": 250.0,
+		"move_speed": 120.0,
 		"max_health": 200.0,
 		"regen_speed": 7.5,
 		"regen_amount": 10.0,
@@ -466,7 +464,7 @@ static var class_base_stats: Dictionary = {
 		"shield_health": 200.0
 	},
 	"Queen": {
-		"move_speed": 250.0,
+		"move_speed": 160.0,
 		"max_health": 200.0,
 		"regen_speed": 10.0,
 		"regen_amount": 10.0,
@@ -484,7 +482,7 @@ static var class_base_stats: Dictionary = {
 		"shield_health": 200.0
 	},
 	"Sultan": {
-		"move_speed": 250.0,
+		"move_speed": 140.0,
 		"max_health": 200.0,
 		"regen_speed": 7.5,
 		"regen_amount": 10.0,
@@ -498,9 +496,8 @@ static var class_base_stats: Dictionary = {
 		"mass_heal_cooldown": 30.0,
 		"shield_health": 200.0
 	},
-
 	"Jester": {
-		"move_speed": 260.0,
+		"move_speed": 210.0,
 		"max_health": 110.0,
 		"regen_speed": 10.0,
 		"regen_amount": 5.0,
@@ -508,7 +505,7 @@ static var class_base_stats: Dictionary = {
 		"projectile_damage": 60.0,
 		"projectile_speed": 325.0,
 		"max_charge_time": 1.3,
-		"accuracy": 85.0,
+		"accuracy": 85.0, 
 		"illusion_cooldown": 12.0,
 		"illusion_duration": 5.0,
 		"illusions_count": 6.0,
@@ -517,7 +514,7 @@ static var class_base_stats: Dictionary = {
 
 	# Rank 9
 	"Super_Queen": {
-		"move_speed": 250.0,
+		"move_speed": 150.0,
 		"max_health": 200.0,
 		"regen_speed": 10.0,
 		"regen_amount": 10.0,
@@ -538,7 +535,7 @@ static var class_base_stats: Dictionary = {
 		"shield_health": 200.0
 	},
 	"Holy_Queen": {
-		"move_speed": 250.0,
+		"move_speed": 150.0,
 		"max_health": 200.0,
 		"regen_speed": 10.0,
 		"regen_amount": 10.0,
@@ -551,8 +548,8 @@ static var class_base_stats: Dictionary = {
 		"max_charge_time": 1.0,
 		"accuracy": 90.0, 
 		"wof_cooldown": 10.0,
-		"wof_length": 500,
-		"wof_damage": 10,
+		"wof_length": 500.0,
+		"wof_damage": 10.0,
 		"mass_heal_amount": 100,
 		"mass_heal_cooldown": 20.0,
 		"shield_health": 200.0

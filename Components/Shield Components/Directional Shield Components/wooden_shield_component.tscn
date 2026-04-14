@@ -1,22 +1,24 @@
 [gd_scene format=3 uid="uid://3y2gt1rbgeo3"]
 
 [ext_resource type="Script" uid="uid://cni8ihob2gt7d" path="res://Components/Shield Components/Directional Shield Components/wooden_shield_component.gd" id="1_vpbaj"]
-[ext_resource type="Texture2D" uid="uid://36s1amagrsw4" path="res://images/HowToPlay/s-key.png" id="2_sx7kd"]
+[ext_resource type="Texture2D" uid="uid://d0oqiwsbfvcid" path="res://images/Shields/Shield.png" id="2_sx7kd"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_3itx8"]
-size = Vector2(46, 17)
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_yf8pf"]
+radius = 23.333334
+height = 46.666668
 
 [node name="WoodenShieldComponent" type="Node2D" unique_id=975093531]
 script = ExtResource("1_vpbaj")
 
 [node name="SpriteComponent" type="Sprite2D" parent="." unique_id=262998126]
 position = Vector2(0.21582794, 0.46896744)
-scale = Vector2(0.5683453, 0.062068947)
+rotation = 1.5707964
+scale = Vector2(0.2, 0.2)
 texture = ExtResource("2_sx7kd")
 
 [node name="Hitbox" type="Area2D" parent="." unique_id=2082028233]
 scale = Vector2(1.8, 0.6)
 
 [node name="Collision" type="CollisionShape2D" parent="Hitbox" unique_id=964632112]
-shape = SubResource("RectangleShape2D_3itx8")
+shape = SubResource("CapsuleShape2D_yf8pf")
 debug_color = Color(0.35710907, 0.115965985, 0.08251613, 0.41960785)

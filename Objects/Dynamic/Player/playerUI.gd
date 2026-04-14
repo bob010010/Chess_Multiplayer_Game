@@ -43,12 +43,14 @@ var current_second_ability: String
 @onready var first_ability_bar: EntityBar = $"../HUD/FirstAbilityBar"
 @onready var second_ability_bar: EntityBar = $"../HUD/SecondAbilityBar"
 
-@onready var reload_bar: EntityBar = $"../UI/ReloadBar"
+@onready var charge_bar: EntityBar = $"../UI/ChargeBar"
 @onready var melee_bar: EntityBar = $"../UI/MeleeBar"
+
+@onready var immunity_bar: EntityBar = $"../UI/ImmunityBar"
 
 func _ready() -> void:
 	ui_container.show()
-	reload_bar.hide()
+	charge_bar.hide()
 	melee_bar.hide()
 	first_ability_bar.hide()
 	second_ability_bar.hide()
@@ -202,6 +204,34 @@ func trigger_attack_ui(type: String, max_cooldown: float) -> void:
 				if is_instance_valid(bar): 
 					bar.hide()
 			)
+
+# Orchestrates the server-to-client communication for the charge bar state.
+func handle_charge_activated(is_active: bool, max_time: float) -> void:
+	if not multiplayer.is_server():
+		return
+	
+	trigger_charge_ui.rpc(is_active, max_time)
+
+# Manages the local fill animation of the charge bar and stops it upon weapon release.
+@rpc("authority", "call_local", "reliable")
+func trigger_charge_ui(is_active: bool, max_time: float) -> void:
+	if not entity.is_in_group("player") or entity.name != str(multiplayer.get_unique_id()):
+		return
+		
+	if not is_instance_valid(charge_bar):
+		return
+
+	if is_active:
+		# Resets and begins filling the bar based on the provided duration
+		charge_bar.show()
+		charge_bar.max_value = max_time
+		charge_bar.value = 0.0
+		charge_bar.animate_value(max_time, max_time, max_time)
+	else:
+		# Instantly terminates the animation and hides the bar
+		if charge_bar.bar_tween:
+			charge_bar.bar_tween.kill()
+		charge_bar.hide()
 
 # Triggers the visual message and cooldown bar animation for a specific ability slot.
 func handle_ability_activated(caller: Node2D, ability_name: String, cooldown: float) -> void:

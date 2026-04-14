@@ -163,6 +163,16 @@ bg_color = Color(0.18072194, 0.180722, 0.18072188, 0.36862746)
 resource_local_to_scene = true
 bg_color = Color(0.99999994, 0.19798115, 0.14916462, 0.6117647)
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_46ev8"]
+bg_color = Color(0.1882353, 0.1882353, 0.1882353, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_p8344"]
+bg_color = Color(0.71305937, 0.71158284, 0, 0.65882355)
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ohodf"]
 bg_color = Color(0.6, 0.6, 0.9607843, 0.6)
 corner_radius_top_left = 5
@@ -573,12 +583,12 @@ offset_bottom = 26.0
 grow_horizontal = 2
 grow_vertical = 0
 
-[node name="ReloadBar" type="ProgressBar" parent="UI" unique_id=894808094]
+[node name="ChargeBar" type="ProgressBar" parent="UI" unique_id=894808094]
 layout_mode = 1
-offset_left = -17.0
-offset_top = -36.0
-offset_right = -13.0
-offset_bottom = -9.0
+offset_left = -15.0
+offset_top = -60.0
+offset_right = -10.0
+offset_bottom = -10.0
 theme_override_styles/background = SubResource("StyleBoxFlat_hacst")
 theme_override_styles/fill = SubResource("StyleBoxFlat_mf1qr")
 fill_mode = 3
@@ -595,6 +605,25 @@ offset_bottom = -9.0
 theme_override_styles/background = SubResource("StyleBoxFlat_5mjlr")
 theme_override_styles/fill = SubResource("StyleBoxFlat_8ai7u")
 fill_mode = 3
+show_percentage = false
+script = ExtResource("10_ktvaa")
+metadata/_custom_type_script = "uid://2lr61aueyl58"
+
+[node name="ImmunityBar" type="ProgressBar" parent="UI" unique_id=1166714927]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -40.0
+offset_top = 65.0
+offset_right = 40.0
+offset_bottom = 71.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_styles/background = SubResource("StyleBoxFlat_46ev8")
+theme_override_styles/fill = SubResource("StyleBoxFlat_p8344")
 show_percentage = false
 script = ExtResource("10_ktvaa")
 metadata/_custom_type_script = "uid://2lr61aueyl58"

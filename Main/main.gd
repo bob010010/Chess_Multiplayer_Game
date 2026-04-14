@@ -72,7 +72,7 @@ func _ready() -> void:
 func _apply_preset_or_custom() -> void:
 	var input: String = $TitleScreen/HostPanel/Preset.text.strip_edges()
 	if input == "":
-		input = "1-Bot"
+		input = "Alone"
 	var parts: Array = input.split(",")
 	print("GAME PRESETS: " + str(parts))
 	# If a single token matches a preset key, apply it directly

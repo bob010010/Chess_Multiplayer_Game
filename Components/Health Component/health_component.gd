@@ -5,6 +5,8 @@ signal died(attacker_id: String)
 @export var max_health: int = 500
 var health: float = 500
 
+
+		
 var healing: bool = true
 @export var regen_amount: float = 2.0
 @export var regen_speed: float = 10.0
@@ -26,6 +28,14 @@ var current_heal: int = 0
 var dmg_tween: Tween = null
 var heal_tween: Tween = null
 
+var immune: bool = false
+var immune_time: float:
+	set(value):
+		immune_time = value
+		if entity.is_in_group("player"):
+			ui_comp.immunity_bar.value = (value / 15.0) * 100 # TODO move this to UI
+			
+
 var mass_heal_amount: int = 50
 var mass_heal_cooldown: float = 5.0
 var current_cooldown: float = 0.0
@@ -40,7 +50,16 @@ func _ready() -> void:
 # Handles passive health regeneration/decay exclusively on the server.
 func _process(delta: float) -> void:
 	if not multiplayer.is_server():
-		return
+		return#
+	
+	# Reduces the time left the entity is immune 
+	if immune:
+		if immune_time > 0.0:
+			immune_time -= delta
+			if immune_time <= 0.0:
+				immune = false
+				ui_comp.immunity_bar.hide()
+			queue_redraw()
 	
 	if current_cooldown > 0.0:
 		current_cooldown -= delta
@@ -53,11 +72,12 @@ func _process(delta: float) -> void:
 			heal(regen_amount)
 
 	# Handles decay regardless of current health status.
-	if decaying and health > 0:
+	if decaying and health > 0 and not immune:
 		decay_cooldown -= delta
 		if decay_cooldown <= 0.0:
 			decay_cooldown = decay_speed
-			take_damage(decay_amount, "")
+			take_damage(decay_amount, "") #TODO this should still hold the player who infliced the debuff?
+			
 
 # Restores health up to the maximum limit and triggers floating heal text.
 func heal(amount: float) -> void:
@@ -74,6 +94,10 @@ func heal(amount: float) -> void:
 # Deducts health, emits death signal if empty, and triggers floating damage text.
 func take_damage(amount: int, attacker_id: String = "", non_entity_attacker: bool = false) -> void:
 	if not multiplayer.is_server():
+		return
+	
+	if immune and not non_entity_attacker:
+		print("Immune")
 		return
 
 	# Friendly Fire Check
@@ -125,3 +149,7 @@ func request_mass_heal() -> void:
 			ui_comp.handle_ability_activated(self, "Mass Heal", mass_heal_cooldown)
 		current_cooldown = mass_heal_cooldown
 		heal(mass_heal_amount)
+
+func _draw() -> void:
+	if immune:
+		draw_circle(Vector2.ZERO, 50.0, Color("ffff33a8"))

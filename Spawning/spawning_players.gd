@@ -20,11 +20,14 @@ func add_player(id: int, start_score: int = 0) -> void:
 	if start_score > 0: # Gives the player score when they start
 		player_instance.ready.connect(func() -> void: _apply_start_score(player_instance, start_score))
 	
+	player_instance.ready.connect(func() -> void: apply_spawn_immunity(player_instance, 15.0))
+	
 	match owner.game_type:
 		"FFA":
 			player_instance.team_id = 1 if id == 1 else get_child_count() + 1
 		"2_Teams":
 			player_instance.team_id = 1 if id == 1 else (get_child_count() % 2) + 1 #TODO change this to be fair
+	
 	
 	#printerr("REAL NAME: " + str(player_instance.name))
 	#printerr("Username: " + player_instance.player_username)
@@ -35,3 +38,10 @@ func _apply_start_score(player: CharacterBody2D, points: int) -> void:
 	var level_comp: Node = player.get_node_or_null("Components/LevelingComponent")
 	if is_instance_valid(level_comp) and level_comp.has_method("get_points"):
 		level_comp.get_points(points)
+
+# Makes the player immune for a while on spawn
+func apply_spawn_immunity(player: CharacterBody2D, time: float) -> void:
+	var health_comp: Node = player.get_node_or_null("Components/HealthComponent")
+	if is_instance_valid(health_comp):
+		health_comp.immune = true
+		health_comp.immune_time = time

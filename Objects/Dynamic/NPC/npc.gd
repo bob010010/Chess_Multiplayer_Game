@@ -56,7 +56,7 @@ func apply_team_color() -> void:
 		return
 	
 	if "team_id" in local_player:
-		if self.team_id == local_player.get("team_id"):
+		if team_id == local_player.get("team_id"):
 			sprite.modulate = Color(0.0, 1.0, 0.0) # Green for teammate
 		else:
 			sprite.modulate = Color(1.0, 0.0, 0.0) # Red for enemy

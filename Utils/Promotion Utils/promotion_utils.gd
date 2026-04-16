@@ -230,45 +230,45 @@ static var class_base_stats: Dictionary = {
 	"Pawn": {
 	"move_speed": 240.0,
 	"max_health": 50.0,
-	"regen_speed": 25.0,
+	"regen_speed": 12.5,
 	"regen_amount": 1.0,
 	"body_damage": 5.0,
 	"melee_damage": 10.0,
 	"melee_knockback": 200.0,
 	"melee_cooldown": 1.0,
-	"shield_health": 20.0
+	"shield_health": 2.0
 	},
 	# Rank 2
 	"Pawn_I": {
 		"move_speed": 230.0,
 		"max_health": 65.0,
-		"regen_speed": 22.5,
+		"regen_speed": 11.25,
 		"regen_amount": 2.0,
 		"body_damage": 8.0,
 		"melee_damage": 15.0,
 		"melee_knockback": 250.0,
 		"melee_cooldown": 0.9,
-		"shield_health": 30.0
+		"shield_health": 3.0
 	},
 
 	# Rank 3
 	"Pawn_II": {
 		"move_speed": 220.0,
 		"max_health": 80.0,
-		"regen_speed": 20.0,
+		"regen_speed": 10.0,
 		"regen_amount": 2.0,
 		"body_damage": 10.0,
 		"melee_damage": 20.0,
 		"melee_knockback": 300.0,
 		"melee_cooldown": 0.8,
-		"shield_health": 40.0
+		"shield_health": 4.0
 	},
 
 	# Rank 4
 	"Knight": {
 		"move_speed": 230.0,
 		"max_health": 60.0,
-		"regen_speed": 17.5,
+		"regen_speed": 8.75,
 		"regen_amount": 2.0,
 		"body_damage": 8.0,
 		"melee_damage": 25.0,
@@ -276,12 +276,12 @@ static var class_base_stats: Dictionary = {
 		"melee_cooldown": 0.6,
 		"teleport_range": 400.0,
 		"teleport_cooldown": 5.0,
-		"shield_health": 40.0
+		"shield_health": 4.0
 	},
 	"Mini_Rook": {
 		"move_speed": 180.0,
 		"max_health": 150.0,
-		"regen_speed": 15.0,
+		"regen_speed": 7.5,
 		"regen_amount": 2.0,
 		"body_damage": 15.0,
 		"projectile_damage": 8.0,
@@ -290,14 +290,14 @@ static var class_base_stats: Dictionary = {
 		"accuracy": 60.0,
 		"mass_heal_amount": 20,
 		"mass_heal_cooldown": 20.0,
-		"shield_health": 80.0
+		"shield_health": 8.0
 	},
 
 	# Rank 5
 	"Shadow_Knight": { 
 		"move_speed": 250.0,
 		"max_health": 45.0,
-		"regen_speed": 17.5,
+		"regen_speed": 8.75,
 		"regen_amount": 1.0,
 		"body_damage": 12.0,
 		"melee_damage": 40.0,
@@ -305,12 +305,12 @@ static var class_base_stats: Dictionary = {
 		"melee_cooldown": 0.4,
 		"stealth_cooldown": 12.0,
 		"stealth_duration": 2.0,
-		"shield_health": 25.0
+		"shield_health": 2.5
 	},
 	"Flowers_Knight": {
 		"move_speed": 220.0,
 		"max_health": 80.0,
-		"regen_speed": 15.0,
+		"regen_speed": 7.5,
 		"regen_amount": 5.0,
 		"body_damage": 10.0,
 		"melee_damage": 22.0,
@@ -318,12 +318,12 @@ static var class_base_stats: Dictionary = {
 		"melee_cooldown": 0.7,
 		"teleport_range": 300.0,
 		"teleport_cooldown": 6.0,
-		"shield_health": 80.0
+		"shield_health": 8.0
 	},
 	"Rook": {
 		"move_speed": 150.0,
 		"max_health": 220.0,
-		"regen_speed": 14.0,
+		"regen_speed": 7.0,
 		"regen_amount": 4.0,
 		"body_damage": 25.0,
 		"projectile_damage": 10.0,
@@ -332,12 +332,12 @@ static var class_base_stats: Dictionary = {
 		"accuracy": 70.0,
 		"spawner_cooldown": 12.0,
 		"max_spawns": 3.0,
-		"shield_health": 120.0
+		"shield_health": 12.0
 	},
 	"Bishop": {
 		"move_speed": 210.0,
 		"max_health": 45.0,
-		"regen_speed": 15.0,
+		"regen_speed": 7.5,
 		"regen_amount": 3.0,
 		"body_damage": 4.0,
 		"projectile_damage": 15.0,
@@ -348,14 +348,14 @@ static var class_base_stats: Dictionary = {
 		"area_knockback": 600.0,
 		"area_radius": 150.0,
 		"area_cooldown": 8.0,
-		"shield_health": 50.0
+		"shield_health": 5.0
 	},
 
 	# Rank 6
 	"Sultans_Knight": {
 		"move_speed": 200.0,
 		"max_health": 70.0,
-		"regen_speed": 14.0,
+		"regen_speed": 7.0,
 		"regen_amount": 3.0,
 		"body_damage": 15.0,
 		"melee_damage": 35.0,
@@ -366,12 +366,12 @@ static var class_base_stats: Dictionary = {
 		"area_damage": 25.0,
 		"area_knockback": 500.0,
 		"area_radius": 100.0,
-		"shield_health": 50.0
+		"shield_health": 5.0
 	},
 	"Rook_Knight": {
 		"move_speed": 140.0,
 		"max_health": 170.0,
-		"regen_speed": 12.5,
+		"regen_speed": 6.25,
 		"regen_amount": 3.0,
 		"body_damage": 18.0,
 		"projectile_damage": 20.0,
@@ -382,12 +382,12 @@ static var class_base_stats: Dictionary = {
 		"teleport_cooldown": 6.0,
 		"spawner_cooldown": 12.0,
 		"max_spawns": 5.0,
-		"shield_health": 100.0
+		"shield_health": 10.0
 	},
 	"Bishop_Knight": {
 		"move_speed": 190.0,
 		"max_health": 60.0,
-		"regen_speed": 15.0,
+		"regen_speed": 7.5,
 		"regen_amount": 4.0,
 		"body_damage": 6.0,
 		"projectile_damage": 25.0,
@@ -398,14 +398,14 @@ static var class_base_stats: Dictionary = {
 		"area_knockback": 750.0,
 		"area_radius": 150.0,
 		"area_cooldown": 6.0,
-		"shield_health": 75.0
+		"shield_health": 8
 	},
 
 	# Rank 7
 	"King_Knight": {
 		"move_speed": 180.0,
 		"max_health": 200.0,
-		"regen_speed": 12.5,
+		"regen_speed": 6.25,
 		"regen_amount": 10.0,
 		"body_damage": 20.0,
 		"melee_damage": 60.0,
@@ -416,11 +416,12 @@ static var class_base_stats: Dictionary = {
 		"area_radius": 100.0,
 		"teleport_range": 1000.0,
 		"teleport_cooldown": 2.0,
+		"shield_health": 12
 	},
 	"King_Bishop": {
 		"move_speed": 170.0,
 		"max_health": 200.0,
-		"regen_speed": 12.5,
+		"regen_speed": 6.25,
 		"regen_amount": 10.0,
 		"body_damage": 20.0,
 		"projectile_damage": 40.0,
@@ -431,11 +432,12 @@ static var class_base_stats: Dictionary = {
 		"area_knockback": 1000.0,
 		"area_radius": 150.0,
 		"area_cooldown": 2.0,
+		"shield_health": 10.0
 	},
 	"King_Rook": {
 		"move_speed": 130.0,
 		"max_health": 200.0,
-		"regen_speed": 10.0,
+		"regen_speed": 5.0,
 		"regen_amount": 10.0,
 		"body_damage": 20.0,
 		"projectile_damage": 40.0,
@@ -444,14 +446,14 @@ static var class_base_stats: Dictionary = {
 		"accuracy": 80.0, 
 		"spawner_cooldown": 12.0,
 		"max_spawns": 7.0,
-		"shield_health": 200.0
+		"shield_health": 20.0
 	},
 
 	# Rank 8
 	"King": {
 		"move_speed": 120.0,
 		"max_health": 200.0,
-		"regen_speed": 7.5,
+		"regen_speed": 3.75,
 		"regen_amount": 10.0,
 		"body_damage": 20.0,
 		"melee_damage": 60.0,
@@ -461,12 +463,12 @@ static var class_base_stats: Dictionary = {
 		"area_knockback": 1000.0,
 		"area_radius": 150.0,
 		"area_cooldown": 2.0,
-		"shield_health": 200.0
+		"shield_health": 20.0
 	},
 	"Queen": {
 		"move_speed": 160.0,
 		"max_health": 200.0,
-		"regen_speed": 10.0,
+		"regen_speed": 5.0,
 		"regen_amount": 10.0,
 		"body_damage": 20.0,
 		"projectile_damage": 40.0,
@@ -479,12 +481,12 @@ static var class_base_stats: Dictionary = {
 		"area_cooldown": 2.0,
 		"teleport_range": 1000.0,
 		"teleport_cooldown": 2.0,
-		"shield_health": 200.0
+		"shield_health": 20.0
 	},
 	"Sultan": {
 		"move_speed": 140.0,
 		"max_health": 200.0,
-		"regen_speed": 7.5,
+		"regen_speed": 3.75,
 		"regen_amount": 10.0,
 		"body_damage": 20.0,
 		"melee_damage": 60.0,
@@ -494,12 +496,12 @@ static var class_base_stats: Dictionary = {
 		"max_spawns": 7.0,
 		"mass_heal_amount": 50,
 		"mass_heal_cooldown": 30.0,
-		"shield_health": 200.0
+		"shield_health": 20.0
 	},
 	"Jester": {
 		"move_speed": 210.0,
 		"max_health": 110.0,
-		"regen_speed": 10.0,
+		"regen_speed": 5.0,
 		"regen_amount": 5.0,
 		"body_damage": 12.0,
 		"projectile_damage": 60.0,
@@ -509,14 +511,14 @@ static var class_base_stats: Dictionary = {
 		"illusion_cooldown": 12.0,
 		"illusion_duration": 5.0,
 		"illusions_count": 6.0,
-		"shield_health": 70.0,
+		"shield_health": 20.0,
 	},
 
 	# Rank 9
 	"Super_Queen": {
 		"move_speed": 150.0,
 		"max_health": 200.0,
-		"regen_speed": 10.0,
+		"regen_speed": 5.0,
 		"regen_amount": 10.0,
 		"body_damage": 20.0,
 		"melee_damage": 60.0,
@@ -532,12 +534,12 @@ static var class_base_stats: Dictionary = {
 		"area_cooldown": 2.0,
 		"teleport_range": 1000.0,
 		"teleport_cooldown": 2.0,
-		"shield_health": 200.0
+		"shield_health": 20.0
 	},
 	"Holy_Queen": {
 		"move_speed": 150.0,
 		"max_health": 200.0,
-		"regen_speed": 10.0,
+		"regen_speed": 5.0,
 		"regen_amount": 10.0,
 		"body_damage": 20.0,
 		"melee_damage": 60.0,
@@ -552,6 +554,6 @@ static var class_base_stats: Dictionary = {
 		"wof_damage": 10.0,
 		"mass_heal_amount": 100,
 		"mass_heal_cooldown": 20.0,
-		"shield_health": 200.0
+		"shield_health": 20.0
 	},
 }

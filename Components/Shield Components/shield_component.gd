@@ -1,7 +1,7 @@
 extends Node2D
 class_name ShieldComponent
 
-@onready var player: CharacterBody2D = get_parent().get_parent() as CharacterBody2D
+@onready var entity: CharacterBody2D = get_parent().get_parent() as CharacterBody2D
 @onready var hitbox: Area2D = $Hitbox
 @onready var hitbox_shape: CollisionShape2D = $Hitbox/Collision
 
@@ -51,7 +51,7 @@ func deactivate_shield() -> void:
 @rpc("authority", "call_local", "reliable")
 func trigger_shield_visuals(activate: bool) -> void:
 	is_active = activate
-	player.shielding = activate
+	entity.shielding = activate
 	if activate:
 		show()
 		queue_redraw()
@@ -60,10 +60,15 @@ func trigger_shield_visuals(activate: bool) -> void:
 
 # Evaluates incoming collisions to reduce health, retract melee weapons, or reflect projectiles.
 func _on_body_entered(body: Node2D) -> void:
-	if not multiplayer.is_server() or not is_active or body == player:
+	if not multiplayer.is_server() or not is_active or body == entity:
 		return
 
 	if body.is_in_group("shield_blockable"):
+		var potential_entity = body.get_parent().get_parent().get_parent() # Can be anything
+		if is_instance_valid(potential_entity) and potential_entity == entity: # It is another component e.g weapon 
+			print("Not blocking same")
+			return
+		
 		shield_health -= 1
 		
 		if body.has_method("apply_bounce"):

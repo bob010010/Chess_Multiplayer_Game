@@ -1,4 +1,5 @@
 extends Sprite2D
+class_name SpriteComponent
 
 @export var pawn_texture: Texture2D
 @export var pawn_i_texture: Texture2D

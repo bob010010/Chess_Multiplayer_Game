@@ -29,7 +29,7 @@ var inp_delay_timer: float = 1.0
 func _ready() -> void:
 	boldness_factor = randf_range(0.5, 10.0) 
 	kindness_factor = randf_range(0.01, 0.2)
-	inp_delay = randf_range(0.2, 0.6)
+	inp_delay = randf_range(0.1, 0.3)
 	inp_delay_timer = inp_delay
 
 # Orchestrates the NPC decision-making loop, prioritizing flee persistence and combat state transitions.
@@ -48,8 +48,8 @@ func _physics_process(delta: float) -> void:
 	
 	combat_brain._clear_blacklist(delta)
 	
-	if curr_class in ["Rook", "Rook_Knight", "King_Rook", "Sultan"]:
-		ability_brain._spawn_towers()
+	#if curr_class in ["Rook", "Rook_Knight", "King_Rook", "Sultan"]:
+		#ability_brain._spawn_towers()
 	
 	var threat: Node2D = fleeing_brain._get_dangerous_threat()
 	if is_instance_valid(threat):
@@ -59,7 +59,6 @@ func _physics_process(delta: float) -> void:
 
 		if fleeing_brain._process_fleeing(threat):
 			state = "Fleeing"
-			
 			
 			var has_target_whilst_fleeing: bool = false
 			# Attacks whilst fleeing, (Wont chase)

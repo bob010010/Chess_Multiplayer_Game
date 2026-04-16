@@ -1,5 +1,6 @@
 extends UIComponent
 
+@onready var main_node: Node = get_tree().current_scene
 @onready var hud: CanvasLayer = $"../HUD"
 @onready var ui_container: Control = $"../UI"
 
@@ -47,6 +48,7 @@ var current_second_ability: String
 @onready var melee_bar: EntityBar = $"../UI/MeleeBar"
 
 @onready var immunity_bar: EntityBar = $"../UI/ImmunityBar"
+@onready var max_spawn_immunity: float = main_node.get("spawn_immunity_time")
 
 func _ready() -> void:
 	ui_container.show()
@@ -283,7 +285,12 @@ func toggle_weapon_ui(type) -> void:
 		entity.WeaponType.Ranged:
 			melee_info_label.hide()
 			ranged_info_label.show()
-	
+
+# Animates the immunity bars
+func animate_immunity_bar(value: float) -> void:
+	immunity_bar.value = (value / max_spawn_immunity) * 100 
+
+
 # Processes server-side debug compilation and transmits formatted strings to the owner client.
 func _process(_delta: float) -> void:
 	if multiplayer.is_server():

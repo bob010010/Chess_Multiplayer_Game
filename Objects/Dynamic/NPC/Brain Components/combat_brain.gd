@@ -10,8 +10,8 @@ class_name CombatBrain
 # Ranges
 var melee_range: float = 110.0
 var comfortable_melee_range: float = 75
-var max_shoot_range: float = 300.0
-var min_shoot_range: float = 150.0
+var max_shoot_range: float = 500.0
+var min_shoot_range: float = 300.0
 
 # Factors that affect whether to take a fight
 var kindness_factor: float = 1.0 
@@ -68,8 +68,8 @@ func _process_targeting(all_targets: Dictionary) -> bool:
 	_update_weapons()
 	
 	#Filters for players/NPCs with too low a score
-	for dict in [players, npcs]:
-		for key in dict:
+	for dict: Dictionary in [players, npcs]:
+		for key: String in dict:
 			var potential_target: Dictionary = dict.get(key)
 			
 			if main_brain.my_score * main_brain.kindness_factor > potential_target.get("score"): # Skips players or nps with a much lower score
@@ -84,7 +84,7 @@ func _process_targeting(all_targets: Dictionary) -> bool:
 				potential_target.set("priority", potential_target.get("priority") + 30)
 	
 	#Filters to not go for food too big for it
-	for f in food:
+	for f: String in food:
 		var food_to_check: Dictionary = food.get(f)
 		if not TargetingUtils._is_food_accessible(food_to_check.get("entity"), 0):
 			if TargetingUtils.less_than_x_hits_to_kill(hits_to_kill_to_target, food_to_check.get("health"), active_melee, active_ranged): # If the thing is low health make an exception and increase the priority
@@ -96,8 +96,8 @@ func _process_targeting(all_targets: Dictionary) -> bool:
 	# Finds the highest priority potential target around
 	var best_potential_target: Dictionary
 	var highest_priority: int = 0
-	for dict in [players, npcs, food, towers]:
-		for key in dict:
+	for dict: Dictionary in [players, npcs, food, towers]:
+		for key: String in dict:
 			var potential_target_info: Dictionary = dict.get(key)
 			var target_priority: int = potential_target_info.get("priority")
 			#print("Target: " + str(potential_target_info.get("entity")) + " Priority: " + str(target_priority))
@@ -191,11 +191,15 @@ func _ranged_attack(target: Node2D, chase: bool = true) -> bool:
 			# If the weapon is not busy charging, start a new attack cycle
 			if not active_ranged.get("is_charging"):
 				active_ranged.request_start_charge()
+				active_ranged.stored_target = target
 			
+			if chase and dist >= max_shoot_range * 0.8: # Move towards if on the outside to prevent missing all shots TODO this is counteracted by recoil
+				move_comp.set_movement_direction(main_brain.npc.global_position.direction_to(target.global_position))
+
 			combat_state = "Ranged_Attack"
 			
-			if dist <= min_shoot_range:
-				combat_state = "Ranged_Attack-TC"
+			#if dist <= min_shoot_range:
+				#combat_state = "Ranged_Attack-TC"
 			return true
 		elif chase:
 			# Out of range, chase

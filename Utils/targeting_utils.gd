@@ -8,7 +8,7 @@ static func get_all_potential_targets(origin: Vector2, detection_area: Area2D, m
 	var targets_to_info: Dictionary = {}
 	
 	for body: Node2D in detection_area.get_overlapping_bodies():
-		if body == exclude_blacklisted or not is_instance_valid(body):
+		if body == exclude_blacklisted or not is_instance_valid(body) or body.is_queued_for_deletion():
 			continue
 			
 		var body_team: int = body.get("team_id") if "team_id" in body else -1

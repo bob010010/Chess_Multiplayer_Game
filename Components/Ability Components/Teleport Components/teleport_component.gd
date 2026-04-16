@@ -6,7 +6,7 @@ class_name TeleportComponent
 @onready var move_comp: Node2D = entity.get_node("Components/MovementComponent")
 @onready var ui_comp: Node2D = entity.get_node("UIComponent")
 
-var starting_scale = Vector2.ONE
+var starting_scale: Vector2 = Vector2.ONE
 var active_illusion: Node2D = null
 var active_tween: Tween
 

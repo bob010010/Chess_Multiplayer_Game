@@ -40,6 +40,8 @@ var bottom_left_x: float = arena_size/2
 var food_per_player: int = 1500
 var max_food: int = 0
 
+var spawn_immunity_time: float = 10.0
+
 var bots_per_player: int = 0
 var max_bots: int = 0
 var npc_gains_points: bool = true
@@ -72,7 +74,7 @@ func _ready() -> void:
 func _apply_preset_or_custom() -> void:
 	var input: String = $TitleScreen/HostPanel/Preset.text.strip_edges()
 	if input == "":
-		input = "Alone"
+		input = "1-Bot"
 	var parts: Array = input.split(",")
 	print("GAME PRESETS: " + str(parts))
 	# If a single token matches a preset key, apply it directly

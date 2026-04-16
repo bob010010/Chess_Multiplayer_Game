@@ -33,7 +33,7 @@ var immune_time: float:
 	set(value):
 		immune_time = value
 		if entity.is_in_group("player"):
-			ui_comp.immunity_bar.value = (value / 15.0) * 100 # TODO move this to UI
+			ui_comp.animate_immunity_bar(value)
 			
 
 var mass_heal_amount: int = 50

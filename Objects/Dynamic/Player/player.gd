@@ -24,6 +24,8 @@ func _ready() -> void:
 	collision_layer = LAYER_NPC_PLAYER_AND_FOOD # Resides on
 	collision_mask = LAYER_NPC_PLAYER_AND_FOOD | LAYER_WORLD_BOUNDARIES # Collides with
 	
+	health_component.died.connect(_on_player_died)
+	
 	# Initialises the weapons and class, uses call_deferred to give the MultiplayerSpawner time to sync sub-nodes
 	if multiplayer.is_server() or name == str(multiplayer.get_unique_id()):
 		promotion_component.request_promotion.rpc_id.call_deferred(1, current_class)

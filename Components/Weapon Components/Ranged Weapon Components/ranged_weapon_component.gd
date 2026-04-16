@@ -8,7 +8,7 @@ class_name RangedWeaponComponent
 @export var projectile_type: String = "Default" # An identifier passed to the projectile so it knows what sprite to load
 
 # Weapon Stats
-var projectile_speed: float = 200.0
+var projectile_speed: int = 200
 var projectile_damage: int = 10
 var projectile_force: float = 2.0
 var recoil_strength: int = 300
@@ -19,6 +19,8 @@ var charge_timer: float = 0.0
 var max_charge_time: float = 2.0
 var ghost_node: Sprite2D = null
 var last_aim_pos: Vector2 = Vector2.ZERO
+
+var stored_target: Node2D
 
 # Tracks the charging state and manages the instantiation of visual indicators.
 func _physics_process(delta: float) -> void:
@@ -31,20 +33,23 @@ func _physics_process(delta: float) -> void:
 		
 		# Auto-fire if the player holds past the maximum charge time
 		if multiplayer.is_server() and charge_timer >= max_charge_time:
+
 			last_aim_pos = get_shoot_at_position()
-			_execute_fire()
+			if last_aim_pos != Vector2.ZERO:
+				_execute_fire()
+			else:
+				is_charging = false
+				trigger_visual_ghost.rpc(false)
+				
 
 func get_shoot_at_position() -> Vector2:
 	if entity.is_in_group("player"):
 		return get_global_mouse_position()
 	elif entity.is_in_group("npc"):
-		if is_instance_valid(entity.main_brain.combat_brain.current_target):
-			return entity.main_brain.combat_brain.current_target.global_position
+		if is_instance_valid(stored_target) and entity.global_position.distance_to(stored_target.global_position) <= entity.main_brain.combat_brain.max_shoot_range:
+			return stored_target.global_position
 		else:
-			printerr("NPC tried to shoot with no target")
-	elif entity.is_in_group("tower"):
-		if is_instance_valid(entity.current_target):
-			return entity.current_target.global_position
+			return Vector2.ZERO
 	printerr("No position to shoot at")
 	return Vector2.ZERO
 
@@ -57,17 +62,18 @@ func request_start_charge() -> void:
 	is_charging = true
 	charge_timer = 0.0
 	
-	if multiplayer.is_server():
-		trigger_visual_ghost.rpc(true)
-		# Notifies the UI component that charging has begun
-		if is_instance_valid(ui_comp) and entity.is_in_group("player"):
-			ui_comp.handle_charge_activated(true, max_charge_time)
+	if not multiplayer.is_server():
+		return
+		
+	# Command all clients to show the charging visual
+	trigger_visual_ghost.rpc(true)
 
 # Terminates the charge and triggers the authoritative projectile spawn on the server.
 @rpc("any_peer", "call_local", "reliable")
 func request_release_charge(click_pos: Vector2) -> void:
 	if not is_charging:
 		return
+	print(str(click_pos))
 	last_aim_pos = click_pos
 	_execute_fire()
 
@@ -80,10 +86,6 @@ func _execute_fire() -> void:
 	is_charging = false
 	
 	if multiplayer.is_server():
-		
-		if is_instance_valid(ui_comp) and entity.is_in_group("player"):
-			ui_comp.handle_charge_activated(false, 0.0)
-			
 		var dir: Vector2 = (last_aim_pos - entity.global_position).normalized()
 		if dir == Vector2.ZERO:
 			dir = Vector2.RIGHT.rotated(rotation)
@@ -106,14 +108,17 @@ func _spawn_projectile_and_recoil(dir: Vector2, final_speed: int, final_damage: 
 	# If the component is attached to a tower, use the tower's stored owner ID for kill credit.
 	if "owner_peer_id" in entity and entity.get("owner_peer_id") != "":
 		shooter_identity = entity.get("owner_peer_id")
+		
 	get_tree().current_scene.get_node("SpawnedProjectiles").spawn_projectile(entity.global_position, dir, shooter_identity, final_speed, final_damage, projectile_type)
 	
 	if entity.has_method("apply_recoil"):
-		#print(str(-dir * (recoil_strength * (final_speed / projectile_speed))))
 		entity.apply_recoil.rpc_id(1, -dir * (recoil_strength * (final_speed / projectile_speed)))
 
 	play_audio()
 
+	# TODO UI
+	#if is_instance_valid(ui_comp) and entity.is_in_group("player"):
+		#ui_comp.handle_attack_activated("Ranged", max_charge_time)
 
 func play_audio() -> void:
 	pass

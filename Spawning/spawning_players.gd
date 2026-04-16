@@ -20,7 +20,7 @@ func add_player(id: int, start_score: int = 0) -> void:
 	if start_score > 0: # Gives the player score when they start
 		player_instance.ready.connect(func() -> void: _apply_start_score(player_instance, start_score))
 	
-	player_instance.ready.connect(func() -> void: apply_spawn_immunity(player_instance, 15.0))
+	player_instance.ready.connect(func() -> void: apply_spawn_immunity(player_instance, get_tree().current_scene.spawn_immunity_time))
 	
 	match owner.game_type:
 		"FFA":

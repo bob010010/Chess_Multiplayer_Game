@@ -11,7 +11,7 @@ func _ready() -> void:
 	super._ready()
 	
 	#Sets it to red blue or green
-	var sprite_comp = get_node_or_null("Sprite2D")
+	var sprite_comp: Sprite2D = get_node_or_null("Sprite2D")
 	if sprite_comp: 
 		sprite_comp.texture = [red_texture, green_texture, blue_texture].pick_random()
 	else:

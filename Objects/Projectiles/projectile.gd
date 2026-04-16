@@ -51,8 +51,8 @@ func _on_body_entered(body: Node2D) -> void:
 			return
 		
 		if "team_id" in body:
-			var target_team = body.get("team_id")
-			var my_team = get_meta("team_id", -1)
+			var target_team: int = body.get("team_id")
+			var my_team: int = get_meta("team_id", -1)
 			if target_team == my_team and target_team != -1: # Don't hit teammates
 				return
 		

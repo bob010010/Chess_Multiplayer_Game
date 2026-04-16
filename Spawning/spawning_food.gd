@@ -13,18 +13,18 @@ func _process(delta: float) -> void:
 	if multiplayer.is_server():
 		spawn_timer -= delta
 		
-		if spawn_timer <= 0.0 and get_child_count() < owner.max_food:
+		if spawn_timer <= 0.0 and get_child_count() < owner.setup_handler.max_food:
 			try_spawn_food()
 			
 			var current_food: float = max(float(get_child_count()), 1.0)
-			spawn_timer = 20.0 / (float(owner.max_food) / current_food)
+			spawn_timer = 20.0 / (float(owner.setup_handler.max_food) / current_food)
 
 # Attempts to find a valid spawn position using rejection sampling with a fixed maximum attempt limit.
 func try_spawn_food() -> void:
 	var max_attempts: int = 7
 	var attempts: int = 0
 	var success: bool = false
-	arena_size = owner.arena_size - 25
+	arena_size = owner.setup_handler.arena_size - 25
 	while attempts < max_attempts and not success:
 		var attempted_position: Vector2 = Vector2(randf_range(-arena_size/2, arena_size/2), randf_range(-arena_size/2, arena_size/2))
 		

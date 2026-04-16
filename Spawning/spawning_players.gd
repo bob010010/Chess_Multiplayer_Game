@@ -9,20 +9,20 @@ func add_player(id: int, start_score: int = 0) -> void:
 	player_instance.name = str(id) 
 	
 	# Retrieves the cosmetic name from the registry and applies it to the instance.
-	if owner.player_names_dict.has(id):
-		player_instance.player_username = owner.player_names_dict[id]
+	if owner.multiplayer_handler.player_names_dict.has(id):
+		player_instance.player_username = owner.multiplayer_handler.player_names_dict[id]
 	else:
 		player_instance.player_username = "Guest_" + str(id)
 	
-	var arena_half: float = owner.arena_size / 2.0 - 50.0
+	var arena_half: float = owner.setup_handler.arena_size / 2.0 - 50.0
 	player_instance.position = Vector2(randf_range(-arena_half, arena_half), randf_range(-arena_half, arena_half))
 	
 	if start_score > 0: # Gives the player score when they start
 		player_instance.ready.connect(func() -> void: _apply_start_score(player_instance, start_score))
 	
-	player_instance.ready.connect(func() -> void: apply_spawn_immunity(player_instance, get_tree().current_scene.spawn_immunity_time))
+	player_instance.ready.connect(func() -> void: apply_spawn_immunity(player_instance, get_tree().current_scene.setup_handler.spawn_immunity_time))
 	
-	match owner.game_type:
+	match owner.setup_handler.game_type:
 		"FFA":
 			player_instance.team_id = 1 if id == 1 else get_child_count() + 1
 		"2_Teams":

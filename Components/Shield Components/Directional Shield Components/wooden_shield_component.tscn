@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://cni8ihob2gt7d" path="res://Components/Shield Components/Directional Shield Components/wooden_shield_component.gd" id="1_vpbaj"]
 [ext_resource type="Texture2D" uid="uid://d0oqiwsbfvcid" path="res://images/Shields/Shield.png" id="2_sx7kd"]
+[ext_resource type="PackedScene" uid="uid://bah68f313cuc3" path="res://Components/Health Component/health_component.tscn" id="3_yf8pf"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_yf8pf"]
 radius = 23.333334
@@ -22,3 +23,7 @@ scale = Vector2(1.8, 0.6)
 [node name="Collision" type="CollisionShape2D" parent="Hitbox" unique_id=964632112]
 shape = SubResource("CapsuleShape2D_yf8pf")
 debug_color = Color(0.35710907, 0.115965985, 0.08251613, 0.41960785)
+
+[node name="Components" type="Node2D" parent="." unique_id=1511346235]
+
+[node name="HealthComponent" parent="Components" unique_id=421527654 instance=ExtResource("3_yf8pf")]

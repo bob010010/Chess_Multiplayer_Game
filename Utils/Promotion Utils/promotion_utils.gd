@@ -534,7 +534,7 @@ static var class_base_stats: Dictionary = {
 		"area_cooldown": 2.0,
 		"teleport_range": 1000.0,
 		"teleport_cooldown": 2.0,
-		"shield_health": 20.0
+		"shield_health": 25.0
 	},
 	"Holy_Queen": {
 		"move_speed": 150.0,
@@ -554,6 +554,6 @@ static var class_base_stats: Dictionary = {
 		"wof_damage": 10.0,
 		"mass_heal_amount": 100,
 		"mass_heal_cooldown": 20.0,
-		"shield_health": 20.0
+		"shield_health": 25.0
 	},
 }

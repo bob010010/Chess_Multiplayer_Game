@@ -4,8 +4,8 @@ var owner_peer_id: String = ""
 var team_id: int = -1 
 
 @onready var detection_area: Area2D = $Area2D
-@onready var ranged_weapon: Node = $Components/BowComponent 
-@onready var health_component: Node = $Components/HealthComponent
+@onready var ranged_weapon: RangedWeaponComponent = $Components/BowComponent 
+@onready var health_component: HealthComponent = $Components/HealthComponent
 
 var current_target: Node2D 
 var current_targets_priority: int = 0

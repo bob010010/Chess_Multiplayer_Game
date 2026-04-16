@@ -4,13 +4,17 @@
 [ext_resource type="Script" uid="uid://t8h5v33i1exp" path="res://Spawning/spawning_food.gd" id="2_0xm2m"]
 [ext_resource type="Script" uid="uid://bxkxyoc5ui4kf" path="res://Spawning/spawning_players.gd" id="2_1bvp3"]
 [ext_resource type="Shader" uid="uid://b5npgpaiuqcby" path="res://Main/main.gdshader" id="2_lquwl"]
+[ext_resource type="Script" uid="uid://bl6w4tuiyrt1p" path="res://Main/player_handler.gd" id="2_qded6"]
+[ext_resource type="Script" uid="uid://kt23qcfj280q" path="res://Main/game_setup_handler.gd" id="2_y88hr"]
 [ext_resource type="Texture2D" uid="uid://b5joo3oy63jxq" path="res://images/chess-pieces/white-jester.png" id="3_o60nc"]
 [ext_resource type="PackedScene" uid="uid://mn3do3kj2f54" path="res://UI/Commands/command_console.tscn" id="3_qac2q"]
+[ext_resource type="Script" uid="uid://cld6n1qot4o2o" path="res://Main/multiplayer_handler.gd" id="4_4uyae"]
 [ext_resource type="Texture2D" uid="uid://qi3wm6wmyrwx" path="res://images/Projectiles/pinRed.png" id="4_f3gf5"]
 [ext_resource type="Texture2D" uid="uid://dnmkrpbyhlmyi" path="res://images/HowToPlay/r-key.png" id="4_f6fdm"]
 [ext_resource type="Script" uid="uid://cx4o8l16ouh2j" path="res://Spawning/spawning_projectiles.gd" id="4_lquwl"]
 [ext_resource type="Texture2D" uid="uid://cerywdswl8l1w" path="res://images/HowToPlay/mouse.png" id="4_rj11h"]
 [ext_resource type="Texture2D" uid="uid://cquod3ct8wdc4" path="res://images/Projectiles/pinBlue.png" id="5_0jx5h"]
+[ext_resource type="Script" uid="uid://qrpjru4for30" path="res://Main/leaderboard_handler.gd" id="5_21byg"]
 [ext_resource type="Script" uid="uid://c4gpkfscoiv78" path="res://Spawning/spawning_traps.gd" id="6_liyct"]
 [ext_resource type="Texture2D" uid="uid://7a3sika43ja6" path="res://images/Projectiles/pinGreen.png" id="6_uhr2j"]
 [ext_resource type="Texture2D" uid="uid://c2148w00gc6qc" path="res://images/chess-pieces/white-king_rook.png" id="7_l5bfp"]
@@ -18,6 +22,14 @@
 [ext_resource type="Texture2D" uid="uid://ddak8qolxfk1x" path="res://images/chess-pieces/white-knight.png" id="9_guo5i"]
 [ext_resource type="Texture2D" uid="uid://cmtej8rvrosdd" path="res://images/Weapons/sword.png" id="10_0gq1e"]
 [ext_resource type="Script" uid="uid://cyhwkk735ps0q" path="res://Spawning/spawning_npcs.gd" id="10_qac2q"]
+[ext_resource type="Texture2D" uid="uid://c0eu3nkkx4gyt" path="res://images/chess-pieces/white-rook_knight.png" id="11_puekb"]
+[ext_resource type="Texture2D" uid="uid://lrlw23g8rloy" path="res://images/chess-pieces/white-bishop_knight.png" id="12_1nqbc"]
+[ext_resource type="Texture2D" uid="uid://bs0omm0xp8fr1" path="res://images/Projectiles/fireball.png" id="13_xw814"]
+[ext_resource type="Texture2D" uid="uid://b3a8nu1fhjefl" path="res://images/chess-pieces/white-super_queen.png" id="14_g147q"]
+[ext_resource type="Texture2D" uid="uid://d0oqiwsbfvcid" path="res://images/Shields/Shield.png" id="15_t85yq"]
+[ext_resource type="Texture2D" uid="uid://bo3he3f6xvib" path="res://images/Weapons/sword_new.png" id="16_t85yq"]
+[ext_resource type="Texture2D" uid="uid://17m7cr86jyar" path="res://images/chess-pieces/white-pawn_II.png" id="17_y88hr"]
+[ext_resource type="Texture2D" uid="uid://c281tijx6np1m" path="res://images/Weapons/spear.png" id="18_qded6"]
 [ext_resource type="PackedScene" uid="uid://c7cu6gk13wi33" path="res://Objects/Dynamic/NPC/npc.tscn" id="19_wbdht"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_7mycd"]
@@ -44,6 +56,42 @@ shader_parameter/color2 = Color(0.23137255, 0.23137255, 0.23137255, 1)
 
 [sub_resource type="FontVariation" id="FontVariation_o60nc"]
 base_font = SubResource("FontVariation_qac2q")
+variation_embolden = 0.8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_puekb"]
+bg_color = Color(1, 0, 0, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+expand_margin_left = 3.0
+expand_margin_top = 3.0
+expand_margin_right = 3.0
+expand_margin_bottom = 3.0
+shadow_color = Color(0, 0, 0, 1)
+shadow_size = 3
+shadow_offset = Vector2(2, 2)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_j4inf"]
+bg_color = Color(0, 0.30980393, 0, 0.9411765)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xi84t"]
+bg_color = Color(0, 0.30980393, 0, 0.9411765)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_nf7xu"]
+bg_color = Color(1, 0, 0, 0.9411765)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0jx5h"]
 bg_color = Color(0, 0.23529412, 0, 1)
@@ -78,6 +126,25 @@ bg_color = Color(0, 0.23529412, 0, 0.54901963)
 
 [node name="Main" type="Node2D" unique_id=769039100]
 script = ExtResource("1_ig7tw")
+is_hosting = null
+
+[node name="Handlers" type="Node2D" parent="." unique_id=2045425312]
+
+[node name="PlayerHandler" type="Node2D" parent="Handlers" unique_id=1479119457]
+position = Vector2(4, 0)
+script = ExtResource("2_qded6")
+
+[node name="GameSetupHandler" type="Node2D" parent="Handlers" unique_id=1332691359]
+position = Vector2(4, 0)
+script = ExtResource("2_y88hr")
+
+[node name="MultiplayerHandler" type="Node2D" parent="Handlers" unique_id=465980870]
+position = Vector2(4, 0)
+script = ExtResource("4_4uyae")
+
+[node name="LeaderboardHandler" type="Node2D" parent="Handlers" unique_id=294446413]
+position = Vector2(4, 0)
+script = ExtResource("5_21byg")
 
 [node name="MYBG" type="ColorRect" parent="." unique_id=1730053322]
 visible = false
@@ -104,9 +171,10 @@ mouse_filter = 2
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=1058365266]
 replication_config = SubResource("SceneReplicationConfig_0gq1e")
 
-[node name="TitleScreen" type="CanvasLayer" parent="." unique_id=806964297]
+[node name="MainTitleScreen" type="CanvasLayer" parent="." unique_id=698496286]
+visible = false
 
-[node name="Background" type="ColorRect" parent="TitleScreen" unique_id=1960527601]
+[node name="Background" type="ColorRect" parent="MainTitleScreen" unique_id=1976075773]
 material = SubResource("ShaderMaterial_qac2q")
 anchors_preset = 15
 anchor_right = 1.0
@@ -114,14 +182,14 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="GameTitle" type="Label" parent="TitleScreen" unique_id=2096204200]
+[node name="GameTitle" type="Label" parent="MainTitleScreen" unique_id=2096204200]
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
-offset_left = -183.0
+offset_left = -237.5
 offset_top = -4.0
-offset_right = 182.0
-offset_bottom = 133.0
+offset_right = 236.5
+offset_bottom = 174.0
 grow_horizontal = 2
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_colors/font_shadow_color = Color(1, 1, 1, 1)
@@ -129,19 +197,20 @@ theme_override_constants/shadow_offset_x = 3
 theme_override_constants/shadow_offset_y = 3
 theme_override_constants/shadow_outline_size = 4
 theme_override_fonts/font = SubResource("FontVariation_o60nc")
-theme_override_font_sizes/font_size = 100
+theme_override_font_sizes/font_size = 130
 text = "Chess 2"
 horizontal_alignment = 1
 
-[node name="Jester" type="TextureRect" parent="TitleScreen" unique_id=1923429423]
+[node name="Jester" type="TextureRect" parent="MainTitleScreen" unique_id=1923429423]
 self_modulate = Color(0, 1, 0, 1)
-offset_left = 156.0
-offset_top = 191.0
-offset_right = 284.0
-offset_bottom = 319.0
+offset_left = 202.0
+offset_top = 202.00002
+offset_right = 330.0
+offset_bottom = 330.0
+scale = Vector2(0.75, 0.75)
 texture = ExtResource("3_o60nc")
 
-[node name="RedPin" type="TextureRect" parent="TitleScreen/Jester" unique_id=868749080]
+[node name="RedPin" type="TextureRect" parent="MainTitleScreen/Jester" unique_id=868749080]
 layout_mode = 0
 offset_left = 68.0
 offset_top = 79.0
@@ -151,7 +220,7 @@ rotation = -0.8638974
 scale = Vector2(0.2, 0.2)
 texture = ExtResource("4_f3gf5")
 
-[node name="BluePin" type="TextureRect" parent="TitleScreen/Jester" unique_id=1342952180]
+[node name="BluePin" type="TextureRect" parent="MainTitleScreen/Jester" unique_id=1342952180]
 layout_mode = 0
 offset_left = 68.0
 offset_top = 93.0
@@ -161,7 +230,7 @@ rotation = -0.6222235
 scale = Vector2(0.2, 0.2)
 texture = ExtResource("5_0jx5h")
 
-[node name="GreenPin" type="TextureRect" parent="TitleScreen/Jester" unique_id=4555742]
+[node name="GreenPin" type="TextureRect" parent="MainTitleScreen/Jester" unique_id=4555742]
 layout_mode = 0
 offset_left = 4.9999967
 offset_top = 134.0
@@ -171,59 +240,76 @@ rotation = -2.0693865
 scale = Vector2(0.2, 0.2)
 texture = ExtResource("6_uhr2j")
 
-[node name="KingRook" type="TextureRect" parent="TitleScreen" unique_id=78229509]
+[node name="KingRook" type="TextureRect" parent="MainTitleScreen" unique_id=78229509]
 modulate = Color(1, 0, 0, 1)
 anchors_preset = 3
 anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -352.0
-offset_top = -205.0
-offset_right = -224.0
-offset_bottom = -77.0
+offset_left = -299.0
+offset_top = -300.0
+offset_right = -171.0
+offset_bottom = -172.0
 grow_horizontal = 0
 grow_vertical = 0
+scale = Vector2(0.75, 0.75)
 texture = ExtResource("7_l5bfp")
 
-[node name="MiniRook" type="TextureRect" parent="TitleScreen/KingRook" unique_id=694837839]
-layout_mode = 0
-offset_left = 91.0
-offset_top = 69.0
-offset_right = 219.0
-offset_bottom = 197.0
+[node name="MiniRook" type="TextureRect" parent="MainTitleScreen/KingRook" unique_id=694837839]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -37.33334
+offset_top = 29.333313
+offset_right = 90.66666
+offset_bottom = 157.33331
+grow_horizontal = 2
+grow_vertical = 0
 scale = Vector2(0.6, 0.6)
 texture = ExtResource("8_guo5i")
 
-[node name="MiniRook2" type="TextureRect" parent="TitleScreen/KingRook" unique_id=1411905692]
-layout_mode = 0
-offset_left = 10.0
-offset_top = 107.0
-offset_right = 138.0
-offset_bottom = 235.0
+[node name="MiniRook2" type="TextureRect" parent="MainTitleScreen/KingRook" unique_id=1411905692]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = -109.33332
+offset_top = 26.666656
+offset_right = 18.66668
+offset_bottom = 154.66669
+grow_vertical = 0
 scale = Vector2(0.6, 0.6)
 texture = ExtResource("8_guo5i")
 
-[node name="MiniRook3" type="TextureRect" parent="TitleScreen/KingRook" unique_id=498110757]
-layout_mode = 0
-offset_left = -43.0
-offset_top = 58.0
-offset_right = 85.0
-offset_bottom = 186.0
+[node name="MiniRook3" type="TextureRect" parent="MainTitleScreen/KingRook" unique_id=498110757]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = -109.33333
+offset_top = -41.333336
+offset_right = 18.666672
+offset_bottom = 86.66667
+grow_vertical = 2
 scale = Vector2(0.6, 0.6)
 texture = ExtResource("8_guo5i")
 
-[node name="Knight" type="TextureRect" parent="TitleScreen" unique_id=1244841933]
+[node name="Knight" type="TextureRect" parent="MainTitleScreen" unique_id=1244841933]
 self_modulate = Color(1, 0, 0, 1)
 z_index = 2
 z_as_relative = false
-offset_left = 198.0
-offset_top = 483.0
-offset_right = 326.0
-offset_bottom = 611.0
+offset_left = 202.375
+offset_top = 502.455
+offset_right = 330.37537
+offset_bottom = 630.4552
+scale = Vector2(0.75, 0.75)
 texture = ExtResource("9_guo5i")
 
-[node name="Sword" type="TextureRect" parent="TitleScreen/Knight" unique_id=673687335]
+[node name="Sword" type="TextureRect" parent="MainTitleScreen/Knight" unique_id=673687335]
 z_index = -1
 layout_mode = 0
 offset_left = 142.0
@@ -233,6 +319,310 @@ offset_bottom = 97.0
 rotation = 0.86456126
 texture = ExtResource("10_0gq1e")
 expand_mode = 1
+
+[node name="HowToPlayLinkButton" type="Button" parent="MainTitleScreen" unique_id=152538385]
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -269.02002
+offset_top = -15.5
+offset_right = -26.02002
+offset_bottom = 15.5
+grow_horizontal = 0
+grow_vertical = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_colors/font_focus_color = Color(0.047148973, 4.5543725e-06, 0.052249126, 1)
+theme_override_colors/font_outline_color = Color(1, 1, 1, 1)
+theme_override_constants/outline_size = 0
+theme_override_styles/normal = SubResource("StyleBoxFlat_puekb")
+text = "Click here to learn how to play"
+
+[node name="SoloButton" type="Button" parent="MainTitleScreen" unique_id=805853036]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -175.0
+offset_top = -110.0
+offset_right = 175.0
+offset_bottom = 18.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_colors/font_hover_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 35
+theme_override_icons/icon = ExtResource("11_puekb")
+theme_override_styles/normal = SubResource("StyleBoxFlat_j4inf")
+text = "Play Solo"
+
+[node name="MultButton" type="Button" parent="MainTitleScreen" unique_id=289009909]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -214.0
+offset_top = 50.0
+offset_right = 214.0
+offset_bottom = 178.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_colors/font_hover_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 35
+theme_override_icons/icon = ExtResource("3_o60nc")
+theme_override_styles/normal = SubResource("StyleBoxFlat_xi84t")
+text = "Play Multiplayer"
+
+[node name="SoloMenuScreen" type="CanvasLayer" parent="." unique_id=535181481]
+visible = false
+
+[node name="Background" type="ColorRect" parent="SoloMenuScreen" unique_id=812128304]
+material = SubResource("ShaderMaterial_qac2q")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="GameTitle" type="Label" parent="SoloMenuScreen" unique_id=1143249748]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -237.5
+offset_top = -4.0
+offset_right = 236.5
+offset_bottom = 174.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_colors/font_shadow_color = Color(1, 1, 1, 1)
+theme_override_constants/shadow_offset_x = 3
+theme_override_constants/shadow_offset_y = 3
+theme_override_constants/shadow_outline_size = 4
+theme_override_fonts/font = SubResource("FontVariation_o60nc")
+theme_override_font_sizes/font_size = 130
+text = "Chess 2"
+horizontal_alignment = 1
+
+[node name="GameModeLabel" type="Label" parent="SoloMenuScreen" unique_id=305475285]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -309.0
+offset_top = -150.0
+offset_right = 309.0
+offset_bottom = -67.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_colors/font_shadow_color = Color(1, 1, 1, 1)
+theme_override_constants/shadow_offset_x = 3
+theme_override_constants/shadow_offset_y = 3
+theme_override_constants/shadow_outline_size = 4
+theme_override_fonts/font = SubResource("FontVariation_o60nc")
+theme_override_font_sizes/font_size = 60
+text = "Choose a gamemode"
+horizontal_alignment = 1
+
+[node name="GameModeButtons" type="VBoxContainer" parent="SoloMenuScreen" unique_id=391031769]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -184.5
+offset_top = -0.36499023
+offset_right = 184.5
+offset_bottom = 207.63507
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 4
+alignment = 1
+
+[node name="ZombiesButton" type="Button" parent="SoloMenuScreen/GameModeButtons" unique_id=627394284]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_colors/font_hover_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 35
+theme_override_icons/icon = ExtResource("11_puekb")
+theme_override_styles/normal = SubResource("StyleBoxFlat_nf7xu")
+text = "Zombies"
+icon_alignment = 2
+expand_icon = true
+
+[node name="FFAButton" type="Button" parent="SoloMenuScreen/GameModeButtons" unique_id=2027406880]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_colors/font_hover_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 35
+theme_override_icons/icon = ExtResource("11_puekb")
+theme_override_styles/normal = SubResource("StyleBoxFlat_nf7xu")
+text = "Free for All"
+icon_alignment = 2
+expand_icon = true
+
+[node name="2TeamsButton" type="Button" parent="SoloMenuScreen/GameModeButtons" unique_id=1504201435]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_colors/font_hover_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 35
+theme_override_icons/icon = ExtResource("11_puekb")
+theme_override_styles/normal = SubResource("StyleBoxFlat_nf7xu")
+text = "2 Teams"
+icon_alignment = 2
+expand_icon = true
+
+[node name="4TeamsButton" type="Button" parent="SoloMenuScreen/GameModeButtons" unique_id=515365052]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_colors/font_hover_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 35
+theme_override_icons/icon = ExtResource("11_puekb")
+theme_override_styles/normal = SubResource("StyleBoxFlat_nf7xu")
+text = "4 Teams"
+icon_alignment = 2
+expand_icon = true
+
+[node name="BishopKnight" type="TextureRect" parent="SoloMenuScreen" unique_id=946810196]
+self_modulate = Color(0, 1, 0, 1)
+offset_left = 103.0
+offset_top = 402.0
+offset_right = 231.0
+offset_bottom = 530.0
+scale = Vector2(0.75, 0.75)
+texture = ExtResource("12_1nqbc")
+
+[node name="Fireball" type="TextureRect" parent="SoloMenuScreen/BishopKnight" unique_id=516519103]
+layout_mode = 0
+offset_left = 78.666664
+offset_top = 138.66666
+offset_right = 153.66666
+offset_bottom = 213.66666
+rotation = -0.8638974
+texture = ExtResource("13_xw814")
+expand_mode = 1
+
+[node name="SuperQueen" type="TextureRect" parent="SoloMenuScreen" unique_id=1375460558]
+self_modulate = Color(1, 0, 0, 1)
+z_index = 3
+z_as_relative = false
+offset_left = 302.0
+offset_top = 601.0
+offset_right = 430.00037
+offset_bottom = 729.00024
+scale = Vector2(0.75, 0.75)
+texture = ExtResource("14_g147q")
+
+[node name="Shield" type="TextureRect" parent="SoloMenuScreen/SuperQueen" unique_id=1320054748]
+z_index = -1
+layout_mode = 0
+offset_left = -6.666687
+offset_top = -145.33334
+offset_right = 193.33331
+offset_bottom = 54.666656
+rotation = 0.86456126
+texture = ExtResource("15_t85yq")
+expand_mode = 1
+
+[node name="Sword" type="TextureRect" parent="SoloMenuScreen/SuperQueen" unique_id=717601523]
+z_index = -1
+layout_mode = 0
+offset_left = 53.33332
+offset_top = -55.999992
+offset_right = 253.33331
+offset_bottom = 144.0
+rotation = 0.001922369
+texture = ExtResource("16_t85yq")
+expand_mode = 1
+
+[node name="PawnII" type="TextureRect" parent="SoloMenuScreen" unique_id=1452107736]
+self_modulate = Color(1, 0, 0, 1)
+z_index = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -298.0
+offset_top = -299.0
+offset_right = -170.0
+offset_bottom = -171.0
+grow_horizontal = 0
+grow_vertical = 0
+scale = Vector2(0.75, 0.75)
+texture = ExtResource("17_y88hr")
+
+[node name="Spear" type="TextureRect" parent="SoloMenuScreen/PawnII" unique_id=784678985]
+z_as_relative = false
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -30.666672
+offset_top = 53.333344
+offset_right = 97.33333
+offset_bottom = 181.33334
+grow_horizontal = 2
+grow_vertical = 0
+rotation = -2.403294
+scale = Vector2(0.99456936, 1)
+texture = ExtResource("18_qded6")
+expand_mode = 1
+
+[node name="PawnII2" type="TextureRect" parent="SoloMenuScreen" unique_id=1118383063]
+self_modulate = Color(0, 1, 0, 1)
+z_index = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -399.0
+offset_top = -197.0
+offset_right = -271.0
+offset_bottom = -69.0
+grow_horizontal = 0
+grow_vertical = 0
+scale = Vector2(0.75, 0.75)
+texture = ExtResource("17_y88hr")
+
+[node name="Spear" type="TextureRect" parent="SoloMenuScreen/PawnII2" unique_id=230004764]
+z_as_relative = false
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = 33.333313
+offset_top = -166.66666
+offset_right = 161.33331
+offset_bottom = -38.666656
+grow_horizontal = 2
+grow_vertical = 0
+rotation = 0.7128341
+scale = Vector2(0.99456936, 1)
+texture = ExtResource("18_qded6")
+expand_mode = 1
+
+[node name="TitleScreen" type="CanvasLayer" parent="." unique_id=806964297]
+
+[node name="Background" type="ColorRect" parent="TitleScreen" unique_id=1960527601]
+material = SubResource("ShaderMaterial_qac2q")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -1.0
+offset_right = -1.0
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="JoinPanel" type="Panel" parent="TitleScreen" unique_id=891877117]
 anchors_preset = 8
@@ -448,6 +838,7 @@ theme_override_font_sizes/font_size = 20
 text = "Ranged Attack"
 
 [node name="Stage" type="Panel" parent="TitleScreen" unique_id=630710994]
+visible = false
 offset_left = 25.0
 offset_top = 25.0
 offset_right = 175.0
@@ -515,11 +906,13 @@ grow_vertical = 2
 theme_override_font_sizes/font_size = 25
 text = "Respawn"
 
-[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1275093181]
+[node name="OverlayLayer" type="CanvasLayer" parent="." unique_id=1275093181]
+visible = false
 
-[node name="CommandConsole" parent="CanvasLayer" unique_id=1812150508 instance=ExtResource("3_qac2q")]
+[node name="CommandConsole" parent="OverlayLayer" unique_id=1812150508 instance=ExtResource("3_qac2q")]
+visible = false
 
-[node name="SharingIPLabel" type="Label" parent="CanvasLayer" unique_id=948553827]
+[node name="SharingIPLabel" type="Label" parent="OverlayLayer" unique_id=948553827]
 anchors_preset = 7
 anchor_left = 0.5
 anchor_top = 1.0

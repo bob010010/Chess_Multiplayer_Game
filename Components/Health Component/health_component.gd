@@ -1,12 +1,11 @@
 extends Node2D
+class_name HealthComponent
 
 signal died(attacker_id: String)
 
-@export var max_health: int = 500
-var health: float = 500
+@export var max_health: int = 1
+var health: float = 1
 
-
-		
 var healing: bool = true
 @export var regen_amount: float = 2.0
 @export var regen_speed: float = 10.0
@@ -19,7 +18,7 @@ var decay_cooldown: float = decay_speed
 
 @onready var entity: Node = get_parent().get_parent()
 @onready var ui_comp: Node = entity.get_node_or_null("UIComponent")
-@onready var health_bar: ProgressBar = entity.get_node("UI/HealthBar")
+@onready var health_bar: ProgressBar = entity.get_node_or_null("UI/HealthBar")
 
 var active_dmg_label: Label = null
 var active_heal_label: Label = null

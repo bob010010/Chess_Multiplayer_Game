@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://dlp1hxy3ufer6"]
 
 [ext_resource type="Script" uid="uid://bcx3a0dxi5w1b" path="res://Components/Shield Components/Magic Shield/magic_shield_component.gd" id="1_lgkrk"]
+[ext_resource type="PackedScene" uid="uid://bah68f313cuc3" path="res://Components/Health Component/health_component.tscn" id="2_1por6"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_lgkrk"]
 
@@ -13,3 +14,7 @@ script = ExtResource("1_lgkrk")
 [node name="Collision" type="CollisionShape2D" parent="Hitbox" unique_id=767059117]
 shape = SubResource("CircleShape2D_lgkrk")
 debug_color = Color(0.760752, 0.45238793, 0, 0.41960785)
+
+[node name="Components" type="Node2D" parent="." unique_id=1798448927]
+
+[node name="HealthComponent" parent="Components" unique_id=421527654 instance=ExtResource("2_1por6")]

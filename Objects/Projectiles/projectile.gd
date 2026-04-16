@@ -15,6 +15,7 @@ const LAYER_WORLD_BOUNDARIES: int = 2
 # Connects the collision signal on the server
 func _ready() -> void:
 	add_to_group("shield_blockable")
+	add_to_group("projectile")
 	
 	collision_layer = LAYER_NPC_PLAYER_AND_FOOD # Resides on
 	collision_mask = LAYER_NPC_PLAYER_AND_FOOD | LAYER_WORLD_BOUNDARIES # Collides with
@@ -29,12 +30,6 @@ func _physics_process(delta: float) -> void:
 		time_to_live -= delta
 		if (time_to_live <= 0):
 			queue_free()
-
-# Accepts a bounce force to reflect the projectile away from the shield.
-func apply_bounce(bounce_force: Vector2) -> void:
-	if multiplayer.is_server():
-		direction = bounce_force.normalized()
-		shooter_id = ""
 
 # Handles core logic when the projectile hits a physics body
 func _on_body_entered(body: Node2D) -> void:
@@ -61,6 +56,17 @@ func _on_body_entered(body: Node2D) -> void:
 		# Trigger the custom subclass hit behavior
 		_on_hit(body)
 
-# VIRTUAL FUNCTION: To be overwritten by subclasses
+# Accepts a bounce force to reflect the projectile away from the shield.
+func apply_bounce(bounce_force: Vector2) -> void:
+	if multiplayer.is_server():
+		direction = bounce_force.normalized()
+		shooter_id = ""
+		bounce_visuals()
+
+# Updates the rotation of the projectile to face its current direction of travel.
+func bounce_visuals() -> void:
+	rotation = direction.angle() + deg_to_rad(90.0)
+	
+# To be overwritten by subclasses
 func _on_hit(_body: Node2D) -> void:
 	pass

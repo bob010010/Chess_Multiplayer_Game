@@ -48,7 +48,7 @@ var current_second_ability: String
 @onready var melee_bar: EntityBar = $"../UI/MeleeBar"
 
 @onready var immunity_bar: EntityBar = $"../UI/ImmunityBar"
-@onready var max_spawn_immunity: float = main_node.get("spawn_immunity_time")
+@onready var max_spawn_immunity: float = main_node.setup_handler.get("spawn_immunity_time")
 
 func _ready() -> void:
 	ui_container.show()

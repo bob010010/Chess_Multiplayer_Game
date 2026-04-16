@@ -20,7 +20,7 @@ signal show_upgrade_menu(count: int, levels: Dictionary)
 var total_score: int = 0
 var pending_upgrades: int = 0
 
-@onready var npc_gains_points: bool = get_tree().current_scene.npc_gains_points
+@onready var npc_gains_points: bool = get_tree().current_scene.setup_handler.npc_gains_points
 var maxed_stats_list: Array[String] = []
 
 # The static additive values applied per level to each stat category.
@@ -154,20 +154,20 @@ func request_level_up_math() -> void:
 		
 		# For NPCs
 		if not is_player and entity_level % 3 == 0:
-			if entity_level % main.npc_levels_for_promotion == 0:
+			if entity_level % main.setup_handler.npc_levels_for_promotion == 0:
 				var promo: Node = entity.get_node("Components/PromotionComponent")
 				promo.add_pending_promotion(peer_id)
 			
-			if entity_level % main.npc_levels_for_upgrade == 0:
+			if entity_level % main.setup_handler.npc_levels_for_upgrade == 0:
 				pending_upgrades += 1
 	
 		# For players
 		if is_player:
-			if entity_level % main.player_levels_for_promotion == 0:
+			if entity_level % main.setup_handler.player_levels_for_promotion == 0:
 				var promo: Node = entity.get_node("Components/PromotionComponent")
 				promo.add_pending_promotion(peer_id)
 			
-			if entity_level % main.player_levels_for_upgrade == 0:
+			if entity_level % main.setup_handler.player_levels_for_upgrade == 0:
 				pending_upgrades += 1
 
 		if is_player:

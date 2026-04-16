@@ -25,8 +25,8 @@ static func strip_physics_and_scripts(node: Node) -> void:
 static func is_position_within_map(main: Node, pos: Vector2) -> bool:
 	var buffer: float = 20.0
 	return (
-		pos.x >= (main.top_left_x + buffer) and
-		pos.x <= (main.top_left_x + main.arena_size - buffer) and
-		pos.y >= (main.top_left_y + buffer) and
-		pos.y <= (main.top_left_y + main.arena_size - buffer)
+		pos.x >= (main.setup_handler.top_left_x + buffer) and
+		pos.x <= (main.setup_handler.top_left_x + main.setup_handler.arena_size - buffer) and
+		pos.y >= (main.setup_handler.top_left_y + buffer) and
+		pos.y <= (main.setup_handler.top_left_y + main.setup_handler.arena_size - buffer)
 	)

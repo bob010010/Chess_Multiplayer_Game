@@ -4,32 +4,39 @@ class_name ShieldComponent
 @onready var entity: CharacterBody2D = get_parent().get_parent() as CharacterBody2D
 @onready var hitbox: Area2D = $Hitbox
 @onready var hitbox_shape: CollisionShape2D = $Hitbox/Collision
+@onready var health_comp: HealthComponent = $Components/HealthComponent
 
-@export var max_shield_health: int = 100
-var shield_health: int = 100
-@export var active_duration: float = 200.0
 var shield_knockback: float = 1000.0
 
 var is_active: bool = false
 
 # Initializes the shield state, groups, and connects collision signals.
 func _ready() -> void:
-	hide()
+	add_to_group("shield")
+	if is_node_ready():
+		health_comp.decay_amount = 1
+		health_comp.decay_speed = 2.0
+		health_comp.regen_amount = 1
+		health_comp.regen_speed = 2.0
+
 	hitbox.monitoring = true
 	hitbox_shape.disabled = false
 	hitbox.body_entered.connect(_on_body_entered)
 	hitbox.area_entered.connect(_on_body_entered)
-	add_to_group("shield")
+	health_comp.died.connect(deactivate_shield)
+	
 
 # Validates activation criteria and starts the shield timer on the server.
 @rpc("any_peer", "call_local", "reliable")
 func request_shield_activation() -> void:
 	if not multiplayer.is_server() or is_active:
 		return
-		
-	shield_health = max_shield_health
-	trigger_shield_visuals.rpc(true)
-	get_tree().create_timer(active_duration).timeout.connect(_on_shield_timeout)
+	print(str(health_comp.health))
+	if health_comp.health >= health_comp.max_health/10:
+		health_comp.decaying = true
+		health_comp.healing = false
+
+		trigger_shield_visuals.rpc(true)
 
 # Validates deactivation criteria and stops the shield on the server.
 @rpc("any_peer", "call_local", "reliable")
@@ -39,13 +46,15 @@ func request_shield_deactivation() -> void:
 	deactivate_shield()
 
 # Deactivates the shield when the active duration timer finishes.
-func _on_shield_timeout() -> void:
+func on_shield_broken() -> void:
 	if is_active:
 		deactivate_shield()
 
 # Triggers network-wide deactivation of the shield visuals and state.
 func deactivate_shield() -> void:
 	trigger_shield_visuals.rpc(false)
+	health_comp.decaying = false
+	health_comp.healing = true
 
 # Toggles the active state, player variable, and visibility of the shield across all clients.
 @rpc("authority", "call_local", "reliable")
@@ -69,7 +78,7 @@ func _on_body_entered(body: Node2D) -> void:
 			print("Not blocking same")
 			return
 		
-		shield_health -= 1
+		health_comp.take_damage(1)
 		
 		if body.has_method("apply_bounce"):
 			var direction: Vector2 = global_position.direction_to(body.global_position)
@@ -80,6 +89,3 @@ func _on_body_entered(body: Node2D) -> void:
 			parent_node.has_hit = true
 			parent_node.is_attacking = false
 			parent_node.trigger_visual_retract.rpc()
-			
-	if shield_health <= 0:
-		deactivate_shield()

@@ -14,8 +14,8 @@ func _process(delta: float) -> void:
 func _handle_npc_spawning(_delta: float) -> void:
 	if not multiplayer.is_server():
 		return
-	if is_instance_valid(self) and get_child_count() < owner.max_bots:
-		var npc_spawn_range: float = owner.arena_size/2 - 50
+	if is_instance_valid(self) and get_child_count() < owner.setup_handler.max_bots:
+		var npc_spawn_range: float = owner.setup_handler.arena_size/2 - 50
 		var spawn_pos: Vector2 = Vector2(randf_range(-npc_spawn_range, npc_spawn_range), randf_range(-npc_spawn_range, npc_spawn_range))
 		spawn_npc(spawn_pos)
 
@@ -26,7 +26,7 @@ func spawn_npc(spawn_pos: Vector2, force_class: String = "") -> void:
 	npc_instance.global_position = spawn_pos
 
 	var main_scene: Node = get_tree().current_scene
-	var current_game_mode: String = main_scene.get("game_type")
+	var current_game_mode: String = main_scene.setup_handler.get("game_type")
 
 	# Add to tree first so setters and synchronizers behave correctly
 	add_child(npc_instance, true)

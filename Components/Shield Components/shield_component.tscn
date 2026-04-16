@@ -1,6 +1,11 @@
 [gd_scene format=3 uid="uid://i81b0a7uurhf"]
 
 [ext_resource type="Script" uid="uid://bkt2sgkchw3fx" path="res://Components/Shield Components/shield_component.gd" id="1_mclvm"]
+[ext_resource type="PackedScene" uid="uid://bah68f313cuc3" path="res://Components/Health Component/health_component.tscn" id="2_oopai"]
 
 [node name="ShieldComponent" type="Node2D" unique_id=1213126401]
 script = ExtResource("1_mclvm")
+
+[node name="Components" type="Node2D" parent="." unique_id=1731561843]
+
+[node name="HealthComponent" parent="Components" unique_id=421527654 instance=ExtResource("2_oopai")]

@@ -152,7 +152,15 @@ func apply_promotion_stats(class_choice: String) -> void:
 		entity.set("body_damage", int(calc.call("body_damage")))
 	
 	if s_comp and base.has("shield_health"):
-		s_comp.max_shield_health = int(calc.call("shield_health"))
+		var s_health_comp: HealthComponent = s_comp.health_comp
+		var old_max: int = s_health_comp.max_health
+		s_health_comp.max_health = int(calc.call("shield_health"))
+		
+		# Heals the player up when they increase max health
+		var health_boost: int = s_health_comp.max_health - old_max
+		s_health_comp.health += health_boost
+		if s_health_comp.health > h_comp.max_health: 
+			s_health_comp.health = s_health_comp.max_health
 	
 	if m_w_comp:
 		if base.has("melee_damage"): m_w_comp.melee_damage = int(calc.call("melee_damage"))

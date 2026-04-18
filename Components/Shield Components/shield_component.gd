@@ -23,7 +23,7 @@ func _ready() -> void:
 	hitbox_shape.disabled = false
 	hitbox.body_entered.connect(_on_body_entered)
 	hitbox.area_entered.connect(_on_body_entered)
-	health_comp.died.connect(deactivate_shield)
+	health_comp.died.connect(on_shield_broken)
 	
 
 # Validates activation criteria and starts the shield timer on the server.
@@ -46,7 +46,7 @@ func request_shield_deactivation() -> void:
 	deactivate_shield()
 
 # Deactivates the shield when the active duration timer finishes.
-func on_shield_broken() -> void:
+func on_shield_broken(attacker_id: String) -> void:
 	if is_active:
 		deactivate_shield()
 
@@ -79,6 +79,8 @@ func _on_body_entered(body: Node2D) -> void:
 			return
 		
 		health_comp.take_damage(1)
+		if health_comp.health < 1:
+			return
 		
 		if body.has_method("apply_bounce"):
 			var direction: Vector2 = global_position.direction_to(body.global_position)

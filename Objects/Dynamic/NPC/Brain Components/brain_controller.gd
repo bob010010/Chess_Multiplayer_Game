@@ -28,6 +28,9 @@ var inp_delay_timer: float = 1.0
 # Initializes randomized behavioral factors and input timers.
 func _ready() -> void:
 	boldness_factor = randf_range(0.5, 10.0) 
+	var game_type: String = get_tree().current_scene.setup_handler.game_type
+	if game_type == "Zombies":
+		boldness_factor = 100
 	kindness_factor = randf_range(0.01, 0.2)
 	inp_delay = randf_range(0.1, 0.3)
 	inp_delay_timer = inp_delay

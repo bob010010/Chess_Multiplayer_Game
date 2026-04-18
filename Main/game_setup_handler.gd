@@ -10,11 +10,16 @@ const PRESETS: Dictionary = {
 	
 	"2-Bot": { "game_type": "FFA", "arena_size": 2500.0, "food_per_player": 1500, "bots_per_player": 2, "bot_classes": ["Pawn"], "npc_points": false, "start_lvls": 200, "player_class": "Pawn_II", "player_levels_for_upgrade": 1, "player_levels_for_promotion": 2}, # 2 Bots for testing
 	
-	"FFA": { "game_type": "FFA", "arena_size": 6000.0, "food_per_player": 7500, "bots_per_player": 20, "bot_classes": ["Pawn", "Pawn_I"], "npc_points": true, "start_lvls": 0, "player_class": "Pawn", "player_levels_for_upgrade": 1, "player_levels_for_promotion": 3}, # Large game FFA
-	"2T": { "game_type": "2_Teams", "arena_size": 6000.0, "food_per_player": 7500, "bots_per_player": 20, "bot_classes": ["Pawn", "Pawn_I"], "npc_points": true, "start_lvls": 0, "player_class": "Pawn", "player_levels_for_upgrade": 1, "player_levels_for_promotion": 3}, # Large game 2 teams
+	"Zombies": { "game_type": "Zombies", "arena_size": 4000.0, "food_per_player": 7500, "bots_per_player": 30, "bot_classes": ["Pawn", "Pawn_I", "Pawn_II"], "npc_points": true, "start_lvls": 0, "player_class": "Pawn", "player_levels_for_upgrade": 1, "player_levels_for_promotion": 3}, # Zombies
+	
+	"FFA": { "game_type": "FFA", "arena_size": 6000.0, "food_per_player": 7500, "bots_per_player": 20, "bot_classes": ["Pawn", "Pawn_I"], "npc_points": true, "start_lvls": 0, "player_class": "Pawn", "player_levels_for_upgrade": 1, "player_levels_for_promotion": 3}, # FFA
+	
+	"2T": { "game_type": "2T", "arena_size": 6000.0, "food_per_player": 7500, "bots_per_player": 20, "bot_classes": ["Pawn", "Pawn_I"], "npc_points": true, "start_lvls": 0, "player_class": "Pawn", "player_levels_for_upgrade": 1, "player_levels_for_promotion": 3}, # 2 teams
+	
+	"4T": { "game_type": "4T", "arena_size": 6000.0, "food_per_player": 7500, "bots_per_player": 20, "bot_classes": ["Pawn", "Pawn_I"], "npc_points": true, "start_lvls": 0, "player_class": "Pawn", "player_levels_for_upgrade": 1, "player_levels_for_promotion": 3}, # 4 teams
 	
 	"FFA-L": { "game_type": "FFA", "arena_size": 12000.0, "food_per_player": 25000, "bots_per_player": 60, "bot_classes": ["Pawn", "Pawn_I", "Pawn_II"], "npc_points": true, "start_lvls": 0, "player_class": "Pawn", "player_levels_for_upgrade": 1, "player_levels_for_promotion": 3}, # Large game FFA
-	"2T-L": { "game_type": "2_Teams", "arena_size": 12000.0, "food_per_player": 25000, "bots_per_player": 60, "bot_classes": ["Pawn", "Pawn_I", "Pawn_II"], "npc_points": true, "start_lvls": 0, "player_class": "Pawn", "player_levels_for_upgrade": 1, "player_levels_for_promotion": 3} # Large game 2 teams
+	"2T-L": { "game_type": "2T", "arena_size": 12000.0, "food_per_player": 25000, "bots_per_player": 60, "bot_classes": ["Pawn", "Pawn_I", "Pawn_II"], "npc_points": true, "start_lvls": 0, "player_class": "Pawn", "player_levels_for_upgrade": 1, "player_levels_for_promotion": 3} # Large game 2 teams
 }
 
 var arena_size: float = 2500.0
@@ -55,40 +60,34 @@ func apply_preset_or_custom(input: String) -> void:
 	print("GAME PRESETS: " + str(parts))
 	# If a single token matches a preset key, apply it directly
 	if parts.size() == 1 and PRESETS.has(parts[0].strip_edges()):
-		var preset: Dictionary = PRESETS[parts[0].strip_edges()]
-		print(str(preset))
-		game_type        = preset["game_type"]
-		arena_size       = preset["arena_size"]
-		food_per_player  = preset["food_per_player"]
-		bots_per_player  = preset["bots_per_player"]
-		bot_spawn_classes = preset["bot_classes"]
-		npc_gains_points = preset["npc_points"]
-		player_levels_at_start = preset["start_lvls"]
-		player_starts_as = preset["player_class"]
-		player_levels_for_upgrade = preset["player_levels_for_upgrade"]
-		player_levels_for_promotion = preset["player_levels_for_promotion"]
-		return
+		matches_preset(PRESETS[parts[0].strip_edges()])
+	else:
+		custom_preset(parts)
 
-	# Otherwise expect: game_type, arena_size, food_per_player, bots_per_player
-	if parts.size() != 5:
-		printerr("Preset input must be a preset number or 5 comma-separated values.")
-		return
+	create_boundaries()
+	
+	main.get_node("Tiles").size = Vector2(arena_size, arena_size)
+	main.get_node("Tiles").position = Vector2(-arena_size/2, -arena_size/2)
 
-	game_type       = parts[0].strip_edges()
-	arena_size      = float(parts[1].strip_edges())
-	food_per_player = int(parts[2].strip_edges())
-	bots_per_player = int(parts[3].strip_edges())
-	bot_spawn_classes = Array(parts[4].strip_edges())
-	npc_gains_points = bool(parts[5].strip_edges())
-	
-	_create_boundaries()
-	
-	main.get_node("Tiles").size = Vector2(main.setup_handler.arena_size, main.setup_handler.arena_size)
-	main.get_node("Tiles").position = Vector2(-main.setup_handler.arena_size/2, -main.setup_handler.arena_size/2)
+# Using a set preset for the game type
+func matches_preset(preset: Dictionary) -> void:
+	print(str(preset))
+	game_type        = preset["game_type"]
+	arena_size       = preset["arena_size"]
+	food_per_player  = preset["food_per_player"]
+	bots_per_player  = preset["bots_per_player"]
+	bot_spawn_classes = preset["bot_classes"]
+	npc_gains_points = preset["npc_points"]
+	player_levels_at_start = preset["start_lvls"]
+	player_starts_as = preset["player_class"]
+	player_levels_for_upgrade = preset["player_levels_for_upgrade"]
+	player_levels_for_promotion = preset["player_levels_for_promotion"]
+
+
 
 # Creates the boundry walls of the arena
-func _create_boundaries() -> void:
-	
+func create_boundaries() -> void:
+	print("Creating")
 	top_left_x = -arena_size/2
 	top_left_y = -arena_size/2
 	bottom_left_x = arena_size/2
@@ -101,4 +100,23 @@ func _create_boundaries() -> void:
 	]
 	
 	for rect: Rect2 in rects:
+		print("Try")
 		main.get_node("SpawnedTraps").spawn_wall(rect)
+
+# Passsing in custom values for each of the presets
+func custom_preset(parts: Array) -> void:
+	# Otherwise expect: game_type, arena_size, food_per_player, bots_per_player
+	if parts.size() != 5:
+		printerr("Preset input must be a preset number or 5 comma-separated values.")
+		return
+
+	game_type       = parts[0].strip_edges()
+	arena_size      = float(parts[1].strip_edges())
+	food_per_player = int(parts[2].strip_edges())
+	bots_per_player = int(parts[3].strip_edges())
+	bot_spawn_classes = Array(parts[4].strip_edges())
+	npc_gains_points = bool(parts[5].strip_edges())
+	player_levels_at_start = int(parts[6].strip_edges())
+	player_starts_as = String(parts[7].strip_edges())
+	player_levels_for_upgrade = int(parts[8].strip_edges())
+	player_levels_for_promotion = int(parts[9].strip_edges())

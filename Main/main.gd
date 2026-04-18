@@ -1,5 +1,5 @@
 extends Node2D
-
+class_name Main
 
 var spectate_target: Node2D = null
 var respawn_timer: float = 0.0
@@ -29,6 +29,14 @@ var temp_username: String
 @onready var player_handler: PlayerHandler = $Handlers/PlayerHandler
 @onready var leaderboard_handler: LeaderboardHandler = $Handlers/LeaderboardHandler
 @onready var multiplayer_handler: MultiplayerHandler = $Handlers/MultiplayerHandler
+
+var ffa_taken_teams: Array
+var team_counts: Dictionary = {
+	"1": 0,
+	"2": 0,
+	"3": 0,
+	"4": 0
+}
 
 # Connects buttons and initializes the game boundary
 func _ready() -> void:
@@ -62,15 +70,18 @@ func connect_game_buttons() -> void:
 	$GameSelectionMenu/GameModeButtons/AloneButton.pressed.connect(start_game.bind("Alone"))
 	$"GameSelectionMenu/GameModeButtons/1BotButton".pressed.connect(start_game.bind("1-Bot"))
 	$GameSelectionMenu/GameModeButtons/FFAButton.pressed.connect(start_game.bind("FFA"))
+	$GameSelectionMenu/GameModeButtons/ZombiesButton.pressed.connect(start_game.bind("Zombies"))
 	$"GameSelectionMenu/GameModeButtons/2TeamsButton".pressed.connect(start_game.bind("2T"))
+	$"GameSelectionMenu/GameModeButtons/4TeamsButton".pressed.connect(start_game.bind("4T"))
 
 func start_game(game_preset: String) -> void:
+	setup_handler.apply_preset_or_custom(game_preset)
+	
 	if hosting or solo_game:
 		multiplayer_handler.host_game()
 	else:
 		multiplayer_handler.join_game()
-	setup_handler.apply_preset_or_custom(game_preset)
-	print(current_layer.name)
+	
 	current_layer.hide()
 	$OverlayLayer.show()
 
@@ -88,6 +99,43 @@ func on_host_pressed() -> void:
 	if op_check and op_check.button_pressed:
 		open_port = true
 	current_layer = game_selection_menu
+
+# Gets the team for the new player/npc based on the game type
+func get_team_from_game_type(entity_type: String) -> int:
+	match setup_handler.game_type:
+		"FFA": # Random from 0 to 999
+			var team_id: int = randi_range(0,999)
+			if team_id in ffa_taken_teams:
+				team_id = get_team_from_game_type(entity_type)
+			else:
+				return team_id
+		"2T":
+			return _get_balanced_team(["1", "2"])
+		"4T":
+			return _get_balanced_team(["1", "2", "3", "4"])
+		"Zombies":
+			if entity_type == "Player":
+				return 1
+			else:
+				return 2
+	return -1
+
+# Returns the team number with the fewest players, breaking ties randomly
+func _get_balanced_team(teams: Array) -> int:
+	var min_count: int = team_counts[teams[0]]
+	for t: String in teams:
+		if team_counts[t] < min_count:
+			min_count = team_counts[t]
+	
+	# Collect all teams tied for the lowest count
+	var candidates: Array = []
+	for t: String in teams:
+		if team_counts[t] == min_count:
+			candidates.append(t)
+	
+	var chosen: String = candidates[randi() % candidates.size()]
+	team_counts[chosen] += 1
+	return int(chosen)
 
 # Handles the countdown timer and smoothly pans the spectator camera to the killer.
 func _process(delta: float) -> void:

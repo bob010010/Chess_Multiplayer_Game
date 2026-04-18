@@ -109,6 +109,7 @@ func apply_recoil(force: Vector2) -> void:
 # Auto kills anything outside the bounds
 func kill_if_outside_bounds() -> bool:
 	if not AbilityUtils.is_position_within_map(get_tree().current_scene, global_position):
+		print("KIlled")
 		health_component.take_damage(99999999999, "", true)
 		return true
 	return false

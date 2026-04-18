@@ -93,8 +93,12 @@ func join_game() -> void:
 	var ip_to_join: String = ip_label.text
 	if ip_to_join == "":
 		ip_to_join = "127.0.0.1"
+	
+	var err: Error = peer.create_client(ip_to_join, PORT)
+	if err != OK:
+		printerr("Failed to connect to: ", ip_to_join, " — Error: ", error_string(err))
+		return
 		
-	peer.create_client(ip_to_join, PORT)
 	multiplayer.multiplayer_peer = peer
 
 	multiplayer.connected_to_server.connect(func() -> void:

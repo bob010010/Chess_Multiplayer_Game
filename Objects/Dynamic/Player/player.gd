@@ -58,10 +58,18 @@ func apply_team_color() -> void:
 
 # Processes server-side physics and calls local client input gathering.
 func _physics_process(delta: float) -> void:
-	if is_queued_for_deletion():
+	if is_queued_for_deletion() or not is_inside_tree():
+		return
+		
+	# Add this specific safety check:
+	if get_world_2d() == null or get_world_2d().space == RID():
 		return
 		
 	if name == str(multiplayer.get_unique_id()):
+		kill_if_outside_bounds()
+		if is_queued_for_deletion() or not is_inside_tree():
+			return
+			
 		if input_needed:
 			check_second_input_wof()
 			return
@@ -74,8 +82,6 @@ func _physics_process(delta: float) -> void:
 		check_second_ability_input()
 		check_shield_input()
 		check_switch_weapon_input()
-		
-		kill_if_outside_bounds()
 	
 	if multiplayer.is_server():
 		decrease_knockback(delta)

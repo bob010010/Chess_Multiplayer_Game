@@ -10,7 +10,6 @@
 [ext_resource type="PackedScene" uid="uid://mn3do3kj2f54" path="res://UI/Commands/command_console.tscn" id="3_qac2q"]
 [ext_resource type="Script" uid="uid://cld6n1qot4o2o" path="res://Main/multiplayer_handler.gd" id="4_4uyae"]
 [ext_resource type="Texture2D" uid="uid://qi3wm6wmyrwx" path="res://images/Projectiles/pinRed.png" id="4_f3gf5"]
-[ext_resource type="Texture2D" uid="uid://dnmkrpbyhlmyi" path="res://images/HowToPlay/r-key.png" id="4_f6fdm"]
 [ext_resource type="Script" uid="uid://cx4o8l16ouh2j" path="res://Spawning/spawning_projectiles.gd" id="4_lquwl"]
 [ext_resource type="Texture2D" uid="uid://cerywdswl8l1w" path="res://images/HowToPlay/mouse.png" id="4_rj11h"]
 [ext_resource type="Texture2D" uid="uid://cquod3ct8wdc4" path="res://images/Projectiles/pinBlue.png" id="5_0jx5h"]
@@ -38,6 +37,10 @@
 [ext_resource type="PackedScene" uid="uid://c7cu6gk13wi33" path="res://Objects/Dynamic/NPC/npc.tscn" id="19_wbdht"]
 [ext_resource type="Texture2D" uid="uid://key2o8vh1iqp" path="res://images/chess-pieces/white-shadow_knight.png" id="28_bm08s"]
 [ext_resource type="Texture2D" uid="uid://bwtxs75vr3234" path="res://images/chess-pieces/white-holy_queen.png" id="29_8dfe0"]
+[ext_resource type="Texture2D" uid="uid://m004i75cigu0" path="res://images/HowToPlay/1-key.png" id="30_bm08s"]
+[ext_resource type="Texture2D" uid="uid://br2yawuf188ny" path="res://images/HowToPlay/2-key.png" id="31_8dfe0"]
+[ext_resource type="Texture2D" uid="uid://bjt0ikcr1fuk6" path="res://images/HowToPlay/promotion_button_example.png" id="33_gbm1g"]
+[ext_resource type="Script" uid="uid://2lr61aueyl58" path="res://UI/Bars/entity_bar.gd" id="34_nigqn"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_7mycd"]
 shader = ExtResource("2_lquwl")
@@ -79,11 +82,25 @@ expand_margin_bottom = 3.0
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8dfe0"]
 bg_color = Color(0.011764706, 0.011764706, 0.011764706, 1)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rj11h"]
-bg_color = Color(0.19215687, 0.17254902, 0.1764706, 1)
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_gbm1g"]
+bg_color = Color(0.3083999, 0.30839992, 0.30839977, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_f6fdm"]
 bg_color = Color(0.19320682, 0.17179596, 0.17566758, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_nigqn"]
+bg_color = Color(0.30980393, 0.30980393, 0.30980393, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vrhvj"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ahvxl"]
+bg_color = Color(0.54758173, 0.6549145, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_q5ft1"]
+bg_color = Color(0.30980393, 0.30980393, 0.30980393, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3g3t8"]
+bg_color = Color(0.30980393, 0.30980393, 0.30980393, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_l5bfp"]
 bg_color = Color(0.8509804, 0, 0, 0.33333334)
@@ -463,7 +480,7 @@ text = "1 Bot"
 icon_alignment = 2
 expand_icon = true
 
-[node name="ZombiesButton3" type="Button" parent="GameSelectionMenu/GameModeButtons" unique_id=190515056]
+[node name="ZombiesButton" type="Button" parent="GameSelectionMenu/GameModeButtons" unique_id=190515056]
 layout_mode = 2
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_colors/font_hover_color = Color(0, 0, 0, 1)
@@ -975,29 +992,19 @@ offset_right = -1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="HowToPlayButtons" type="Panel" parent="HowToPlay" unique_id=232176575]
-anchors_preset = 8
-anchor_left = 0.5
+[node name="1-Key" type="TextureRect" parent="HowToPlay" unique_id=1629867472]
+anchors_preset = 4
 anchor_top = 0.5
-anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -100.0
-offset_top = -200.0
-offset_right = 100.0
-grow_horizontal = 2
+offset_left = 38.14
+offset_top = -139.015
+offset_right = 108.14
+offset_bottom = -67.01514
 grow_vertical = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_rj11h")
-
-[node name="R-Key" type="TextureRect" parent="HowToPlay/HowToPlayButtons" unique_id=1629867472]
-layout_mode = 1
-offset_left = 5.0
-offset_top = 5.0
-offset_right = 75.0
-offset_bottom = 77.0
-texture = ExtResource("4_f6fdm")
+texture = ExtResource("30_bm08s")
 expand_mode = 1
 
-[node name="KeyLabel" type="Label" parent="HowToPlay/HowToPlayButtons/R-Key" unique_id=654151273]
+[node name="KeyLabel" type="Label" parent="HowToPlay/1-Key" unique_id=654151273]
 layout_mode = 1
 anchors_preset = 7
 anchor_left = 0.5
@@ -1010,20 +1017,38 @@ offset_right = 20.0
 offset_bottom = 21.235046
 grow_horizontal = 2
 grow_vertical = 0
-text = "Use Shield"
+theme_override_styles/normal = SubResource("StyleBoxFlat_gbm1g")
+text = "Use first Ability"
+horizontal_alignment = 1
 
-[node name="WASDLabel" type="Label" parent="HowToPlay/HowToPlayButtons" unique_id=535143620]
-layout_mode = 1
+[node name="2-Key" type="TextureRect" parent="HowToPlay" unique_id=763365750]
 anchors_preset = 4
 anchor_top = 0.5
 anchor_bottom = 0.5
-offset_left = 5.0
-offset_top = 6.5
-offset_right = 133.0
-offset_bottom = 34.5
+offset_left = 38.14
+offset_top = -36.0
+offset_right = 108.14
+offset_bottom = 36.0
 grow_vertical = 2
-theme_override_font_sizes/font_size = 20
-text = "WASD - Move"
+texture = ExtResource("31_8dfe0")
+expand_mode = 1
+
+[node name="KeyLabel" type="Label" parent="HowToPlay/2-Key" unique_id=751989138]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -20.0
+offset_top = -1.7649994
+offset_right = 20.0
+offset_bottom = 21.235046
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_styles/normal = SubResource("StyleBoxFlat_gbm1g")
+text = "Use second Ability"
+horizontal_alignment = 1
 
 [node name="HowToPlayMouse" type="Panel" parent="HowToPlay" unique_id=1480650102]
 anchors_preset = 8
@@ -1031,10 +1056,10 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -150.0
-offset_top = 50.0
-offset_right = 150.0
-offset_bottom = 200.0
+offset_left = 395.0
+offset_top = -112.0
+offset_right = 695.0
+offset_bottom = 38.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_f6fdm")
@@ -1063,19 +1088,22 @@ grow_vertical = 2
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0, 0, 1)
 theme_override_font_sizes/font_size = 20
-text = "Melee Attack"
+text = "Attack"
+horizontal_alignment = 1
 
 [node name="MouseButton3" type="Label" parent="HowToPlay/HowToPlayMouse/MouseImage/HBoxContainer" unique_id=1229924743]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.8, 0.24705882, 0.54509807, 1)
 theme_override_font_sizes/font_size = 20
-text = "Use first ability"
+text = "N/A"
+horizontal_alignment = 1
 
 [node name="MouseButton2" type="Label" parent="HowToPlay/HowToPlayMouse/MouseImage/HBoxContainer" unique_id=718294132]
 layout_mode = 2
 theme_override_colors/font_color = Color(0, 0, 1, 1)
 theme_override_font_sizes/font_size = 20
-text = "Ranged Attack"
+text = "N/A"
+horizontal_alignment = 1
 
 [node name="BackButton" type="Button" parent="HowToPlay" unique_id=1988477265]
 offset_left = 5.0
@@ -1085,6 +1113,93 @@ offset_bottom = 46.0
 theme_override_styles/normal = ExtResource("17_7k2ad")
 theme_override_styles/hover = ExtResource("16_28m4a")
 text = "Back"
+
+[node name="Player" type="TextureRect" parent="HowToPlay" unique_id=563720036]
+self_modulate = Color(0, 1, 0, 1)
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -64.0
+offset_top = -64.0
+offset_right = 64.0
+offset_bottom = 64.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("17_bq3qr")
+
+[node name="PromotionButton" type="TextureRect" parent="HowToPlay/Player" unique_id=1548939582]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -51.5
+offset_top = -182.945
+offset_right = 51.5
+offset_bottom = -51.945007
+grow_horizontal = 2
+texture = ExtResource("33_gbm1g")
+
+[node name="PromotionLabel" type="Label" parent="HowToPlay/Player/PromotionButton" unique_id=225693080]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -204.0
+offset_top = -25.755
+offset_right = 204.0
+offset_bottom = -2.7549992
+grow_horizontal = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_nigqn")
+text = "These buttons show which classes you can change to"
+horizontal_alignment = 1
+
+[node name="HealthBar" type="ProgressBar" parent="HowToPlay/Player" unique_id=1866443152]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -25.0
+offset_top = 14.0
+offset_right = 25.0
+offset_bottom = 24.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_styles/background = SubResource("StyleBoxFlat_vrhvj")
+theme_override_styles/fill = SubResource("StyleBoxFlat_ahvxl")
+value = 50.0
+show_percentage = false
+script = ExtResource("34_nigqn")
+metadata/_custom_type_script = "uid://2lr61aueyl58"
+
+[node name="HealthBarLabel" type="Label" parent="HowToPlay/Player/HealthBar" unique_id=1487760072]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -171.0
+offset_top = 9.684999
+offset_right = 171.0
+offset_bottom = 32.684998
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_styles/normal = SubResource("StyleBoxFlat_q5ft1")
+text = "The health bar shows your remaining health"
+horizontal_alignment = 1
+
+[node name="TeamLabel" type="Label" parent="HowToPlay/Player" unique_id=1836434136]
+layout_mode = 0
+offset_left = -151.0
+offset_top = 65.0
+offset_right = 17.0
+offset_bottom = 88.0
+theme_override_styles/normal = SubResource("StyleBoxFlat_3g3t8")
+text = "Green - On your team"
 
 [node name="RespawnLayer" type="CanvasLayer" parent="." unique_id=2044515707]
 visible = false

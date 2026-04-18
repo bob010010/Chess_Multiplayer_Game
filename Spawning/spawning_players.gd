@@ -2,6 +2,7 @@ extends Node2D
 
 @export var player_scene: PackedScene = preload("res://Objects/Dynamic/Player/player.tscn")
 
+@onready var main: Main = get_parent()
 
 # Instantiates a player node using the technical peer ID as its unique name.
 func add_player(id: int, start_score: int = 0) -> void:
@@ -15,19 +16,18 @@ func add_player(id: int, start_score: int = 0) -> void:
 		player_instance.player_username = "Guest_" + str(id)
 	
 	var arena_half: float = owner.setup_handler.arena_size / 2.0 - 50.0
-	player_instance.position = Vector2(randf_range(-arena_half, arena_half), randf_range(-arena_half, arena_half))
+	player_instance.global_position = Vector2(randf_range(-arena_half, arena_half), randf_range(-arena_half, arena_half))
+	
+	if not AbilityUtils.is_position_within_map(get_tree().current_scene, player_instance.global_position):
+		printerr("Outside map")
+		return
 	
 	if start_score > 0: # Gives the player score when they start
 		player_instance.ready.connect(func() -> void: _apply_start_score(player_instance, start_score))
 	
 	player_instance.ready.connect(func() -> void: apply_spawn_immunity(player_instance, get_tree().current_scene.setup_handler.spawn_immunity_time))
 	
-	match owner.setup_handler.game_type:
-		"FFA":
-			player_instance.team_id = 1 if id == 1 else get_child_count() + 1
-		"2_Teams":
-			player_instance.team_id = 1 if id == 1 else (get_child_count() % 2) + 1 #TODO change this to be fair
-	
+	player_instance.team_id = main.get_team_from_game_type("Player")
 	
 	#printerr("REAL NAME: " + str(player_instance.name))
 	#printerr("Username: " + player_instance.player_username)
